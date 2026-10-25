@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
-import { Download } from "lucide-react";
+import { CheckCircle2, Clock, Download, Eye, ShieldCheck, Sparkles } from "lucide-react";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { FaqAccordion } from "@/components/shared/faq-accordion";
 import { JsonLdScript } from "@/components/shared/json-ld";
@@ -128,50 +128,101 @@ export async function PaperPage({
             ))}
         </dl>
 
-        {/* MINIMAL REFINED DOWNLOAD ACTION CARD */}
-        <div className="my-6 space-y-4 sm:my-8">
-          <div className="border-2 border-border bg-card p-5 sm:p-6 shadow-hard">
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2.5 border-b-2 border-border/30 pb-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="eyebrow flex items-center gap-1.5 border border-border bg-accent/15 px-2.5 py-0.5 text-xs font-bold text-accent">
-                    <Download className="size-3.5" aria-hidden="true" />
-                    Official Question Paper
-                  </span>
-                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Clean vault copy · Fast download
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <BookmarkButton slug={slug} size="sm" />
-                  <ReportDialog slug={slug} />
-                </div>
-              </div>
+        {/* PREMIUM HIGH-IMPACT DOWNLOAD ACTION HERO */}
+        <section
+          aria-label="Download paper"
+          className="my-8 overflow-hidden border-2 border-border bg-card shadow-hard-lg"
+        >
+          {/* TOP CONTRAST HEADER RIBBON */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-border bg-muted/60 px-4 py-3 sm:px-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 border-2 border-border bg-primary px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm">
+                <ShieldCheck className="size-3.5" aria-hidden="true" />
+                Verified Vault Copy
+              </span>
+              <span className="hidden sm:inline-flex items-center gap-1.5 border border-border/80 bg-background px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-foreground">
+                <Sparkles className="size-3.5 text-accent" aria-hidden="true" />
+                Clean &amp; Watermark-Free
+              </span>
+            </div>
 
-              <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
-                <p className="max-w-md text-xs sm:text-sm text-muted-foreground">
-                  {ready
-                    ? "Direct download with automated verification and interactive PDF reader."
-                    : "We are preparing this PDF with our cover pages. It will be available shortly."}
-                </p>
-
-                {ready ? (
-                  <Link
-                    href={routes.download(slug)}
-                    className="inline-flex h-11 sm:h-12 w-full sm:w-auto sm:min-w-[200px] shrink-0 items-center justify-center gap-2.5 border-2 border-border bg-primary px-6 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm transition-all hover:bg-primary/90 hover:shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5"
-                  >
-                    <Download className="size-4.5" aria-hidden="true" />
-                    <span>Download PDF</span>
-                  </Link>
-                ) : (
-                  <div className="inline-flex h-11 sm:h-12 w-full sm:w-auto sm:min-w-[180px] shrink-0 items-center justify-center gap-2 border-2 border-border bg-muted px-6 text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                    <Download className="size-4" aria-hidden="true" /> PDF coming soon
-                  </div>
-                )}
-              </div>
+            <div className="flex items-center gap-2">
+              <BookmarkButton slug={slug} size="sm" />
+              <ReportDialog slug={slug} variant="outline" size="sm" />
             </div>
           </div>
-        </div>
+
+          {/* MAIN ACTION BODY */}
+          <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-8">
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h2 className="font-display text-2xl uppercase leading-none tracking-tight sm:text-3xl text-foreground">
+                    {ready ? "Instant PDF Download" : "PDF In Preparation"}
+                  </h2>
+                  {p.pages && (
+                    <span className="border-2 border-border bg-accent px-2 py-0.5 text-xs font-bold uppercase text-accent-foreground shadow-hard-sm">
+                      {p.pages} Pages
+                    </span>
+                  )}
+                </div>
+                <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
+                  {ready
+                    ? "Complete official question paper. Cleaned, formatted and optimized for fast mobile reading or high-quality printing."
+                    : "We are currently formatting this official question paper with our clean cover pages. It will be ready shortly."}
+                </p>
+              </div>
+
+              {/* TRUST HIGHLIGHTS ROW */}
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-2 pt-1 text-xs font-bold uppercase tracking-wide text-foreground">
+                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                  <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
+                  Fast Direct CDN
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                  <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
+                  Print-Ready Vector
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+                  <CheckCircle2 className="size-4 text-primary" aria-hidden="true" />
+                  100% Free
+                </span>
+              </div>
+            </div>
+
+            {/* ACTION BUTTON GROUP */}
+            <div className="flex flex-col gap-2.5 sm:min-w-[240px]">
+              {ready ? (
+                <Link
+                  href={routes.download(slug)}
+                  className="inline-flex h-13 sm:h-14 w-full items-center justify-center gap-3 border-2 border-border bg-primary px-7 text-sm sm:text-base font-bold uppercase tracking-wider text-primary-foreground shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg hover:bg-primary/95 active:translate-x-0.5 active:translate-y-0.5"
+                >
+                  <Download className="size-5 shrink-0" aria-hidden="true" />
+                  <span>Download PDF</span>
+                </Link>
+              ) : (
+                <div className="inline-flex h-13 sm:h-14 w-full items-center justify-center gap-2.5 border-2 border-border bg-muted px-7 text-xs sm:text-sm font-bold uppercase tracking-wide text-muted-foreground">
+                  <Clock className="size-4.5 shrink-0" aria-hidden="true" />
+                  <span>PDF Coming Soon</span>
+                </div>
+              )}
+
+              {p.content_excerpt && (
+                <a
+                  href="#excerpt-heading"
+                  className="inline-flex h-9 w-full items-center justify-center gap-2 border-2 border-border bg-background px-3 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-muted hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5"
+                >
+                  <Eye className="size-3.5" aria-hidden="true" />
+                  <span>Read Preview Online</span>
+                </a>
+              )}
+
+              <p className="text-center font-mono text-[11px] font-medium text-muted-foreground">
+                ⚡ Direct link · Free account
+              </p>
+            </div>
+          </div>
+        </section>
       </header>
 
       <section aria-labelledby="about-heading" className="max-w-5xl space-y-5">

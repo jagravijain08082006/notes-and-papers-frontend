@@ -30,8 +30,17 @@ const schema = z.object({
 });
 type Values = z.infer<typeof schema>;
 
-/** Native <dialog>: focus trap, Escape to close and backdrop come from the browser. */
-export function ReportDialog({ slug }: { slug: string }) {
+export function ReportDialog({
+  slug,
+  variant = "ghost",
+  size = "sm",
+  className,
+}: {
+  slug: string;
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "destructive" | "link";
+  size?: "sm" | "md" | "lg" | "icon";
+  className?: string;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   // Drive the native dialog from state so event handlers never touch the ref during render.
@@ -71,8 +80,8 @@ export function ReportDialog({ slug }: { slug: string }) {
 
   return (
     <>
-      <Button variant="ghost" size="sm" onClick={() => setOpen(true)}>
-        <Flag className="size-4" aria-hidden="true" /> Report a problem
+      <Button variant={variant} size={size} className={className} onClick={() => setOpen(true)}>
+        <Flag className="size-3.5" aria-hidden="true" /> Report
       </Button>
       <dialog
         ref={ref}
