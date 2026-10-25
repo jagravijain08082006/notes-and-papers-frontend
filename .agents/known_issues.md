@@ -11,6 +11,8 @@
 - **Mobile layout overflow in admin & search (Resolved):** Search bar dropdown positioning, sticky filters, and wide table containers across admin views now enforce strict responsive breakpoints (`overflow-x-auto`, `w-full`, and bounded popovers).
 - **Mobile PaperCard viewport overflow (Resolved):** Added `overflow-x: hidden; max-width: 100vw;` to `html, body`, constrained `PaperList` and `PaperCard` with `grid-cols-1 w-full min-w-0 max-w-full`, and added `break-words` on titles.
 - **Search dropdown empty state (Resolved):** Dropdown popup now completely hides when the input is empty and no recent searches are saved in `localStorage`.
-- **Exam year papers cards redesign (Resolved):** Replaced cramped single-container table rows on `/exams/[slug]` with spacious, prominent individual neo-brutalist cards with generous spacing, prominent tags, and hover lift.
+- **Googlebot Host directive warning (Resolved):** Google Search Console flagged non-standard `Host:` directive in `robots.txt`. Removed from `src/app/robots.ts` so Googlebot parses directives cleanly with zero warnings.
+- **Dynamic sitemap localhost:3010 leak (Resolved):** Sitemaps were resolving base URL from fallback during build. Refactored `sitemap.xml` and `/sitemaps/[type]/[file]` to dynamically derive `baseUrl` from incoming `req.url` request origin, ensuring all 4,139+ paper URLs emit canonical `https://notesandpapers.dpdns.org`.
+- **Paper download action hero redesign (Resolved):** Paper download card was low-contrast and awkward. Replaced with high-impact hero section with verified vault & watermark-free badges, matched outline bookmark/report buttons, trust indicators, large CTA, and online preview link.
 
 
