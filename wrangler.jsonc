@@ -27,9 +27,18 @@
 	],
 	// Variables and secrets set in the Cloudflare dashboard (INDEXNOW_KEY, REVALIDATE_SECRET) survive every deploy.
 	"keep_vars": true,
+	"routes": [
+		{
+			"pattern": "notesandpapers.dpdns.org",
+			"custom_domain": true
+		}
+	],
+	"vars": {
+		"INDEXNOW_KEY": "d8e8d88bcb06e2901c2031fe56889b39",
+		"NEXT_PUBLIC_SITE_URL": "https://notesandpapers.dpdns.org",
+		"NEXT_PUBLIC_API_URL": "https://backend.notesandpapers.dpdns.org/api/v1"
+	},
 	"observability": {
 		"enabled": true
 	}
-	// Secrets (never put these here): npx wrangler secret put REVALIDATE_SECRET / INDEXNOW_KEY
-	// Public settings (NEXT_PUBLIC_*) are baked in at build time: see .env.production.example
 }

@@ -25,11 +25,11 @@ export const STATIC_PATHS = [
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-export function urlsetXml(entries: SitemapEntry[]) {
+export function urlsetXml(entries: SitemapEntry[], base: string = SITE_URL) {
   const body = entries
     .map(
       (e) =>
-        `<url><loc>${esc(SITE_URL + (e.path === "/" ? "" : e.path))}</loc><lastmod>${esc(e.lastmod)}</lastmod></url>`,
+        `<url><loc>${esc(base + (e.path === "/" ? "" : e.path))}</loc><lastmod>${esc(e.lastmod)}</lastmod></url>`,
     )
     .join("");
   return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}</urlset>`;
