@@ -25,11 +25,13 @@
 - **ProsePage (legal/static pages):** src/components/shared/prose-page.tsx
 
 - **UserMenu / SignOutButton / DevLoginForm:** src/components/shared/{user-menu,sign-out-button,dev-login-form}.tsx
-- **BookmarkButton / ReportDialog / PdfPreview:** src/components/shared/{bookmark-button,report-dialog,pdf-preview}.tsx
+- **BookmarkButton / ReportDialog (supports variant, size) / PdfPreview:** src/components/shared/{bookmark-button,report-dialog,pdf-preview}.tsx
+- **PaperPage (high-impact hero download card + trust badges):** src/components/shared/paper-page.tsx
 - **UploadForm / ContactForm:** src/components/shared/{upload-form,contact-form}.tsx
 
 ## admin (src/components/admin)
-- **AdminNav, NoPermission, DataTable, StatCard, BarChart, StatusBadge, PageHeader, SearchForm, Select:** admin-nav.tsx, no-permission.tsx, data-table.tsx, ui.tsx
+- **AdminNav, NoPermission, DataTable (min-w-[54rem] scroll-slim), StatCard, BarChart, StatusBadge, PageHeader, SearchForm (uniform h-11), Select:** admin-nav.tsx, no-permission.tsx, data-table.tsx, ui.tsx
+- **InstantSyncButton (GitHub Actions daily-sync trigger with toast):** instant-sync-button.tsx
 - **AdminAction (button -> API -> toast -> refresh):** admin-action.tsx
 - **ReviewEditor, SourceCard, NewSourceForm, SettingsForm, UserControls, content-editors:** matching files
 

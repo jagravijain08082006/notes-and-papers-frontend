@@ -1,15 +1,16 @@
 # Deployment (frontend)
 
-Last updated: 2026-10-19. Read this before changing anything about hosting.
+Last updated: 2026-10-25.
 
 ## Status
 
 | Part | State |
 |---|---|
-| Frontend | **Live** on Cloudflare Workers: https://notes-and-papers.thecodinggiant.workers.dev |
-| Backend (FastAPI) + Postgres | **Not hosted yet.** They run only on the developer's PC. The live site therefore shows no data (empty lists, error page on course/paper pages). |
-| Custom domain | None yet (only the free `workers.dev` address). |
-| `NEXT_PUBLIC_SITE_URL` baked into the live build | Still the placeholder `https://notes-and-papers.workers.dev`, so canonical links, sitemap and share previews use the wrong address. Fix: set it to the real address in `.env.production` and redeploy. |
+| Frontend | **Live** on Cloudflare Workers on custom domain: [https://notesandpapers.dpdns.org](https://notesandpapers.dpdns.org) |
+| Backend (FastAPI) + Postgres | **Live** on Render: [https://backend.notesandpapers.dpdns.org/health](https://backend.notesandpapers.dpdns.org/health) with Supabase PostgreSQL session pooler. |
+| Custom domain | Configured in `wrangler.jsonc` under `routes`: `notesandpapers.dpdns.org` (`custom_domain: true`). |
+| Production Environment | `NEXT_PUBLIC_SITE_URL=https://notesandpapers.dpdns.org`, `NEXT_PUBLIC_API_URL=https://backend.notesandpapers.dpdns.org/api/v1`, `INDEXNOW_KEY=d8e8d88bcb06e2901c2031fe56889b39` configured in `wrangler.jsonc` vars and runtime env fallbacks. |
+| Google Search Console | Ownership verified via HTML meta tag `6kg8ml3F16HFts5p3ygtf5Kpr93ve4XNjX5fcRVbPl8`. Sitemaps resolved dynamically. |
 
 ## Why Cloudflare
 
