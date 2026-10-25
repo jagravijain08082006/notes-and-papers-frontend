@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { useBookmarkSlugs, useToggleBookmark } from "@/hooks/use-bookmarks";
 import { useMe } from "@/hooks/use-me";
 
-export function BookmarkButton({ slug }: { slug: string }) {
+export function BookmarkButton({
+  slug,
+  size = "md",
+}: {
+  slug: string;
+  size?: "sm" | "md" | "lg";
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const { data: me, isPending } = useMe();
@@ -22,11 +28,11 @@ export function BookmarkButton({ slug }: { slug: string }) {
   return (
     <Button
       variant="outline"
-      size="lg"
+      size={size}
       onClick={onClick}
       disabled={isPending || toggle.isPending}
       aria-pressed={isSaved}
-      className="w-full sm:w-auto"
+      className="shrink-0"
     >
       {isSaved ? (
         <BookmarkCheck className="size-4" aria-hidden="true" />

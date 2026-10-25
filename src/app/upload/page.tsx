@@ -17,7 +17,9 @@ export default async function UploadPage() {
   if (!(await getFeatures()).uploads) {
     return (
       <div className="mx-auto max-w-2xl space-y-6">
-        <h1 className="text-5xl sm:text-6xl">Upload a paper or notes</h1>
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-tight">
+          Upload a paper or notes
+        </h1>
         <EmptyState
           title="Uploads are paused"
           description="Uploads are paused for now and will return later."
@@ -30,7 +32,9 @@ export default async function UploadPage() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <header className="space-y-1">
-        <h1 className="text-5xl sm:text-6xl">Upload a paper or notes</h1>
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-tight">
+          Upload a paper or notes
+        </h1>
         <p className="text-muted-foreground">
           Share previous year papers or your own notes. Every upload is reviewed by a moderator
           before it is published. Only upload material you have the right to share.

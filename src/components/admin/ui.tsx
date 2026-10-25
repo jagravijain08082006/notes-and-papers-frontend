@@ -2,6 +2,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Select as UiSelect } from "@/components/ui/select";
+import { Search } from "lucide-react";
+
+export { InstantSyncButton } from "@/components/admin/instant-sync-button";
 
 const TONES: Record<string, string> = {
   published: "bg-success/15 text-success",
@@ -21,7 +24,9 @@ const TONES: Record<string, string> = {
 
 export function StatusBadge({ status }: { status: string }) {
   return (
-    <Badge className={cn("whitespace-nowrap", TONES[status])}>{status.replace(/_/g, " ")}</Badge>
+    <Badge className={cn("whitespace-nowrap font-bold", TONES[status])}>
+      {status.replace(/_/g, " ")}
+    </Badge>
   );
 }
 
@@ -37,18 +42,18 @@ export function StatCard({
   tone?: "warn" | "bad";
 }) {
   return (
-    <Card className="p-4">
-      <p className="text-sm text-muted-foreground">{label}</p>
+    <Card className="p-4 transition-all hover:shadow-hard">
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
       <p
         className={cn(
-          "mt-1 text-3xl font-bold tabular-nums",
+          "mt-2 text-3xl font-extrabold tabular-nums tracking-tight",
           tone === "warn" && "text-amber-600 dark:text-amber-400",
           tone === "bad" && "text-destructive",
         )}
       >
         {typeof value === "number" ? value.toLocaleString("en-IN") : value}
       </p>
-      {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+      {hint && <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>}
     </Card>
   );
 }
@@ -110,12 +115,14 @@ export function PageHeader({
   actions?: React.ReactNode;
 }) {
   return (
-    <header className="mb-10 flex flex-wrap items-end justify-between gap-5">
-      <div className="space-y-4">
-        <h1 className="text-4xl sm:text-5xl">{title}</h1>
-        {description && <p className="max-w-2xl text-sm text-muted-foreground">{description}</p>}
+    <header className="mb-8 flex flex-wrap items-end justify-between gap-4 min-w-0 max-w-full">
+      <div className="space-y-2 min-w-0 max-w-full">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl break-words leading-tight">{title}</h1>
+        {description && (
+          <p className="max-w-2xl text-xs sm:text-sm text-muted-foreground leading-relaxed">{description}</p>
+        )}
       </div>
-      {actions}
+      {actions && <div className="flex flex-wrap items-center gap-2.5">{actions}</div>}
     </header>
   );
 }
@@ -123,7 +130,7 @@ export function PageHeader({
 export function SearchForm({
   action,
   q,
-  placeholder = "Search",
+  placeholder = "Search...",
   hidden = {},
   children,
 }: {
@@ -133,28 +140,39 @@ export function SearchForm({
   hidden?: Record<string, string | undefined>;
   children?: React.ReactNode;
 }) {
+  const effectivePlaceholder = placeholder.trim() || "Search...";
   return (
-    <form action={action} role="search" className="mb-4 flex flex-wrap items-center gap-2">
+    <form
+      action={action}
+      role="search"
+      className="mb-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 min-w-0 max-w-full"
+    >
       {Object.entries(hidden).map(([k, v]) =>
         v ? <input key={k} type="hidden" name={k} value={v} /> : null,
       )}
-      <label htmlFor="admin-q" className="sr-only">
-        {placeholder}
-      </label>
-      <input
-        id="admin-q"
-        name="q"
-        defaultValue={q}
-        placeholder={placeholder}
-        maxLength={120}
-        className="h-10 min-w-48 flex-1 border-2 border-input bg-card font-medium focus-visible:shadow-hard-sm focus-visible:outline-none placeholder:font-normal placeholder:text-muted-foreground px-3 text-sm"
-      />
+      <div className="relative flex-1 min-w-0 sm:min-w-64">
+        <label htmlFor="admin-q" className="sr-only">
+          {effectivePlaceholder}
+        </label>
+        <Search
+          className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <input
+          id="admin-q"
+          name="q"
+          defaultValue={q}
+          placeholder={effectivePlaceholder}
+          maxLength={120}
+          className="h-11 w-full border-2 border-border bg-card pl-10 pr-3.5 text-sm font-medium text-foreground placeholder:font-normal placeholder:text-muted-foreground focus-visible:outline-none focus-visible:shadow-hard-sm transition-shadow"
+        />
+      </div>
       {children}
       <button
         type="submit"
-        className="h-10 border-2 border-border bg-primary px-4 text-xs font-bold uppercase tracking-wide text-primary-foreground shadow-hard-sm hover:shadow-hard"
+        className="h-11 w-full sm:w-auto shrink-0 border-2 border-border bg-primary px-6 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 transition-all flex items-center justify-center gap-1.5"
       >
-        Apply
+        <span>Apply</span>
       </button>
     </form>
   );
@@ -172,7 +190,7 @@ export function Select({
   label: string;
 }) {
   return (
-    <>
+    <div className="w-full sm:w-auto sm:min-w-48 shrink-0">
       <label htmlFor={`f-${name}`} className="sr-only">
         {label}
       </label>
@@ -180,7 +198,7 @@ export function Select({
         id={`f-${name}`}
         name={name}
         defaultValue={value ?? ""}
-        className="h-10 border-2 border-input bg-card font-medium focus-visible:shadow-hard-sm focus-visible:outline-none placeholder:font-normal placeholder:text-muted-foreground px-2 text-sm"
+        className="w-full"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -188,10 +206,11 @@ export function Select({
           </option>
         ))}
       </UiSelect>
-    </>
+    </div>
   );
 }
 
 export function fmtDate(v: string | null | undefined) {
   return v ? new Date(v).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }) : "-";
 }
+

@@ -42,6 +42,9 @@ export const metadata: Metadata = {
     ],
     apple: { url: "/favicon/apple-touch-icon.png", sizes: "180x180" },
   },
+  verification: {
+    google: "6kg8ml3F16HFts5p3ygtf5Kpr93ve4XNjX5fcRVbPl8",
+  },
 };
 
 export const viewport: Viewport = {
@@ -60,7 +63,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`${display.variable} ${body.variable} ${mono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "if(typeof __name==='undefined'){window.__name=function(t,n){return Object.defineProperty(t,'name',{value:n,configurable:!0})}}",
+          }}
+        />
+      </head>
+      <body className="flex min-h-full flex-col overflow-x-hidden">
         <Providers>
           <a
             href="#main"
@@ -70,7 +81,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </a>
           <OfflineBanner />
           <SiteHeader />
-          <main id="main" className="mx-auto w-full max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:py-14">
+          <main id="main" className="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-hidden px-3.5 py-8 sm:px-6 sm:py-10 lg:py-14">
             {children}
           </main>
           <SiteFooter />

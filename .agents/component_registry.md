@@ -11,8 +11,11 @@
 ## shared (molecules)
 - **Providers (theme, TanStack Query, Toaster):** src/components/shared/providers.tsx
 - **SiteHeader / SiteFooter / ThemeToggle / OfflineBanner:** src/components/shared/
-- **SearchBar (GET form + suggestions):** src/components/shared/search-bar.tsx
+- **SearchBar (GET form + suggestions, 800ms debounce, shimmer, local history):** src/components/shared/search-bar.tsx
 - **PaperCard / PaperList / PaperListSkeleton:** src/components/shared/paper-card.tsx, paper-list.tsx
+- **DownloadManager (countdown, auto-download, success state, embedded preview):** src/components/shared/download-manager.tsx
+- **ExamsCatalogView (domain tabs: All, University, Competitive, School Board):** src/components/shared/exams-catalog-view.tsx
+- **ExamsSection (dynamic home/exams showcase with active filters):** src/components/shared/exams-section.tsx
 - **Pagination (link based):** src/components/shared/pagination.tsx
 - **Breadcrumbs (+JSON-LD) / JsonLdScript:** src/components/shared/breadcrumbs.tsx, json-ld.tsx
 - **FaqAccordion (`<details>`):** src/components/shared/faq-accordion.tsx

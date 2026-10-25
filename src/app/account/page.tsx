@@ -42,7 +42,7 @@ export default async function AccountPage() {
             <p className="eyebrow inline-block bg-accent px-2 py-0.5 capitalize text-accent-foreground">
               {me.role}
             </p>
-            <h1 className="text-4xl sm:text-6xl">{me.display_name ?? "Student"}</h1>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-tight">{me.display_name ?? "Student"}</h1>
             <p className="text-sm text-muted-foreground">
               {me.email}
               {me.college ? ` · ${me.college}` : ""}

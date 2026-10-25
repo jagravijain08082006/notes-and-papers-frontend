@@ -49,7 +49,7 @@ async function load() {
   const [uni, latest, exams, stats] = await Promise.allSettled([
     getUniversities(),
     getLatestPapers(8),
-    getExams("exam"),
+    getExams(),
     getStats(),
   ]);
   return {
@@ -117,7 +117,7 @@ export default async function HomePage() {
           <p className="eyebrow inline-flex items-center gap-2 border-2 border-border bg-card px-2.5 py-1">
             <span className="size-2 bg-accent" aria-hidden="true" /> Open academic vault
           </p>
-          <h1 id="hero-heading" className="text-5xl sm:text-7xl lg:text-8xl">
+          <h1 id="hero-heading" className="text-4xl xs:text-5xl sm:text-7xl lg:text-8xl break-words leading-none">
             Previous year papers.
             <br />
             Turn study into{" "}
@@ -134,53 +134,79 @@ export default async function HomePage() {
           </p>
           <div className="max-w-2xl space-y-4">
             <SearchBar size="lg" />
-            <p className="flex flex-wrap items-center gap-2 text-sm">
-              <span className="eyebrow text-muted-foreground">Quick links</span>
-              {QUICK.map((q) => (
-                <Link
-                  key={q.label}
-                  href={q.href}
-                  className="border-2 border-border bg-card px-2.5 py-1 text-xs font-bold uppercase tracking-wide hover:bg-primary"
-                >
-                  {q.label}
-                </Link>
-              ))}
-            </p>
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <span className="eyebrow text-xs text-muted-foreground">Quick links:</span>
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                {QUICK.map((q) => (
+                  <Link
+                    key={q.label}
+                    href={q.href}
+                    className="border-2 border-border bg-card px-2.5 py-1 text-xs font-bold uppercase tracking-wide shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+                  >
+                    {q.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
-        <aside aria-label="Library at a glance" className="brutal space-y-6 p-6 lg:rotate-1">
-          <div className="flex items-center justify-between">
-            <p className="eyebrow">Vault metrics</p>
-            <span className="eyebrow flex items-center gap-1.5 bg-primary px-1.5 py-0.5">
-              <span className="size-1.5 bg-foreground" aria-hidden="true" /> Live
+        <aside
+          aria-label="Library at a glance"
+          className="brutal space-y-5 border-2 border-border bg-card p-5 shadow-hard-lg transition-transform sm:p-6 lg:rotate-1 hover:rotate-0"
+        >
+          <div className="flex items-center justify-between border-b-2 border-border pb-3">
+            <p className="eyebrow tracking-wider">Vault metrics</p>
+            <span className="eyebrow flex items-center gap-2 border-2 border-border bg-primary px-2 py-0.5 font-bold shadow-hard-sm">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-foreground opacity-75"></span>
+                <span className="relative inline-flex size-2 rounded-full bg-foreground"></span>
+              </span>
+              LIVE VAULT
             </span>
           </div>
-          <dl className="grid grid-cols-3 gap-3 text-center">
+          <dl className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
             {[
-              { v: totalPapers, l: "Papers" },
-              { v: courseCount, l: "Courses" },
-              { v: examCount, l: "Exams & boards" },
+              { v: totalPapers, l: "Papers", highlight: true },
+              { v: courseCount, l: "Courses", highlight: false },
+              { v: examCount, l: "Exams & boards", highlight: false },
             ].map((m) => (
-              <div key={m.l} className="border-2 border-border bg-background px-1 py-4">
-                <dd className="font-display text-4xl leading-[1.2]">
+              <div
+                key={m.l}
+                className={cn(
+                  "flex flex-col justify-between border-2 border-border p-2.5 sm:p-3.5 transition-all shadow-hard-sm",
+                  m.highlight ? "bg-primary text-primary-foreground" : "bg-background",
+                )}
+              >
+                <dd className="font-display text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-tight whitespace-nowrap">
                   {m.v.toLocaleString("en-IN")}
                 </dd>
-                <dt className="eyebrow mt-2 text-muted-foreground">{m.l}</dt>
+                <dt className="eyebrow mt-1 text-[10px] sm:text-xs text-foreground/80 truncate">
+                  {m.l}
+                </dt>
               </div>
             ))}
           </dl>
-          <ul className="space-y-2 text-sm font-medium">
-            <li className="flex items-center gap-2">
-              <ShieldCheck className="size-4" aria-hidden="true" /> Clean PDFs, hosted by us
+          <ul className="space-y-2.5 text-xs sm:text-sm font-medium border-t-2 border-border/40 pt-3">
+            <li className="flex items-center gap-2.5">
+              <span className="grid size-5 shrink-0 place-items-center border border-border bg-primary">
+                <ShieldCheck className="size-3.5" aria-hidden="true" />
+              </span>
+              <span>Clean, watermark-free PDFs</span>
             </li>
-            <li className="flex items-center gap-2">
-              <Download className="size-4" aria-hidden="true" /> Free download with an account
+            <li className="flex items-center gap-2.5">
+              <span className="grid size-5 shrink-0 place-items-center border border-border bg-accent text-accent-foreground">
+                <Download className="size-3.5" aria-hidden="true" />
+              </span>
+              <span>Free downloads with account</span>
             </li>
           </ul>
           <Link
-            href={routes.exams}
-            className={cn(buttonVariants({ variant: "outline" }), "w-full")}
+            href={routes.universities}
+            className={cn(
+              buttonVariants({ variant: "outline", size: "lg" }),
+              "w-full uppercase font-bold tracking-wider shadow-hard-sm hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5",
+            )}
           >
             Explore the catalog <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
@@ -188,26 +214,26 @@ export default async function HomePage() {
       </section>
 
       {/* CATEGORIES */}
-      <section aria-labelledby="cat-heading" className="space-y-8">
-        <div className="space-y-2">
+      <section aria-labelledby="cat-heading" className="space-y-8 w-full min-w-0 max-w-full">
+        <div className="space-y-2 min-w-0">
           <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground">
             Start here
           </p>
-          <h2 id="cat-heading" className="text-4xl sm:text-5xl">
+          <h2 id="cat-heading" className="text-3xl sm:text-4xl lg:text-5xl break-words leading-none">
             Explore the vault by category
           </h2>
         </div>
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4 w-full min-w-0 max-w-full">
           {categories.map((c) => (
-            <li key={c.title}>
-              <Link href={c.href} className="brutal brutal-hover flex h-full flex-col gap-5 p-6">
+            <li key={c.title} className="w-full min-w-0 max-w-full">
+              <Link href={c.href} className="brutal brutal-hover flex h-full flex-col gap-5 p-5 sm:p-6 bg-card w-full min-w-0">
                 <span
-                  className={`grid size-14 place-items-center border-2 border-border ${c.tone}`}
+                  className={`grid size-12 sm:size-14 place-items-center border-2 border-border ${c.tone}`}
                 >
-                  <c.icon className="size-7" aria-hidden="true" />
+                  <c.icon className="size-6 sm:size-7" aria-hidden="true" />
                 </span>
-                <span className="space-y-2">
-                  <span className="block font-display text-3xl uppercase leading-[1.2]">
+                <span className="space-y-2 min-w-0">
+                  <span className="block font-display text-2xl sm:text-3xl uppercase leading-[1.2] break-words">
                     {c.title}
                   </span>
                   <span className="block text-sm text-muted-foreground">{c.text}</span>

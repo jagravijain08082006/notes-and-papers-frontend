@@ -21,7 +21,7 @@ export default async function DownloadsPage(props: PageProps<"/downloads">) {
   );
   return (
     <div className="space-y-6">
-      <h1 className="text-5xl sm:text-6xl">Download history</h1>
+      <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-tight">Download history</h1>
       {data.items.length === 0 ? (
         <EmptyState
           title="No downloads yet"

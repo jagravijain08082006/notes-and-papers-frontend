@@ -47,7 +47,7 @@ export default async function UsersPage(props: PageProps<"/admin/users">) {
         title="Users"
         description="Change roles and ban abusive accounts. Emails live in Supabase Auth."
       />
-      <SearchForm action="/admin/users" placeholder="">
+      <SearchForm action="/admin/users" placeholder="Search users by name, role or ID...">
         <Select
           name="role"
           label="Role"

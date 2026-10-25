@@ -41,8 +41,8 @@ export default async function NotesPage(props: PageProps<"/notes">) {
   return (
     <div className="space-y-6">
       <header className="space-y-3">
-        <h1 className="text-5xl sm:text-6xl">Notes</h1>
-        <form action="/notes" role="search" className="flex max-w-xl gap-2">
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-tight">Notes</h1>
+        <form action="/notes" role="search" className="flex flex-col sm:flex-row max-w-xl gap-2">
           <label htmlFor="notes-q" className="sr-only">
             Search notes
           </label>
@@ -55,7 +55,7 @@ export default async function NotesPage(props: PageProps<"/notes">) {
             className="h-10 w-full border-2 border-input bg-card font-medium focus-visible:shadow-hard-sm focus-visible:outline-none placeholder:font-normal placeholder:text-muted-foreground px-3 text-sm"
           />
           <button
-            className="h-10 border-2 border-border bg-primary px-4 text-xs font-bold uppercase tracking-wide text-primary-foreground shadow-hard-sm hover:shadow-hard"
+            className="h-10 w-full sm:w-auto border-2 border-border bg-primary px-5 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
             type="submit"
           >
             Search

@@ -16,17 +16,18 @@ import {
   type SearchQuery,
 } from "@/services/queries";
 
+const CATALOG_STALE_TIME = 300_000; // 5 minutes
+
 /**
  * `initial` is the server-rendered copy (so the HTML has real content for search engines and no-JS visitors).
- * `refetchOnMount: "always"` then asks the JSON API for fresh data as soon as the page is interactive.
+ * Reuses server-rendered data for 5 minutes instead of immediately firing duplicate API calls on mount.
  */
 export function useUniversities(initial?: UniversityListItem[] | null) {
   return useQuery({
     queryKey: ["universities"],
     queryFn: ({ signal }) => fetchUniversities(signal),
     initialData: initial ?? undefined,
-    refetchOnMount: "always",
-    staleTime: 0,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
@@ -35,18 +36,21 @@ export function useExams(kind: ExamSummary["kind"] | undefined, initial?: ExamSu
     queryKey: ["exams", kind ?? "all"],
     queryFn: ({ signal }) => fetchExams(kind, signal),
     initialData: initial ?? undefined,
-    refetchOnMount: "always",
-    staleTime: 0,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 
-export function useLatestPapers(size: number, initial?: Paginated<PaperSummary> | null) {
+export function useLatestPapers(
+  size: number,
+  page: number = 1,
+  initial?: Paginated<PaperSummary> | null,
+) {
   return useQuery({
-    queryKey: ["papers", "latest", size],
-    queryFn: ({ signal }) => fetchPapers({ sort: "latest", page: 1, size }, signal),
-    initialData: initial ?? undefined,
-    refetchOnMount: "always",
-    staleTime: 0,
+    queryKey: ["papers", "latest", size, page],
+    queryFn: ({ signal }) => fetchPapers({ sort: "latest", page, size }, signal),
+    initialData: page === 1 ? (initial ?? undefined) : undefined,
+    placeholderData: keepPreviousData,
+    staleTime: CATALOG_STALE_TIME,
   });
 }
 

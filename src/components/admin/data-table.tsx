@@ -52,11 +52,11 @@ export function DataTable<T>({
 }: DataTableProps<T>) {
   if (rows.length === 0) return <EmptyState title={emptyTitle} description={emptyDescription} />;
   return (
-    <div className="space-y-3">
-      <div className="scroll-slim overflow-x-auto border-2 border-border bg-card">
-        <table className="w-full min-w-[40rem] text-left text-sm">
+    <div className="space-y-3 min-w-0 max-w-full">
+      <div className="scroll-slim overflow-x-auto border-2 border-border bg-card shadow-hard-sm [-webkit-overflow-scrolling:touch]">
+        <table className="w-full min-w-[54rem] text-left text-sm border-collapse">
           <caption className="sr-only">{caption}</caption>
-          <thead className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
+          <thead className="bg-muted/80 text-xs uppercase tracking-wider font-bold text-foreground border-b-2 border-border">
             <tr>
               {columns.map((c) => {
                 const active = c.sortKey && sort === c.sortKey;
@@ -66,7 +66,7 @@ export function DataTable<T>({
                     key={c.key}
                     scope="col"
                     aria-sort={active ? (order === "asc" ? "ascending" : "descending") : undefined}
-                    className={`px-3 py-2 font-medium ${c.className ?? ""}`}
+                    className={`px-4 py-3 font-semibold whitespace-nowrap ${c.className ?? ""}`}
                   >
                     {c.sortKey ? (
                       <Link
@@ -94,11 +94,11 @@ export function DataTable<T>({
               })}
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="divide-y divide-border/40">
             {rows.map((r) => (
-              <tr key={rowKey(r)} className="hover:bg-muted/40">
+              <tr key={rowKey(r)} className="hover:bg-muted/30 transition-colors">
                 {columns.map((c) => (
-                  <td key={c.key} className={`px-3 py-2 align-top ${c.className ?? ""}`}>
+                  <td key={c.key} className={`px-4 py-3 align-middle ${c.className ?? ""}`}>
                     {c.cell(r)}
                   </td>
                 ))}

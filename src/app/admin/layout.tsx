@@ -12,14 +12,14 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
   if (me.role !== "admin" && me.role !== "moderator")
     return <NoPermission need="an admin or moderator account" />;
   return (
-    <div className="grid gap-6 lg:grid-cols-[14rem_1fr]">
-      <aside className="lg:sticky lg:top-24 lg:self-start">
+    <div className="grid gap-6 min-w-0 max-w-full w-full overflow-x-clip lg:grid-cols-[14rem_1fr]">
+      <aside className="min-w-0 max-w-full w-full lg:sticky lg:top-24 lg:self-start">
         <p className="mb-2 hidden px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground lg:block">
           {me.role === "admin" ? "Admin" : "Moderation"}
         </p>
         <AdminNav role={me.role} />
       </aside>
-      <section className="min-w-0">{children}</section>
+      <section className="min-w-0 max-w-full w-full overflow-x-clip">{children}</section>
     </div>
   );
 }

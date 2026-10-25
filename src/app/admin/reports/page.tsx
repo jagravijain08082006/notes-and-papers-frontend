@@ -88,7 +88,7 @@ export default async function ReportsPage(props: PageProps<"/admin/reports">) {
         title="Reports"
         description="Broken or wrong papers, takedown requests and contact messages."
       />
-      <SearchForm action="/admin/reports" placeholder="">
+      <SearchForm action="/admin/reports" placeholder="Search reports by message or details...">
         <Select
           name="status"
           label="Status"

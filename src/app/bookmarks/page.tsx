@@ -18,7 +18,7 @@ export default async function BookmarksPage(props: PageProps<"/bookmarks">) {
   );
   return (
     <div className="space-y-6">
-      <h1 className="text-5xl sm:text-6xl">Bookmarks</h1>
+      <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-tight">Bookmarks</h1>
       {data.items.length === 0 ? (
         <EmptyState
           title="No bookmarks yet"

@@ -52,7 +52,7 @@ export default async function RunsPage(props: PageProps<"/admin/runs">) {
         title="Crawl runs"
         description="History of pipeline runs. Open one to read its log."
       />
-      <SearchForm action="/admin/runs" placeholder="" hidden={{ source_id: sourceId }}>
+      <SearchForm action="/admin/runs" placeholder="Filter runs by status or source..." hidden={{ source_id: sourceId }}>
         <Select
           name="status"
           label="Status"

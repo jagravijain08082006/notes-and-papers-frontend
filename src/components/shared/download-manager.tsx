@@ -1,0 +1,252 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  FileCheck,
+  Loader2,
+  RefreshCw,
+  Share2,
+  Sparkles,
+} from "lucide-react";
+import { toast } from "sonner";
+import { PdfPreview } from "@/components/shared/pdf-preview";
+import { Button } from "@/components/ui/button";
+import type { PaperDetail } from "@/lib/api/types";
+import { paperContext, routes } from "@/lib/routes";
+import { track } from "@/lib/track";
+
+export function DownloadManager({ paper }: { paper: PaperDetail }) {
+  const [progress, setProgress] = useState(15);
+  const [statusMessage, setStatusMessage] = useState("Connecting to academic vault...");
+  const [downloaded, setDownloaded] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  // Trigger download flow
+  const triggerFileDownload = useCallback(async () => {
+    setIsDownloading(true);
+    track("download_attempt", { paper_slug: paper.slug });
+
+    try {
+      const res = await fetch(`/api/download/${paper.slug}`, {
+        cache: "no-store",
+        credentials: "same-origin",
+      });
+
+      if (res.redirected && new URL(res.url).pathname.startsWith("/login")) {
+        window.location.assign(res.url);
+        return;
+      }
+
+      if (res.status === 404) {
+        throw new Error("This PDF is still being prepared. Please try again later.");
+      }
+
+      const isPdf = (res.headers.get("content-type") ?? "").includes("pdf");
+      if (!res.ok || !isPdf) {
+        throw new Error("Could not download the PDF at this moment. Please try again.");
+      }
+
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = `${paper.slug}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
+
+      setDownloaded(true);
+      setProgress(100);
+      setStatusMessage("Verified copy saved to your device!");
+      toast.success("PDF Downloaded successfully!");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Download failed. Please try again.");
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [paper.slug]);
+
+  // Animated preparation loader
+  useEffect(() => {
+    let timer1: NodeJS.Timeout;
+    let timer2: NodeJS.Timeout;
+    let timer3: NodeJS.Timeout;
+
+    if (!downloaded) {
+      timer1 = setTimeout(() => {
+        setProgress(45);
+        setStatusMessage("Securing watermark-free academic copy...");
+      }, 700);
+
+      timer2 = setTimeout(() => {
+        setProgress(80);
+        setStatusMessage("Compiling verification metadata...");
+      }, 1500);
+
+      timer3 = setTimeout(() => {
+        setProgress(100);
+        setStatusMessage("Starting file transfer...");
+        void triggerFileDownload();
+      }, 2300);
+    }
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+    };
+  }, [paper.slug, downloaded, triggerFileDownload]);
+
+  function copyShareLink() {
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.origin + routes.paper(paper.slug));
+      toast.success("Paper link copied to clipboard!");
+    }
+  }
+
+  return (
+    <div className="space-y-12">
+      {/* HEADER / STATUS CARD */}
+      <section className="border-2 border-border bg-card p-6 shadow-hard sm:p-10">
+        <div className="space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-border pb-4">
+            <span className="eyebrow flex items-center gap-2 border-2 border-border bg-primary px-3 py-1 font-bold shadow-hard-sm">
+              <FileCheck className="size-4" aria-hidden="true" />
+              {downloaded ? "DOWNLOAD COMPLETED" : "PREPARING YOUR CLEAN PDF"}
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              Official Vault Repository
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            <h1 className="text-3xl font-display uppercase tracking-tight sm:text-5xl lg:text-6xl break-words leading-tight">
+              {paper.title}
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              {paperContext(paper)}
+              {paper.university_name ? ` · ${paper.university_name}` : ""}
+            </p>
+          </div>
+
+          {/* Paper Metadata Badges */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 pt-2">
+            <div className="border-2 border-border bg-background p-3">
+              <span className="eyebrow block text-muted-foreground">Year</span>
+              <span className="font-display text-2xl uppercase">{paper.year ?? "N/A"}</span>
+            </div>
+            {paper.session && (
+              <div className="border-2 border-border bg-background p-3">
+                <span className="eyebrow block text-muted-foreground">Session</span>
+                <span className="font-display text-2xl uppercase">{paper.session}</span>
+              </div>
+            )}
+            {paper.paper_code && (
+              <div className="border-2 border-border bg-background p-3">
+                <span className="eyebrow block text-muted-foreground">Paper Code</span>
+                <span className="font-display text-2xl uppercase">{paper.paper_code}</span>
+              </div>
+            )}
+            <div className="border-2 border-border bg-background p-3">
+              <span className="eyebrow block text-muted-foreground">Format</span>
+              <span className="font-display text-2xl uppercase">
+                {paper.pages ? `${paper.pages} Pages PDF` : "Clean PDF"}
+              </span>
+            </div>
+          </div>
+
+          {/* ANIMATED PROGRESS LOADER */}
+          {!downloaded && (
+            <div className="space-y-3 border-2 border-border bg-muted/40 p-6 shadow-hard-sm">
+              <div className="flex items-center justify-between text-sm font-bold uppercase tracking-wider">
+                <span className="flex items-center gap-2">
+                  <Loader2 className="size-4 animate-spin text-foreground" />
+                  {statusMessage}
+                </span>
+                <span className="font-display text-lg">{progress}%</span>
+              </div>
+              <div className="h-5 w-full overflow-hidden border-2 border-border bg-card p-0.5 shadow-inner">
+                <div
+                  className="h-full bg-primary transition-all duration-500 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Your PDF is being streamed from our high-speed vault. If prompted, please allow downloads in your browser.
+              </p>
+            </div>
+          )}
+
+          {/* COOL CELEBRATORY MESSAGE WHEN DOWNLOADED */}
+          {downloaded && (
+            <div className="space-y-4 border-2 border-border bg-primary p-6 text-primary-foreground shadow-hard sm:p-8">
+              <div className="flex items-start gap-4">
+                <div className="grid size-12 shrink-0 place-items-center border-2 border-border bg-card text-foreground shadow-hard-sm">
+                  <Sparkles className="size-7 text-primary" aria-hidden="true" />
+                </div>
+                <div className="space-y-1">
+                  <h2 className="text-2xl font-black uppercase tracking-wide sm:text-3xl">
+                    🎉 PDF Download Started!
+                  </h2>
+                  <p className="text-sm font-medium opacity-90 sm:text-base">
+                    Your clean, official copy of <strong>{paper.title}</strong> has been sent to your downloads folder. Best of luck with your exams!
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-3 pt-3">
+                <Button
+                  onClick={() => void triggerFileDownload()}
+                  disabled={isDownloading}
+                  className="border-2 border-border bg-card text-foreground font-bold uppercase tracking-wider shadow-hard-sm hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+                >
+                  <RefreshCw className={`mr-2 size-4 ${isDownloading ? "animate-spin" : ""}`} />
+                  Download again
+                </Button>
+                <Link
+                  href={routes.paper(paper.slug)}
+                  className="inline-flex h-11 items-center gap-2 border-2 border-border bg-background px-5 text-sm font-bold uppercase tracking-wider text-foreground shadow-hard-sm hover:bg-card active:translate-x-0.5 active:translate-y-0.5"
+                >
+                  <ArrowLeft className="size-4" />
+                  Back to paper details
+                </Link>
+                <Button
+                  variant="outline"
+                  onClick={copyShareLink}
+                  className="border-2 border-border bg-card text-foreground font-bold uppercase tracking-wider shadow-hard-sm hover:shadow-hard"
+                >
+                  <Share2 className="mr-2 size-4" />
+                  Share paper
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* LIVE PREVIEW SECTION */}
+      {paper.file_available && (
+        <section aria-labelledby="live-preview-heading" className="space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-border pb-3">
+            <div className="space-y-1">
+              <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground">
+                Document Viewer
+              </p>
+              <h2 id="live-preview-heading" className="text-3xl sm:text-4xl">
+                Live PDF preview
+              </h2>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Read or solve questions directly in your browser without leaving this page.
+            </p>
+          </div>
+
+          <PdfPreview slug={paper.slug} title={paper.title} />
+        </section>
+      )}
+    </div>
+  );
+}

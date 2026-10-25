@@ -25,36 +25,40 @@ export default async function AdminPapersPage(props: PageProps<"/admin/papers">)
     {
       key: "title",
       header: "Title",
+      className: "min-w-[240px] max-w-sm",
       cell: (p) => (
-        <div>
-          <Link href={`/admin/review/${p.id}`} className="font-medium text-link hover:underline">
+        <div className="space-y-0.5">
+          <Link href={`/admin/review/${p.id}`} className="font-semibold text-link hover:underline block leading-snug">
             {p.title}
           </Link>
-          <p className="text-xs text-muted-foreground">{p.slug}</p>
+          <p className="font-mono text-xs text-muted-foreground truncate">{p.slug}</p>
         </div>
       ),
     },
     {
       key: "class",
       header: "Course / subject",
+      className: "min-w-[180px]",
       cell: (p) => [p.course_name, p.subject_name].filter(Boolean).join(" · ") || "-",
     },
-    { key: "year", header: "Year", cell: (p) => p.year ?? "-" },
-    { key: "dl", header: "Downloads", cell: (p) => p.download_count },
+    { key: "year", header: "Year", className: "whitespace-nowrap font-medium", cell: (p) => p.year ?? "-" },
+    { key: "dl", header: "Downloads", className: "text-right tabular-nums whitespace-nowrap font-semibold", cell: (p) => p.download_count.toLocaleString("en-IN") },
     {
       key: "status",
       header: "Status",
+      className: "whitespace-nowrap",
       cell: (p) => (
         <div className="space-y-1">
           <StatusBadge status={p.status} />
-          {p.missing_from_source && <p className="text-xs text-amber-600">missing from source</p>}
+          {p.missing_from_source && <p className="text-xs text-amber-600 font-medium">missing from source</p>}
         </div>
       ),
     },
-    { key: "upd", header: "Updated", cell: (p) => fmtDate(p.updated_at) },
+    { key: "upd", header: "Updated", className: "whitespace-nowrap text-xs text-muted-foreground", cell: (p) => fmtDate(p.updated_at) },
     {
       key: "act",
       header: "Actions",
+      className: "whitespace-nowrap",
       cell: (p) =>
         p.status === "published" ? (
           <AdminAction
@@ -66,7 +70,7 @@ export default async function AdminPapersPage(props: PageProps<"/admin/papers">)
         ) : p.subject_id ? (
           <AdminAction label="Publish" path={`admin/papers/${p.id}/publish`} variant="secondary" />
         ) : (
-          <span className="text-xs text-muted-foreground">needs a subject</span>
+          <span className="text-xs text-muted-foreground font-medium">needs a subject</span>
         ),
     },
   ];

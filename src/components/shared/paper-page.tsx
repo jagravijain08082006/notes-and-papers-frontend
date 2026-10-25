@@ -6,9 +6,7 @@ import { FaqAccordion } from "@/components/shared/faq-accordion";
 import { JsonLdScript } from "@/components/shared/json-ld";
 import { BookmarkButton } from "@/components/shared/bookmark-button";
 import { PaperList } from "@/components/shared/paper-list";
-import { PdfPreview } from "@/components/shared/pdf-preview";
 import { ReportDialog } from "@/components/shared/report-dialog";
-import { DownloadLink } from "@/components/shared/download-link";
 import { TrackOnMount } from "@/components/shared/tracker";
 import { getPaper, getPaperRedirect } from "@/lib/api/public";
 import { kindLabel, paperContext, paperHref, routes, subjectHref } from "@/lib/routes";
@@ -105,14 +103,14 @@ export async function PaperPage({
             {kindLabel(p.kind)}
             {p.year ? ` · ${p.year}` : ""}
           </p>
-          <h1 className="max-w-6xl text-5xl sm:text-7xl lg:text-8xl">{m.h1}</h1>
+          <h1 className="max-w-6xl text-3xl sm:text-5xl lg:text-7xl break-words leading-tight">{m.h1}</h1>
           <p className="text-xl text-muted-foreground">
             {paperContext(p)}
             {isCourse && uniName ? ` · ${uniName}` : ""}
           </p>
         </div>
 
-        <dl className="grid grid-cols-2 border-2 border-border bg-card shadow-hard sm:grid-cols-3 lg:grid-cols-5 [&>div]:border-b-2 [&>div]:border-r-2 [&>div]:border-border [&>div]:p-5 sm:[&>div]:p-6">
+        <dl className="grid grid-cols-2 border-2 border-border bg-card shadow-hard sm:grid-cols-3 lg:grid-cols-5 [&>div]:border-b-2 [&>div]:border-r-2 [&>div]:border-border [&>div]:p-3.5 sm:[&>div]:p-5">
           {[
             ["Year", p.year ? String(p.year) : null],
             ["Session", p.session],
@@ -130,32 +128,51 @@ export async function PaperPage({
             ))}
         </dl>
 
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Same-origin route: sends visitors to log in first (and back here), then to the PDF. The source URL
-              is never written into this page. */}
-          {ready ? (
-            <DownloadLink slug={slug} href={routes.download(slug)}>
-              <Download className="size-5" aria-hidden="true" /> Download PDF
-            </DownloadLink>
-          ) : (
-            <span className="inline-flex h-14 items-center gap-2 border-2 border-border bg-muted px-7 text-base font-bold uppercase tracking-wide text-muted-foreground">
-              <Download className="size-5" aria-hidden="true" /> PDF coming soon
-            </span>
-          )}
-          <BookmarkButton slug={slug} />
-          <ReportDialog slug={slug} />
-        </div>
-        {ready ? (
-          <p className="eyebrow text-muted-foreground">Free account required to download</p>
-        ) : (
-          <p className="eyebrow text-muted-foreground">
-            We are preparing this PDF with our cover pages. It is added automatically, usually
-            within a day.
-          </p>
-        )}
-      </header>
+        {/* MINIMAL REFINED DOWNLOAD ACTION CARD */}
+        <div className="my-6 space-y-4 sm:my-8">
+          <div className="border-2 border-border bg-card p-5 sm:p-6 shadow-hard">
+            <div className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2.5 border-b-2 border-border/30 pb-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="eyebrow flex items-center gap-1.5 border border-border bg-accent/15 px-2.5 py-0.5 text-xs font-bold text-accent">
+                    <Download className="size-3.5" aria-hidden="true" />
+                    Official Question Paper
+                  </span>
+                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    Clean vault copy · Fast download
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <BookmarkButton slug={slug} size="sm" />
+                  <ReportDialog slug={slug} />
+                </div>
+              </div>
 
-      {ready && p.pages ? <PdfPreview slug={slug} title={p.title} /> : null}
+              <div className="flex flex-col gap-3.5 sm:flex-row sm:items-center sm:justify-between">
+                <p className="max-w-md text-xs sm:text-sm text-muted-foreground">
+                  {ready
+                    ? "Direct download with automated verification and interactive PDF reader."
+                    : "We are preparing this PDF with our cover pages. It will be available shortly."}
+                </p>
+
+                {ready ? (
+                  <Link
+                    href={routes.download(slug)}
+                    className="inline-flex h-11 sm:h-12 w-full sm:w-auto sm:min-w-[200px] shrink-0 items-center justify-center gap-2.5 border-2 border-border bg-primary px-6 text-sm font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm transition-all hover:bg-primary/90 hover:shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5"
+                  >
+                    <Download className="size-4.5" aria-hidden="true" />
+                    <span>Download PDF</span>
+                  </Link>
+                ) : (
+                  <div className="inline-flex h-11 sm:h-12 w-full sm:w-auto sm:min-w-[180px] shrink-0 items-center justify-center gap-2 border-2 border-border bg-muted px-6 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                    <Download className="size-4" aria-hidden="true" /> PDF coming soon
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
 
       <section aria-labelledby="about-heading" className="max-w-5xl space-y-5">
         <h2 id="about-heading" className="text-3xl sm:text-4xl">

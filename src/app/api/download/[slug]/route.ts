@@ -3,13 +3,11 @@ import { getAccessToken } from "@/lib/auth/session";
 import { API_URL } from "@/lib/env";
 
 /**
- * GET /papers/<slug>/download
- * Downloads need an account. Signed-out visitors go to /login and come back to the paper page afterwards; signed-in
- * visitors get the PDF itself. The API either sends the file (papers stored without their cover pages are put together
- * there) or points at a short-lived storage link; both end here as one plain PDF response, so the browser never needs
- * permission to talk to the storage service and the source address is never exposed.
+ * GET /api/download/<slug>
+ * Authenticated binary PDF streaming endpoint.
+ * Returns the attachment with proper content-disposition and content-type headers.
  */
-export async function GET(req: Request, ctx: RouteContext<"/papers/[slug]/download">) {
+export async function GET(req: Request, ctx: { params: Promise<{ slug: string }> }) {
   const { slug } = await ctx.params;
   const token = await getAccessToken();
   if (!token) return toLogin(req, slug);
@@ -24,7 +22,6 @@ export async function GET(req: Request, ctx: RouteContext<"/papers/[slug]/downlo
 
   const target = upstream?.headers.get("location");
   if (upstream && upstream.status >= 300 && upstream.status < 400 && target) {
-    // Older papers: the API hands out a signed storage link (no login header goes to the storage service).
     const file = await fetch(target, { cache: "no-store" }).catch(() => null);
     if (file?.ok && file.body) return pdf(file.body, slug);
     return unavailable();
@@ -40,7 +37,7 @@ export async function GET(req: Request, ctx: RouteContext<"/papers/[slug]/downlo
 
 function toLogin(req: Request, slug: string) {
   const login = new URL("/login", req.url);
-  login.searchParams.set("next", `/papers/${slug}`);
+  login.searchParams.set("next", `/papers/${slug}/download`);
   return NextResponse.redirect(login);
 }
 

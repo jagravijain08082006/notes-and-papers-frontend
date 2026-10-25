@@ -43,31 +43,45 @@ const ITEMS = [
   { href: "/admin/audit", label: "Audit log", icon: History, admin: true },
 ];
 
+import { InstantSyncButton } from "@/components/admin/instant-sync-button";
+
 export function AdminNav({ role }: { role: Role }) {
   const path = usePathname();
   const items = ITEMS.filter((i) => !i.admin || role === "admin");
   return (
-    <nav
-      aria-label="Admin"
-      className="flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0"
-    >
-      {items.map(({ href, label, icon: Icon }) => {
-        const active = href === "/admin" ? path === href : path.startsWith(href);
-        return (
-          <Link
-            key={href}
-            href={href}
-            aria-current={active ? "page" : undefined}
-            className={cn(
-              "flex shrink-0 items-center gap-2 border-2 border-transparent px-3 py-2 text-xs font-bold uppercase tracking-wide hover:border-border hover:bg-muted",
-              active && "border-border bg-primary text-primary-foreground shadow-hard-sm",
-            )}
-          >
-            <Icon className="size-4" aria-hidden="true" />
-            {label}
-          </Link>
-        );
-      })}
-    </nav>
+    <div className="flex flex-col gap-3 min-w-0 max-w-full">
+      <nav
+        aria-label="Admin"
+        className="flex w-full min-w-0 max-w-full gap-1.5 overflow-x-auto pb-2 border-b-2 border-border/30 lg:border-none lg:flex-col lg:overflow-visible lg:pb-0 scroll-smooth [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {items.map(({ href, label, icon: Icon }) => {
+          const active = href === "/admin" ? path === href : path.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "flex shrink-0 items-center gap-2 border-2 border-transparent px-3 py-2 text-xs font-bold uppercase tracking-wide hover:border-border hover:bg-muted transition-colors",
+                active && "border-border bg-primary text-primary-foreground shadow-hard-sm",
+              )}
+            >
+              <Icon className="size-4 shrink-0" aria-hidden="true" />
+              <span className="whitespace-nowrap">{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+      {role === "admin" && (
+        <div className="shrink-0 lg:pt-2 lg:border-t-2 lg:border-border/30">
+          <InstantSyncButton
+            variant="primary"
+            size="sm"
+            className="w-full justify-center"
+          />
+        </div>
+      )}
+    </div>
   );
 }
+

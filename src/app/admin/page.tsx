@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { BarChart, PageHeader, StatCard, StatusBadge, fmtDate } from "@/components/admin/ui";
+import { BarChart, InstantSyncButton, PageHeader, StatCard, StatusBadge, fmtDate } from "@/components/admin/ui";
 import { NoPermission } from "@/components/admin/no-permission";
 import { authedFetch, getMe } from "@/lib/api/server";
 import type { AdminOverview } from "@/lib/api/types";
@@ -14,7 +14,11 @@ export default async function AdminOverviewPage() {
 
   return (
     <>
-      <PageHeader title="Overview" description="What the platform is doing right now." />
+      <PageHeader
+        title="Overview"
+        description="What the platform is doing right now."
+        actions={<InstantSyncButton />}
+      />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Published papers"

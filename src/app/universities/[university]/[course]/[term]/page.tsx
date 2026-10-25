@@ -54,7 +54,7 @@ export default async function TermPage(
         ]}
       />
       <header className="space-y-4">
-        <h1 className="text-5xl sm:text-6xl">{m.h1}</h1>
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-tight">{m.h1}</h1>
         <p className="max-w-3xl text-muted-foreground">
           {t.paper_count} previous year question papers across {t.subjects.length} subjects for{" "}
           {t.course.name} {m.label}

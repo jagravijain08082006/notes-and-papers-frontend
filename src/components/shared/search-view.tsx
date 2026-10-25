@@ -60,16 +60,16 @@ export function SearchView() {
 
   return (
     <div className="space-y-8">
-      <div className="space-y-3">
+      <div className="space-y-3 min-w-0">
         <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground">
           Search archive
         </p>
-        <h1 className="text-5xl sm:text-6xl">Search &amp; explore papers</h1>
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-none">Search &amp; explore papers</h1>
       </div>
       <SearchBar key={params.q} defaultValue={params.q} />
 
       {data && (data.facets.courses.length > 0 || data.facets.years.length > 0) && (
-        <div className="grid gap-4 border-2 border-border bg-card p-5 shadow-hard-sm sm:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 border-2 border-border bg-card p-4 sm:p-5 shadow-hard-sm sm:grid-cols-2 lg:grid-cols-4 w-full min-w-0">
           <FilterSelect
             label="Course"
             value={params.course ?? ""}

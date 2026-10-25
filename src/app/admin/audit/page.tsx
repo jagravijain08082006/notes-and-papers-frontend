@@ -61,7 +61,7 @@ export default async function AuditPage(props: PageProps<"/admin/audit">) {
   return (
     <>
       <PageHeader title="Audit log" description="Who changed what, newest first." />
-      <SearchForm action="/admin/audit" placeholder="">
+      <SearchForm action="/admin/audit" placeholder="Filter audit logs by action or actor...">
         <Select
           name="entity"
           label="Entity"

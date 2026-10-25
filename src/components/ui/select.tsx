@@ -198,7 +198,7 @@ export function Select({
         onClick={() => (open ? setOpen(false) : openMenu())}
         onKeyDown={onKeyDown}
         className={cn(
-          "flex h-11 w-full items-center justify-between gap-2 border-2 border-input bg-card px-3 text-left text-sm font-medium transition-shadow focus-visible:shadow-hard-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-11 w-full items-center justify-between gap-2 border-2 border-border bg-card px-3.5 text-left text-sm font-medium transition-shadow focus-visible:shadow-hard-sm focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50",
           open && "shadow-hard-sm",
           invalid && "border-destructive",
         )}

@@ -1,5 +1,6 @@
 import { AdminAction } from "@/components/admin/admin-action";
 import { AutoRefresh } from "@/components/admin/auto-refresh";
+import { InstantSyncButton } from "@/components/admin/instant-sync-button";
 import { NoPermission } from "@/components/admin/no-permission";
 import { PageHeader, StatCard, StatusBadge, fmtDate } from "@/components/admin/ui";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -129,14 +130,17 @@ export default async function ImportsPage() {
               also runs by itself from GitHub Actions.
             </p>
           </div>
-          <AdminAction
-            label="Run daily sync"
-            path="/admin/sync"
-            body={{ site: "all", brand_limit: 300 }}
-            success="Sync started"
-            disabled={running}
-            confirm="Run the full sync now? It can take a while."
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <InstantSyncButton label="Instant Sync (GitHub Actions)" />
+            <AdminAction
+              label="Run local sync"
+              path="/admin/sync"
+              body={{ site: "all", brand_limit: 300 }}
+              success="Local sync started"
+              disabled={running}
+              confirm="Run the full sync now locally? It can take a while."
+            />
+          </div>
         </div>
         {sync.jobs.length > 0 && (
           <ul className="divide-y border-2 border-border bg-card text-sm">

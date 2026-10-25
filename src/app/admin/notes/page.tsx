@@ -35,29 +35,31 @@ export default async function AdminNotesPage(props: PageProps<"/admin/notes">) {
     {
       key: "title",
       header: "Note",
+      className: "min-w-[240px] max-w-sm",
       cell: (n) => (
-        <div className="max-w-md">
-          <p className="font-medium">{n.title}</p>
+        <div className="space-y-0.5">
+          <p className="font-semibold text-foreground leading-snug">{n.title}</p>
           {n.description && (
             <p className="line-clamp-2 text-xs text-muted-foreground">{n.description}</p>
           )}
         </div>
       ),
     },
-    { key: "subj", header: "Subject", cell: (n) => n.subject_name ?? "-" },
-    { key: "when", header: "Uploaded", cell: (n) => fmtDate(n.created_at) },
-    { key: "status", header: "Status", cell: (n) => <StatusBadge status={n.status} /> },
+    { key: "subj", header: "Subject", className: "min-w-[160px] font-medium text-sm", cell: (n) => n.subject_name ?? "-" },
+    { key: "when", header: "Uploaded", className: "whitespace-nowrap text-xs text-muted-foreground", cell: (n) => fmtDate(n.created_at) },
+    { key: "status", header: "Status", className: "whitespace-nowrap", cell: (n) => <StatusBadge status={n.status} /> },
     {
       key: "act",
       header: "Actions",
+      className: "whitespace-nowrap",
       cell: (n) => (
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap items-center gap-1.5">
           {n.has_file && (
             <a
               href={`/api/backend/admin/notes/${n.id}/file`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-9 items-center border-2 border-border bg-card px-3 text-xs font-bold uppercase hover:bg-primary"
+              className="inline-flex h-8 items-center border-2 border-border bg-card px-2.5 text-xs font-bold uppercase hover:bg-primary shadow-hard-sm"
             >
               View PDF
             </a>
@@ -87,7 +89,7 @@ export default async function AdminNotesPage(props: PageProps<"/admin/notes">) {
   return (
     <>
       <PageHeader title="Notes" description="Moderate notes uploaded by students." />
-      <SearchForm action="/admin/notes" placeholder="">
+      <SearchForm action="/admin/notes" placeholder="Filter notes by title, author or subject...">
         <Select
           name="status"
           label="Status"

@@ -1,8 +1,10 @@
 import { DataTable, type Column } from "@/components/admin/data-table";
+import { InstantSyncButton } from "@/components/admin/instant-sync-button";
 import { NoPermission } from "@/components/admin/no-permission";
 import { PageHeader, SearchForm, Select, StatCard, fmtDate } from "@/components/admin/ui";
 import { authedFetch, getMe } from "@/lib/api/server";
 import { enumParam, first, intParam } from "@/lib/search-params";
+import { cn } from "@/lib/utils";
 
 interface SeoOverview {
   pages: number;
@@ -58,44 +60,86 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
     {
       key: "url",
       header: "Page",
-      cell: (p) => (
-        <a
-          href={p.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="break-all text-link hover:underline"
-        >
-          {p.url.replace(/^https?:\/\/[^/]+/, "")}
-        </a>
-      ),
+      className: "min-w-[280px] max-w-sm",
+      cell: (p) => {
+        const pathOnly = p.url.replace(/^https?:\/\/[^/]+/, "");
+        return (
+          <a
+            href={p.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={p.url}
+            className="truncate block font-mono text-xs text-link hover:underline max-w-[280px] sm:max-w-sm"
+          >
+            {pathOnly}
+          </a>
+        );
+      },
     },
-    { key: "type", header: "Type", cell: (p) => p.page_type ?? "-" },
+    {
+      key: "type",
+      header: "Type",
+      className: "whitespace-nowrap font-medium text-xs uppercase tracking-wider text-muted-foreground",
+      cell: (p) => p.page_type ?? "-",
+    },
     {
       key: "idx",
       header: "Indexed",
-      cell: (p) => (p.indexed === null ? "unknown" : p.indexed ? "yes" : "no"),
+      className: "whitespace-nowrap",
+      cell: (p) => (
+        <span
+          className={cn(
+            "inline-flex items-center px-2 py-0.5 text-xs font-bold uppercase tracking-wider border",
+            p.indexed === true
+              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
+              : p.indexed === false
+                ? "bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/30"
+                : "bg-muted text-muted-foreground border-border",
+          )}
+        >
+          {p.indexed === null ? "unknown" : p.indexed ? "yes" : "no"}
+        </span>
+      ),
     },
-    { key: "clicks", header: "Clicks", sortKey: "clicks", cell: (p) => p.clicks ?? "-" },
+    {
+      key: "clicks",
+      header: "Clicks",
+      sortKey: "clicks",
+      className: "text-right tabular-nums whitespace-nowrap font-bold",
+      cell: (p) => p.clicks?.toLocaleString("en-IN") ?? "-",
+    },
     {
       key: "impr",
       header: "Impressions",
       sortKey: "impressions",
-      cell: (p) => p.impressions ?? "-",
+      className: "text-right tabular-nums whitespace-nowrap font-bold",
+      cell: (p) => p.impressions?.toLocaleString("en-IN") ?? "-",
     },
     {
       key: "pos",
       header: "Position",
       sortKey: "position",
+      className: "text-right tabular-nums whitespace-nowrap font-mono text-xs",
       cell: (p) => (p.position === null ? "-" : p.position.toFixed(1)),
     },
     {
       key: "issues",
       header: "Issues",
+      className: "min-w-[220px]",
       cell: (p) =>
         p.issues.length ? (
-          <span className="text-amber-700 dark:text-amber-300">{p.issues.join(", ")}</span>
+          <div className="flex flex-wrap gap-1">
+            {p.issues.map((iss) => (
+              <span
+                key={iss}
+                className="inline-flex items-center px-1.5 py-0.5 text-[11px] font-semibold bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30"
+              >
+                {iss.replace(/_/g, " ")}
+              </span>
+            ))}
+          </div>
         ) : (
-          <span className="text-muted-foreground">none</span>
+          <span className="text-xs text-muted-foreground">none</span>
         ),
     },
   ];
@@ -105,6 +149,7 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
       <PageHeader
         title="SEO"
         description={`Search Console data (28 days) plus problems found in our own pages. Last synced ${fmtDate(ov.last_synced)}.`}
+        actions={<InstantSyncButton />}
       />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Tracked pages" value={ov.pages} />
@@ -121,18 +166,25 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
       </div>
 
       {issues.length > 0 && (
-        <section aria-labelledby="issues-h" className="mt-6">
-          <h2 id="issues-h" className=" mb-4 text-2xl">
+        <section aria-labelledby="issues-h" className="mt-8">
+          <h2 id="issues-h" className="mb-4 text-2xl font-bold">
             Issues
           </h2>
-          <ul className="grid gap-2 md:grid-cols-2">
+          <ul className="grid gap-3 sm:grid-cols-2">
             {issues.map((g) => (
-              <li key={g.issue} className="border-2 border-border bg-card p-3 text-sm">
-                <p className="font-medium">
-                  {g.issue.replace(/_/g, " ")}{" "}
-                  <span className="text-muted-foreground">({g.count})</span>
-                </p>
-                <p className="mt-1 truncate text-xs text-muted-foreground">
+              <li
+                key={g.issue}
+                className="border-2 border-border bg-card p-4 shadow-hard-sm transition-all hover:shadow-hard"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <p className="font-bold text-sm text-foreground">
+                    {g.issue.replace(/_/g, " ")}
+                  </p>
+                  <span className="inline-flex items-center px-2 py-0.5 text-xs font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 tabular-nums">
+                    {g.count.toLocaleString("en-IN")}
+                  </span>
+                </div>
+                <p className="mt-2 truncate font-mono text-xs text-muted-foreground bg-muted/40 px-2.5 py-1 border border-border/40">
                   e.g. {g.sample[0]?.replace(/^https?:\/\/[^/]+/, "")}
                 </p>
               </li>
@@ -141,11 +193,16 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
         </section>
       )}
 
-      <section aria-labelledby="pages-h" className="mt-6">
-        <h2 id="pages-h" className=" mb-4 text-2xl">
-          Pages
-        </h2>
-        <SearchForm action="/admin/seo" placeholder="">
+      <section aria-labelledby="pages-h" className="mt-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <h2 id="pages-h" className="text-2xl font-bold">
+            Pages
+          </h2>
+          <span className="text-xs text-muted-foreground font-semibold">
+            {pages.total.toLocaleString("en-IN")} pages tracked
+          </span>
+        </div>
+        <SearchForm action="/admin/seo" placeholder="Filter pages by URL or path...">
           <Select
             name="page_type"
             label="Page type"
@@ -178,3 +235,4 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
     </>
   );
 }
+
