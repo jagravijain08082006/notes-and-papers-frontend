@@ -43,8 +43,6 @@ const ITEMS = [
   { href: "/admin/audit", label: "Audit log", icon: History, admin: true },
 ];
 
-import { InstantSyncButton } from "@/components/admin/instant-sync-button";
-
 export function AdminNav({ role }: { role: Role }) {
   const path = usePathname();
   const items = ITEMS.filter((i) => !i.admin || role === "admin");
@@ -72,15 +70,6 @@ export function AdminNav({ role }: { role: Role }) {
           );
         })}
       </nav>
-      {role === "admin" && (
-        <div className="shrink-0 lg:pt-2 lg:border-t-2 lg:border-border/30">
-          <InstantSyncButton
-            variant="primary"
-            size="sm"
-            className="w-full justify-center"
-          />
-        </div>
-      )}
     </div>
   );
 }

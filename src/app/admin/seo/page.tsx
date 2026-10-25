@@ -1,5 +1,4 @@
 import { DataTable, type Column } from "@/components/admin/data-table";
-import { InstantSyncButton } from "@/components/admin/instant-sync-button";
 import { NoPermission } from "@/components/admin/no-permission";
 import { PageHeader, SearchForm, Select, StatCard, fmtDate } from "@/components/admin/ui";
 import { authedFetch, getMe } from "@/lib/api/server";
@@ -149,7 +148,6 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
       <PageHeader
         title="SEO"
         description={`Search Console data (28 days) plus problems found in our own pages. Last synced ${fmtDate(ov.last_synced)}.`}
-        actions={<InstantSyncButton />}
       />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Tracked pages" value={ov.pages} />

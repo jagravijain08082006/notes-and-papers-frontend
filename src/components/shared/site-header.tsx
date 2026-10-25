@@ -25,7 +25,7 @@ export async function SiteHeader() {
     { href: "/account", label: "My account" },
   ];
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-border bg-background">
+    <header className="sticky top-0 z-50 border-b-2 border-border bg-background/95 backdrop-blur-md shadow-sm">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-2 px-3 sm:gap-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5" aria-label={`${SITE_NAME} home`}>
           <Image

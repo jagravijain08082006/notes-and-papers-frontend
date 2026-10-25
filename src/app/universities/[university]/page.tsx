@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowRight, BookOpen, CalendarDays, Clock, FileText, GraduationCap } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -43,7 +44,13 @@ export async function generateMetadata(props: PageProps<"/universities/[universi
         : ""
     }. Free PDFs, subject-wise.`,
     path: routes.university(slug),
-    noindex: failed || !u || u.courses.length === 0,
+    noindex: !u && !failed,
+    keywords: [
+      `${name} question papers`,
+      `${name} pyq`,
+      `${name} previous year papers`,
+      `${name} exam papers pdf`,
+    ],
   });
 }
 
@@ -76,26 +83,49 @@ export default async function UniversityPage(props: PageProps<"/universities/[un
     <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {courses.map((c) => (
         <li key={c.slug}>
-          <Card className="h-full transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard">
-            <Link href={routes.course(slug, c.slug)} className="block space-y-2 p-5">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="border border-border bg-primary px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide">
-                  {c.scheme === "semester"
-                    ? "Semester System"
-                    : c.scheme === "annual"
-                      ? "Annual System"
-                      : "Course"}
-                </span>
-                {c.level && (
-                  <span className="border border-border bg-card px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                    {c.level === "UG" ? "Undergraduate" : c.level === "PG" ? "Postgraduate" : c.level}
+          <Card className="group h-full transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard border-2 border-border">
+            <Link href={routes.course(slug, c.slug)} className="flex flex-col h-full justify-between p-5">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3.5">
+                  <span className="grid size-11 sm:size-12 shrink-0 place-items-center border-2 border-border bg-primary text-foreground shadow-hard-sm transition-colors group-hover:bg-accent group-hover:text-accent-foreground">
+                    <GraduationCap className="size-5 sm:size-6" aria-hidden="true" />
                   </span>
-                )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                      <span className="inline-flex items-center gap-1 border border-border bg-primary px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide">
+                        {c.scheme === "semester" ? (
+                          <>
+                            <CalendarDays className="size-3" aria-hidden="true" />
+                            Semester System
+                          </>
+                        ) : c.scheme === "annual" ? (
+                          <>
+                            <Clock className="size-3" aria-hidden="true" />
+                            Annual System
+                          </>
+                        ) : (
+                          "Course"
+                        )}
+                      </span>
+                      {c.level && (
+                        <span className="border border-border bg-card px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                          {c.level === "UG" ? "Undergraduate" : c.level === "PG" ? "Postgraduate" : c.level}
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="text-xl sm:text-2xl font-bold leading-snug group-hover:text-link transition-colors">{c.name}</h2>
+                  </div>
+                  <ArrowRight className="hidden size-5 shrink-0 transition-transform group-hover:translate-x-1 sm:block text-muted-foreground group-hover:text-foreground" aria-hidden="true" />
+                </div>
               </div>
-              <h2 className="text-2xl font-bold">{c.name}</h2>
-              <p className="text-sm text-muted-foreground">
-                {plural(c.paper_count, "paper")} available
-              </p>
+
+              <div className="mt-4 pt-3 border-t border-border/30 flex items-center justify-between text-xs text-muted-foreground font-semibold">
+                <span className="inline-flex items-center gap-1">
+                  <FileText className="size-3.5 text-muted-foreground" aria-hidden="true" />
+                  {plural(c.paper_count, "paper")} available
+                </span>
+                <span className="text-foreground group-hover:underline">Explore papers &rarr;</span>
+              </div>
             </Link>
           </Card>
         </li>
@@ -163,6 +193,7 @@ export default async function UniversityPage(props: PageProps<"/universities/[un
             <section id="semester-programmes" className="scroll-mt-24 space-y-4">
               <div className="border-b-2 border-border pb-2">
                 <h2 className="flex items-center gap-3 text-2xl sm:text-3xl">
+                  <CalendarDays className="size-6 text-foreground" aria-hidden="true" />
                   Semester System Programmes
                   <span className="border-2 border-border bg-primary px-2 py-0.5 text-xs font-bold">
                     {semesterCourses.length}
@@ -180,6 +211,7 @@ export default async function UniversityPage(props: PageProps<"/universities/[un
             <section id="annual-programmes" className="scroll-mt-24 space-y-4">
               <div className="border-b-2 border-border pb-2">
                 <h2 className="flex items-center gap-3 text-2xl sm:text-3xl">
+                  <Clock className="size-6 text-foreground" aria-hidden="true" />
                   Annual System Programmes
                   <span className="border-2 border-border bg-primary px-2 py-0.5 text-xs font-bold">
                     {annualCourses.length}
@@ -197,6 +229,7 @@ export default async function UniversityPage(props: PageProps<"/universities/[un
             <section id="other-programmes" className="scroll-mt-24 space-y-4">
               <div className="border-b-2 border-border pb-2">
                 <h2 className="flex items-center gap-3 text-2xl sm:text-3xl">
+                  <BookOpen className="size-6 text-foreground" aria-hidden="true" />
                   Other Programmes
                   <span className="border-2 border-border bg-primary px-2 py-0.5 text-xs font-bold">
                     {otherCourses.length}

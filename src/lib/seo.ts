@@ -46,7 +46,19 @@ export function buildMetadata({
     description: d,
     ...(keywords?.length ? { keywords } : {}),
     alternates: { canonical: url },
-    robots: noindex ? { index: false, follow: true } : { index: true, follow: true },
+    robots: noindex
+      ? { index: false, follow: true }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+          },
+        },
     openGraph: {
       title: t,
       description: d,

@@ -15,6 +15,7 @@ import { ErrorBox } from "./home-sections";
 import { Pagination } from "./pagination";
 import { PaperList, PaperListSkeleton } from "./paper-list";
 import { SearchBar } from "./search-bar";
+import { SearchSuggestionsHub } from "./search-suggestions-hub";
 import { Select } from "@/components/ui/select";
 
 const SIZE = 20;
@@ -97,10 +98,7 @@ export function SearchView() {
       )}
 
       {!active ? (
-        <EmptyState
-          title="Start with a search"
-          description='Type a course, subject or year, for example "BCA 1st year question papers".'
-        />
+        <SearchSuggestionsHub onSelectQuery={(query) => update({ q: query })} />
       ) : isPending ? (
         <div aria-busy="true" className="space-y-3">
           <Skeleton className="h-4 w-24" />
@@ -109,11 +107,14 @@ export function SearchView() {
       ) : isError && !data ? (
         <ErrorBox message={error.message} onRetry={() => void refetch()} />
       ) : data && data.items.length === 0 ? (
-        <EmptyState
-          title={params.q ? `No results for "${params.q}"` : "No results"}
-          description="Check the spelling, remove a filter, or browse by course instead."
-          action={{ href: routes.universities, label: "Browse courses" }}
-        />
+        <div className="space-y-10">
+          <EmptyState
+            title={params.q ? `No results for "${params.q}"` : "No results"}
+            description="Check the spelling, remove a filter, or browse by course instead."
+            action={{ href: routes.universities, label: "Browse courses" }}
+          />
+          <SearchSuggestionsHub onSelectQuery={(query) => update({ q: query })} />
+        </div>
       ) : data ? (
         <section
           aria-live="polite"

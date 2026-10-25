@@ -4,13 +4,13 @@ import { useState } from "react";
 import { ThemeProvider } from "next-themes";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
-import { makeQueryClient } from "@/lib/query-client";
+import { getQueryClient } from "@/lib/query-client";
 import { PageViewTracker } from "./tracker";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(makeQueryClient);
+  const [queryClient] = useState(getQueryClient);
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} disableTransitionOnChange>
       <QueryClientProvider client={queryClient}>
         {children}
         <PageViewTracker />

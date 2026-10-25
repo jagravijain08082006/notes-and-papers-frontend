@@ -4,9 +4,9 @@ import { PaperCard } from "./paper-card";
 export function PaperList({ papers }: { papers: PaperSummary[] }) {
   return (
     <ul className="grid grid-cols-1 gap-3.5 sm:gap-4 lg:grid-cols-2 w-full min-w-0 max-w-full">
-      {papers.map((p) => (
+      {papers.map((p, i) => (
         <li key={p.slug} className="w-full min-w-0 max-w-full">
-          <PaperCard paper={p} />
+          <PaperCard paper={p} index={i} totalInGroup={papers.length} />
         </li>
       ))}
     </ul>

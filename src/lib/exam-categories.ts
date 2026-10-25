@@ -1,7 +1,54 @@
+import {
+  Award,
+  BookOpen,
+  Briefcase,
+  Building2,
+  Cpu,
+  GraduationCap,
+  Layers,
+  Scale,
+  School,
+  Shield,
+  Stethoscope,
+  type LucideIcon,
+} from "lucide-react";
+
 export interface ExamDomain {
   id: string;
   label: string;
   description: string;
+  icon: LucideIcon;
+}
+
+const BOARD_CLEAN_NAMES: Record<string, string> = {
+  "uni-rajasthanboard": "RBSE Board (Rajasthan BSER)",
+  "uni-cbseboardonline": "CBSE Board (Central Board)",
+  "uni-upboardonline": "UP Board (UPMSP)",
+  "uni-mpboardonline": "MP Board (MPBSE)",
+  "uni-icseonline": "ICSE & ISC Board (CISCE)",
+  "uni-bsebstudy": "Bihar Board (BSEB)",
+  "uni-haryanaboard": "HBSE Haryana Board (BSEH)",
+  "uni-cgboardonline": "CG Board (CGBSE)",
+  "uni-gujaratboardonline": "GSEB Gujarat Board",
+  "uni-maharashtrastudy": "Maharashtra State Board (MSBSHSE)",
+  "uni-punjabboardonline": "PSEB Punjab Board",
+  "cg-open-school": "CG Open School Board",
+  "toss": "Telangana Open School (TOSS)",
+  "uni-niosstudy": "NIOS National Open School",
+};
+
+/** Sanitize exam name: handles empty/whitespace titles like rajasthan-4th-grade and verbose crawler board titles */
+export function cleanExamTitle(name?: string | null, slug?: string | null): string {
+  if (slug && BOARD_CLEAN_NAMES[slug]) {
+    return BOARD_CLEAN_NAMES[slug];
+  }
+  const trimmed = (name ?? "").trim();
+  if (trimmed.length > 0) return trimmed;
+  if (!slug) return "Examination";
+  return slug
+    .split("-")
+    .map((w) => (w.length > 0 ? w[0].toUpperCase() + w.slice(1) : ""))
+    .join(" ");
 }
 
 export const EXAM_DOMAINS: ExamDomain[] = [
@@ -9,56 +56,67 @@ export const EXAM_DOMAINS: ExamDomain[] = [
     id: "all",
     label: "All Categories",
     description: "Browse all competitive examinations and school boards across India",
+    icon: Layers,
   },
   {
     id: "civil-services",
     label: "Civil Services & State PSC",
     description: "UPSC CSE, MPPSC, UPPSC, State Public Service Commissions",
+    icon: Building2,
   },
   {
     id: "banking-finance",
     label: "Banking & Finance",
     description: "SBI Clerk / PO, CAIIB, JAIIB, CA, CMA & CS",
+    icon: Briefcase,
   },
   {
     id: "ssc-police",
     label: "Staff Selection & Police",
     description: "SSC CGL, CHSL, Constable, Police SI & State Forces",
+    icon: Shield,
   },
   {
     id: "engineering",
     label: "Engineering Entrance",
     description: "GATE, JEE Main & Advanced, WBJEE, Polytechnic",
+    icon: Cpu,
   },
   {
     id: "medical",
     label: "Medical & Nursing",
     description: "NEET, B.Sc. Nursing, GPAT, Pharmacy & AIIMS NORCET",
+    icon: Stethoscope,
   },
   {
     id: "teaching",
     label: "Teaching & Eligibility",
     description: "UGC-NET, CTET, MP-TET, REET, UP-TET, D.El.Ed, BSTC",
+    icon: GraduationCap,
   },
   {
     id: "defence",
     label: "Defence Services",
     description: "NDA NA, Indian Army Agniveer, NCC Certificates",
+    icon: Award,
   },
   {
     id: "law",
     label: "Law & Judiciary",
     description: "AIBE, CLAT, Rajasthan Judicial Service, Civil Judge Exams",
+    icon: Scale,
   },
   {
     id: "school-boards",
     label: "School Boards & Entrance",
     description: "CBSE, ICSE, Navodaya JNVST, Sainik School AISSEE, NMMS, NTSE & State Boards",
+    icon: School,
   },
   {
     id: "management",
     label: "Management & Others",
     description: "CAT, CMAT, CUET and National Entrance Tests",
+    icon: BookOpen,
   },
 ];
 

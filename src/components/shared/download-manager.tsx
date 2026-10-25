@@ -12,16 +12,33 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { PdfPreview } from "@/components/shared/pdf-preview";
+import { PaperList } from "@/components/shared/paper-list";
 import { Button } from "@/components/ui/button";
-import type { PaperDetail } from "@/lib/api/types";
+import type { PaperDetail, PaperSummary } from "@/lib/api/types";
 import { paperContext, routes } from "@/lib/routes";
 import { track } from "@/lib/track";
 
-export function DownloadManager({ paper }: { paper: PaperDetail }) {
+export function DownloadManager({
+  paper,
+  suggestedPapers = [],
+}: {
+  paper: PaperDetail;
+  suggestedPapers?: PaperSummary[];
+}) {
   const [progress, setProgress] = useState(15);
   const [statusMessage, setStatusMessage] = useState("Connecting to academic vault...");
   const [downloaded, setDownloaded] = useState(false);
+  const [downloadedBlobUrl, setDownloadedBlobUrl] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+
+  // Revoke object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (downloadedBlobUrl) {
+        URL.revokeObjectURL(downloadedBlobUrl);
+      }
+    };
+  }, [downloadedBlobUrl]);
 
   // Trigger download flow
   const triggerFileDownload = useCallback(async () => {
@@ -50,13 +67,14 @@ export function DownloadManager({ paper }: { paper: PaperDetail }) {
 
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
+      setDownloadedBlobUrl(blobUrl);
+
       const a = document.createElement("a");
       a.href = blobUrl;
       a.download = `${paper.slug}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
 
       setDownloaded(true);
       setProgress(100);
@@ -123,7 +141,7 @@ export function DownloadManager({ paper }: { paper: PaperDetail }) {
           </div>
 
           <div className="space-y-3">
-            <h1 className="text-3xl font-display uppercase tracking-tight sm:text-5xl lg:text-6xl break-words leading-tight">
+            <h1 className="text-3xl font-display uppercase tracking-wider sm:text-5xl lg:text-6xl break-words leading-tight">
               {paper.title}
             </h1>
             <p className="text-lg text-muted-foreground">
@@ -232,21 +250,73 @@ export function DownloadManager({ paper }: { paper: PaperDetail }) {
         <section aria-labelledby="live-preview-heading" className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-border pb-3">
             <div className="space-y-1">
-              <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground">
+              <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground font-bold tracking-wider shadow-hard-sm">
                 Document Viewer
               </p>
-              <h2 id="live-preview-heading" className="text-3xl sm:text-4xl">
+              <h2 id="live-preview-heading" className="text-3xl sm:text-4xl font-display uppercase tracking-wider">
                 Live PDF preview
               </h2>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground font-medium">
               Read or solve questions directly in your browser without leaving this page.
             </p>
           </div>
 
-          <PdfPreview slug={paper.slug} title={paper.title} />
+          <PdfPreview
+            slug={paper.slug}
+            title={paper.title}
+            blobUrl={downloadedBlobUrl}
+            defaultOpen={downloaded}
+            pages={paper.pages}
+          />
         </section>
       )}
+
+      {/* SUGGESTIONS & RELATED EXPLORATION */}
+      <section className="space-y-5 border-t-2 border-border pt-10">
+        <div className="space-y-1">
+          <span className="eyebrow inline-block bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm">
+            Keep Practicing
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-display uppercase tracking-wider">
+            Suggested Next Steps &amp; Related Papers
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Download adjacent exam years or explore syllabus-related subjects.
+          </p>
+        </div>
+
+        {suggestedPapers && suggestedPapers.length > 0 && (
+          <div className="pt-2">
+            <PaperList papers={suggestedPapers} />
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-3">
+          {paper.subject_name && (
+            <Link
+              href={`/search?q=${encodeURIComponent(paper.subject_name)}`}
+              className="inline-flex items-center gap-2 border-2 border-border bg-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+            >
+              All years of {paper.subject_name} →
+            </Link>
+          )}
+          {paper.course_name && paper.university_slug && paper.course_slug && (
+            <Link
+              href={routes.course(paper.university_slug, paper.course_slug)}
+              className="inline-flex items-center gap-2 border-2 border-border bg-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+            >
+              All semesters of {paper.course_name} →
+            </Link>
+          )}
+          <Link
+            href="/search"
+            className="inline-flex items-center gap-2 border-2 border-border bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+          >
+            Search More Papers →
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

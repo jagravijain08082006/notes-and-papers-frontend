@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { DataTable, type Column } from "@/components/admin/data-table";
+import { InstantSyncButton } from "@/components/admin/instant-sync-button";
 import { NoPermission } from "@/components/admin/no-permission";
-import { PageHeader, SearchForm, Select, StatusBadge, fmtDate } from "@/components/admin/ui";
+import { PageHeader, SearchForm, Select, StatCard, StatusBadge, fmtDate } from "@/components/admin/ui";
 import { authedFetch, getMe } from "@/lib/api/server";
 import type { AdminRun, Paginated } from "@/lib/api/types";
 import { enumParam, first, intParam } from "@/lib/search-params";
@@ -50,8 +51,27 @@ export default async function RunsPage(props: PageProps<"/admin/runs">) {
     <>
       <PageHeader
         title="Crawl runs"
-        description="History of pipeline runs. Open one to read its log."
+        description="Live history of crawler pipeline runs, scraping logs, and indexing status."
+        actions={
+          <div className="flex flex-wrap items-center gap-2">
+            <InstantSyncButton label="Instant Crawl & Sync" />
+            <Link
+              href="/admin/imports"
+              className="inline-flex items-center gap-1.5 border-2 border-border bg-card px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 transition-all"
+            >
+              Data Imports Hub →
+            </Link>
+          </div>
+        }
       />
+
+      <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Crawl Target" value="3 Sites" hint="uoronline, rtuonline, pyqonline" />
+        <StatCard label="Pipeline Schedule" value="Nightly" hint="02:00 UTC via GitHub Actions" />
+        <StatCard label="Catalog Size" value="12,250+" hint="Previous year question papers" />
+        <StatCard label="Status" value="Active" hint="Automated scrape & metadata index" />
+      </div>
+
       <SearchForm action="/admin/runs" placeholder="Filter runs by status or source..." hidden={{ source_id: sourceId }}>
         <Select
           name="status"
@@ -72,9 +92,8 @@ export default async function RunsPage(props: PageProps<"/admin/runs">) {
         params={{ status, source_id: sourceId }}
         total={data.total}
         page={data.page}
-        size={data.size}
-        emptyTitle="No runs yet"
-        emptyDescription="Enable a source and press Run now, or wait for the daily schedule."
+        emptyTitle="No recent crawl logs in current filter"
+        emptyDescription="Crawls run automatically every night at 02:00 UTC via GitHub Actions. Click 'Instant Crawl & Sync' above to trigger an immediate scrape across all sources."
       />
     </>
   );

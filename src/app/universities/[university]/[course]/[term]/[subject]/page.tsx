@@ -23,7 +23,13 @@ export async function generateMetadata(props: Props) {
     title: m.title,
     description: m.description,
     path: routes.subject(university, course, term, subject),
-    noindex: s.papers.length === 0,
+    noindex: false,
+    keywords: [
+      `${s.subject.name} question papers`,
+      `${s.subject.name} pyq pdf`,
+      `${s.course.name} ${s.subject.name}`,
+      `${s.university.name} ${s.subject.name}`,
+    ],
   });
 }
 

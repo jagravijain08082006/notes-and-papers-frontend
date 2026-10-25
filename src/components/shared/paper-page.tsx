@@ -8,8 +8,10 @@ import { BookmarkButton } from "@/components/shared/bookmark-button";
 import { PaperList } from "@/components/shared/paper-list";
 import { ReportDialog } from "@/components/shared/report-dialog";
 import { TrackOnMount } from "@/components/shared/tracker";
-import { getPaper, getPaperRedirect } from "@/lib/api/public";
+import { getLatestPapers, getPaper, getPaperRedirect } from "@/lib/api/public";
+import type { PaperSummary } from "@/lib/api/types";
 import { kindLabel, paperContext, paperHref, routes, subjectHref } from "@/lib/routes";
+import { cleanPreviewExcerpt } from "@/lib/sanitize-preview";
 import { buildMetadata, faqLd, learningResourceLd, paperMeta } from "@/lib/seo";
 
 export async function paperMetadata(slug: string) {
@@ -56,6 +58,18 @@ export async function PaperPage({
   const uniName = p.university_name ?? "";
   const uniSlug = p.university_slug ?? "";
   const topic = p.subject_name ?? p.title;
+  const cleanedExcerpt = cleanPreviewExcerpt(p.content_excerpt);
+
+  const hasRelated = p.other_years.length > 0 || p.related.length > 0;
+  let fallbackPapers: PaperSummary[] = [];
+  if (!hasRelated) {
+    try {
+      const latest = await getLatestPapers(8);
+      fallbackPapers = (latest.items ?? []).filter((item) => item.slug !== slug).slice(0, 6);
+    } catch {
+      fallbackPapers = [];
+    }
+  }
   const faqs = [
     {
       q: `Where can I download the ${m.h1}?`,
@@ -157,7 +171,7 @@ export async function PaperPage({
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2.5">
-                  <h2 className="font-display text-2xl uppercase leading-none tracking-tight sm:text-3xl text-foreground">
+                  <h2 className="font-display text-2xl uppercase leading-none tracking-wider sm:text-3xl text-foreground">
                     {ready ? "Instant PDF Download" : "PDF In Preparation"}
                   </h2>
                   {p.pages && (
@@ -207,7 +221,7 @@ export async function PaperPage({
                 </div>
               )}
 
-              {p.content_excerpt && (
+              {cleanedExcerpt && (
                 <a
                   href="#excerpt-heading"
                   className="inline-flex h-9 w-full items-center justify-center gap-2 border-2 border-border bg-background px-3 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-muted hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5"
@@ -246,13 +260,13 @@ export async function PaperPage({
         </p>
       </section>
 
-      {p.content_excerpt && (
+      {cleanedExcerpt && (
         <section aria-labelledby="excerpt-heading" className="max-w-5xl space-y-5">
           <h2 id="excerpt-heading" className="text-3xl sm:text-4xl">
             Paper preview
           </h2>
           <blockquote className="whitespace-pre-line border-2 border-border bg-card p-5 shadow-hard-sm text-sm leading-relaxed">
-            {p.content_excerpt}
+            {cleanedExcerpt}
           </blockquote>
         </section>
       )}
@@ -275,11 +289,74 @@ export async function PaperPage({
         </section>
       )}
 
+      {!hasRelated && fallbackPapers.length > 0 && (
+        <section aria-labelledby="recent-heading" className="space-y-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="space-y-1">
+              <span className="eyebrow inline-block bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm">
+                Keep Practicing
+              </span>
+              <h2 id="recent-heading" className="text-3xl sm:text-4xl font-display uppercase tracking-wider">
+                Recent Question Papers
+              </h2>
+            </div>
+            <Link
+              href="/search"
+              className="inline-flex items-center gap-1.5 border-2 border-border bg-card px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm hover:bg-primary hover:shadow-hard transition-all active:translate-x-0.5 active:translate-y-0.5"
+            >
+              Browse All Papers →
+            </Link>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Explore recent question papers added across university courses and exam categories.
+          </p>
+          <PaperList papers={fallbackPapers} />
+        </section>
+      )}
+
       <section aria-labelledby="faq-heading" className="max-w-5xl space-y-5">
-        <h2 id="faq-heading" className="text-3xl sm:text-4xl">
+        <h2 id="faq-heading" className="text-3xl sm:text-4xl font-display uppercase tracking-wider">
           Frequently asked questions
         </h2>
         <FaqAccordion faqs={faqs} />
+      </section>
+
+      {/* SUGGESTIONS & NEXT STEPS */}
+      <section className="space-y-5 border-t-2 border-border pt-10">
+        <div className="space-y-1">
+          <span className="eyebrow inline-block bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm">
+            Keep Practicing
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-display uppercase tracking-wider">
+            Suggested Next Steps &amp; Related Links
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Explore more question papers, syllabus streams, and exam collections.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href={subjectHref(p)}
+            className="inline-flex items-center gap-2 border-2 border-border bg-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+          >
+            {isCourse ? `All ${topic} question papers →` : `All ${p.exam_name ?? "exam"} papers →`}
+          </Link>
+          {isCourse && p.university_slug && p.course_slug && (
+            <Link
+              href={routes.course(p.university_slug, p.course_slug)}
+              className="inline-flex items-center gap-2 border-2 border-border bg-card px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+            >
+              All Semesters of {p.course_name} →
+            </Link>
+          )}
+          <Link
+            href="/search"
+            className="inline-flex items-center gap-2 border-2 border-border bg-primary px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+          >
+            Search More Papers →
+          </Link>
+        </div>
       </section>
 
       <JsonLdScript data={[learningResourceLd(p, m.title, m.description), faqLd(faqs)]} />

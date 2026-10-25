@@ -12,14 +12,7 @@ import { cn } from "@/lib/utils";
 const RECENT_KEY = "notespapers_recent_searches";
 const MAX_RECENTS = 6;
 
-function useDebounced<T>(value: T, ms = 800) {
-  const [v, setV] = useState(value);
-  useEffect(() => {
-    const t = setTimeout(() => setV(value), ms);
-    return () => clearTimeout(t);
-  }, [value, ms]);
-  return v;
-}
+import { useDebounce } from "@/hooks/use-debounce";
 
 function getStoredRecents(): string[] {
   if (typeof window === "undefined") return [];
@@ -71,7 +64,7 @@ export function SearchBar({
   const [recents, setRecents] = useState<string[]>(() => getStoredRecents());
 
   const trimmed = value.trim();
-  const debounced = useDebounced(trimmed, 800);
+  const debounced = useDebounce(trimmed, 450);
   const isDebouncing = trimmed.length >= 2 && debounced !== trimmed;
 
   const { data, isFetching } = useQuery({
@@ -196,8 +189,7 @@ export function SearchBar({
                 }
               }}
               className={cn(
-                "h-full min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 font-medium shadow-none outline-none placeholder:font-normal placeholder:text-muted-foreground focus-visible:outline-none focus-visible:shadow-none",
-                size === "lg" ? "text-sm sm:text-base" : "text-sm",
+                "h-full min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-base font-medium shadow-none outline-none placeholder:font-normal placeholder:text-muted-foreground focus-visible:outline-none focus-visible:shadow-none",
               )}
             />
             {value.length > 0 && (

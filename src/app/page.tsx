@@ -29,6 +29,21 @@ export const metadata = buildMetadata({
   description:
     "Free previous year question papers for Rajasthan University (BA, BSc, BCom, BCA...) and competitive exams (UPSC, SSC, GATE, NEET, UGC NET...). Search by subject, course, exam and year.",
   path: "/",
+  keywords: [
+    "notes and papers",
+    "notes and papers dpdns",
+    "notesandpapers",
+    "notesandpapers dpdns org",
+    "notes and papers question papers",
+    "previous year question papers",
+    "free pyq pdf download",
+    "rajasthan university question papers",
+    "rtu previous year papers",
+    "cbse sample papers",
+    "rbse board papers",
+    "upsc previous year papers",
+    "ssc question papers",
+  ],
 });
 
 const QUICK = [
@@ -111,7 +126,7 @@ export default async function HomePage() {
       {/* HERO */}
       <section
         aria-labelledby="hero-heading"
-        className="grid items-center gap-10 py-2 lg:grid-cols-[1.4fr_1fr] lg:gap-12 lg:py-10"
+        className="grid items-start gap-10 py-2 lg:grid-cols-[1.4fr_1fr] lg:gap-12 lg:py-10"
       >
         <div className="space-y-8">
           <p className="eyebrow inline-flex items-center gap-2 border-2 border-border bg-card px-2.5 py-1">
@@ -153,7 +168,7 @@ export default async function HomePage() {
 
         <aside
           aria-label="Library at a glance"
-          className="brutal space-y-5 border-2 border-border bg-card p-5 shadow-hard-lg transition-transform sm:p-6 lg:rotate-1 hover:rotate-0"
+          className="brutal space-y-5 border-2 border-border bg-card p-5 shadow-hard-lg transition-transform sm:p-6 lg:rotate-1 hover:rotate-0 lg:sticky lg:top-24 lg:self-start"
         >
           <div className="flex items-center justify-between border-b-2 border-border pb-3">
             <p className="eyebrow tracking-wider">Vault metrics</p>
@@ -178,7 +193,7 @@ export default async function HomePage() {
                   m.highlight ? "bg-primary text-primary-foreground" : "bg-background",
                 )}
               >
-                <dd className="font-display text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-tight whitespace-nowrap">
+                <dd className="font-display text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-wide whitespace-nowrap">
                   {m.v.toLocaleString("en-IN")}
                 </dd>
                 <dt className="eyebrow mt-1 text-[10px] sm:text-xs text-foreground/80 truncate">

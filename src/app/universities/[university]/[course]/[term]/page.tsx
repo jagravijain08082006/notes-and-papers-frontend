@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { BookOpen } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { EmptyState } from "@/components/shared/empty-state";
+import { InteractiveCardLink } from "@/components/shared/interactive-card";
 import { JsonLdScript } from "@/components/shared/json-ld";
-import { Card } from "@/components/ui/card";
 import { getTerm } from "@/lib/api/public";
 import { routes, yearRange } from "@/lib/routes";
 import { buildMetadata, collectionPageLd, itemListLd, termMeta } from "@/lib/seo";
@@ -29,7 +30,12 @@ export async function generateMetadata(
     title: m.title,
     description: m.description,
     path: routes.term(university, course, term),
-    noindex: t.subjects.length === 0,
+    noindex: false,
+    keywords: [
+      `${t.course.name} ${m.label}`,
+      `${t.course.name} question papers`,
+      `${t.university.name} ${t.course.name}`,
+    ],
   });
 }
 
@@ -69,25 +75,52 @@ export default async function TermPage(
           description="Subjects appear once papers are published."
         />
       ) : (
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {t.subjects.map((s) => (
-            <li key={s.slug}>
-              <Card className="h-full transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard">
-                <Link
+        <div className="space-y-12">
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {t.subjects.map((s) => (
+              <li key={s.slug}>
+                <InteractiveCardLink
                   href={routes.subject(university, course, term, s.slug)}
-                  className="block space-y-1 p-5"
-                >
-                  <h2 className="text-xl leading-tight">{s.name}</h2>
-                  <p className="text-sm text-muted-foreground">
-                    {plural(s.paper_count, "paper")}
-                    {s.year_min ? ` · ${yearRange(s.year_min, s.year_max)}` : ""}
-                    {s.paper_code ? ` · ${s.paper_code}` : ""}
-                  </p>
-                </Link>
-              </Card>
-            </li>
-          ))}
-        </ul>
+                  title={s.name}
+                  subtitle={`${plural(s.paper_count, "paper")}${s.year_min ? ` · ${yearRange(s.year_min, s.year_max)}` : ""}${s.paper_code ? ` · ${s.paper_code}` : ""}`}
+                  icon={<BookOpen className="size-5" aria-hidden="true" />}
+                />
+              </li>
+            ))}
+          </ul>
+
+          {/* SUGGESTIONS & NAVIGATION */}
+          <section className="space-y-4 border-t-2 border-border pt-10">
+            <div className="space-y-1">
+              <span className="eyebrow inline-block bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm">
+                Suggestions &amp; Quick Links
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-display uppercase tracking-wider">
+                Explore More in {t.course.name}
+              </h2>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href={routes.course(university, course)}
+                className="inline-flex items-center gap-2 border-2 border-border bg-card px-4 py-2 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+              >
+                ← All Semesters of {t.course.name}
+              </Link>
+              <Link
+                href={routes.university(university)}
+                className="inline-flex items-center gap-2 border-2 border-border bg-card px-4 py-2 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+              >
+                All Courses in {t.university.name}
+              </Link>
+              <Link
+                href={`/search?course=${encodeURIComponent(t.course.name)}`}
+                className="inline-flex items-center gap-2 border-2 border-border bg-primary px-4 py-2 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+              >
+                Search all {t.course.name} papers →
+              </Link>
+            </div>
+          </section>
+        </div>
       )}
 
       <JsonLdScript

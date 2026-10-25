@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { DownloadManager } from "@/components/shared/download-manager";
-import { getPaper } from "@/lib/api/public";
+import { getLatestPapers, getPaper } from "@/lib/api/public";
+import type { PaperSummary } from "@/lib/api/types";
 import { paperHref, routes } from "@/lib/routes";
 import { buildMetadata, paperMeta } from "@/lib/seo";
 
@@ -48,10 +49,24 @@ export default async function DownloadPage(props: PageProps<"/papers/[slug]/down
         { name: "Download", path: routes.download(slug) },
       ];
 
+  let suggestedPapers: PaperSummary[] = [];
+  if (p.related && p.related.length > 0) {
+    suggestedPapers = p.related.slice(0, 6);
+  } else if (p.other_years && p.other_years.length > 0) {
+    suggestedPapers = p.other_years.slice(0, 6);
+  } else {
+    try {
+      const latest = await getLatestPapers(8);
+      suggestedPapers = (latest.items ?? []).filter((item) => item.slug !== slug).slice(0, 6);
+    } catch {
+      suggestedPapers = [];
+    }
+  }
+
   return (
     <div className="space-y-8">
       <Breadcrumbs items={crumbs} />
-      <DownloadManager paper={p} />
+      <DownloadManager paper={p} suggestedPapers={suggestedPapers} />
     </div>
   );
 }

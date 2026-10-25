@@ -27,29 +27,31 @@
   --border: 0 0% 7%;
   --input: 0 0% 7%;
   --ring: 14 100% 50%;
+  --shadow-ink: 0 0% 7%;
   --radius: 0.125rem;
 }
 
 .dark {
-  --background: 0 0% 7%;
-  --foreground: 60 33% 96%;
-  --card: 0 0% 11%;
-  --card-foreground: 60 33% 96%;
-  --primary: 48 96% 53%;
-  --primary-foreground: 0 0% 7%;
-  --link: 48 96% 60%;
-  --secondary: 0 0% 15%;
-  --secondary-foreground: 60 33% 96%;
-  --muted: 0 0% 14%;
-  --muted-foreground: 50 10% 70%;
-  --accent: 14 100% 60%;
-  --accent-foreground: 0 0% 7%;
-  --destructive: 0 80% 62%;
-  --destructive-foreground: 0 0% 7%;
-  --success: 152 55% 55%;
-  --border: 60 20% 88%;
-  --input: 60 20% 88%;
-  --ring: 48 96% 60%;
+  --background: 222 24% 8%; /* #0F1319 deep rich obsidian slate */
+  --foreground: 60 30% 98%; /* #FAFAF5 crisp paper white */
+  --card: 222 20% 13%; /* #191E28 elevated slate card surface */
+  --card-foreground: 60 30% 98%;
+  --primary: 48 100% 50%; /* #FFCC00 electric punchy gold */
+  --primary-foreground: 0 0% 6%;
+  --link: 48 100% 62%;
+  --secondary: 222 18% 18%; /* #222836 */
+  --secondary-foreground: 60 30% 98%;
+  --muted: 222 18% 16%; /* #1E2330 */
+  --muted-foreground: 218 16% 68%; /* #9AA5B8 crisp readable contrast */
+  --accent: 16 100% 58%; /* #FF5722 flame orange */
+  --accent-foreground: 0 0% 6%;
+  --destructive: 0 85% 62%;
+  --destructive-foreground: 0 0% 100%;
+  --success: 152 65% 48%;
+  --border: 220 16% 32%; /* #454D5E crisp defined slate border */
+  --input: 220 16% 32%;
+  --ring: 48 100% 50%;
+  --shadow-ink: 0 0% 0%; /* Deep pitch black 3D hard shadows */
 }
 
 @theme inline {
@@ -79,16 +81,29 @@
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display), Impact, sans-serif;
   --font-mono: var(--font-mono), ui-monospace, monospace;
-  --shadow-hard: 4px 4px 0 0 hsl(var(--border));
-  --shadow-hard-sm: 2px 2px 0 0 hsl(var(--border));
-  --shadow-hard-lg: 6px 6px 0 0 hsl(var(--border));
+  --shadow-hard: 4px 4px 0 0 hsl(var(--shadow-ink));
+  --shadow-hard-sm: 2px 2px 0 0 hsl(var(--shadow-ink));
+  --shadow-hard-lg: 6px 6px 0 0 hsl(var(--shadow-ink));
 }
 
 @layer base {
   html,
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100vw;
+  }
+  /* Enforce minimum 16px font-size on all inputs, selects and textareas */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  @media screen and (max-width: 768px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
   }
   * {
     border-color: hsl(var(--border));
@@ -135,13 +150,9 @@
     padding: 0.4rem 0.75rem;
     font-weight: 700;
     font-size: 0.75rem;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     cursor: pointer;
-  }
-  html,
-  body {
-    overflow-x: clip;
   }
   html {
     scroll-behavior: smooth;
@@ -151,28 +162,28 @@
     color: hsl(var(--foreground));
     font-family: var(--font-sans);
   }
-  /* Big, loud, condensed headings. h3 and below stay in the body face. */
+  /* Big, loud headings with generous letter-spacing so characters breathe clearly. */
   h1,
   h2,
   .font-display {
     font-family: var(--font-display);
     font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.01em;
-    line-height: 1.05;
+    letter-spacing: 0.055em;
+    line-height: 1.15;
     overflow-wrap: break-word;
     hyphens: manual;
     font-synthesis: none; /* never fake-bold the condensed display face */
-    word-spacing: 0.08em;
+    word-spacing: 0.12em;
   }
   h1,
   h2 {
-    letter-spacing: 0.035em;
+    letter-spacing: 0.06em;
     line-height: 1.15;
   }
   .font-display {
     font-synthesis: none;
-    letter-spacing: 0.035em;
+    letter-spacing: 0.06em;
   }
   /* Everything clickable shows the pointer. */
   a[href],
@@ -208,7 +219,7 @@
   .eyebrow {
     font-size: 0.6875rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
   /* A bordered surface that lifts on hover with a hard shadow. */

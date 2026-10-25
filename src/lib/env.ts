@@ -18,5 +18,8 @@ export const API_URL = trim(
 export const CONTACT_EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "thecodinggiant@gmail.com";
 export const CONTACT_PHONE = process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "";
 
+export const TELEGRAM_URL = process.env.NEXT_PUBLIC_TELEGRAM_URL || "https://telegram.me/notes_and_papers";
+export const INSTAGRAM_URL = process.env.NEXT_PUBLIC_INSTAGRAM_URL || "https://www.instagram.com/exam.notes.and.papers";
+
 export const SITE_NAME = "Notes & Papers";
 

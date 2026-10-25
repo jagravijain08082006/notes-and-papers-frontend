@@ -13,15 +13,15 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
   return (
     <>
       <nav aria-label="Breadcrumb" className="mb-6">
-        <ol className="flex flex-wrap items-center gap-1 sm:gap-1.5 border-2 border-border bg-card px-2.5 py-1.5 sm:px-3 sm:py-2 text-xs font-bold uppercase tracking-wide shadow-hard-sm">
+        <ol className="flex flex-wrap items-center gap-1.5 sm:gap-2 border-2 border-border bg-card px-3 py-2 sm:px-4 sm:py-2.5 text-xs font-bold uppercase tracking-wider shadow-hard-sm">
           {items.map((it, i) => {
             const last = i === items.length - 1;
             return (
-              <li key={`${it.path}-${i}`} className="inline-flex min-w-0 items-center gap-1">
+              <li key={`${it.path}-${i}`} className="inline-flex min-w-0 items-center gap-1.5">
                 {last ? (
                   <span
                     aria-current="page"
-                    className="max-w-[20ch] xs:max-w-[26ch] sm:max-w-[40ch] truncate bg-primary px-1.5 py-0.5"
+                    className="max-w-[20ch] xs:max-w-[26ch] sm:max-w-[40ch] truncate border border-border bg-primary px-2.5 py-1 font-bold text-primary-foreground shadow-hard-sm"
                     title={it.name}
                   >
                     {it.name}
@@ -29,13 +29,13 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
                 ) : (
                   <Link
                     href={it.path}
-                    className="flex items-center gap-1 whitespace-nowrap text-muted-foreground hover:text-foreground hover:underline"
+                    className="flex items-center gap-1.5 whitespace-nowrap px-2 py-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
                     {i === 0 && <Home className="size-3.5" aria-hidden="true" />}
                     {i === 0 ? <span className="sr-only">{it.name}</span> : it.name}
                   </Link>
                 )}
-                {!last && <ChevronRight className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />}
+                {!last && <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/80" aria-hidden="true" />}
               </li>
             );
           })}

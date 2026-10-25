@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { BarChart, InstantSyncButton, PageHeader, StatCard, StatusBadge, fmtDate } from "@/components/admin/ui";
+import { BarChart, PageHeader, StatCard, StatusBadge, fmtDate } from "@/components/admin/ui";
 import { NoPermission } from "@/components/admin/no-permission";
 import { authedFetch, getMe } from "@/lib/api/server";
 import type { AdminOverview } from "@/lib/api/types";
@@ -17,7 +17,14 @@ export default async function AdminOverviewPage() {
       <PageHeader
         title="Overview"
         description="What the platform is doing right now."
-        actions={<InstantSyncButton />}
+        actions={
+          <Link
+            href="/admin/imports"
+            className="inline-flex items-center gap-1.5 border-2 border-border bg-primary px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 transition-all"
+          >
+            Open Crawl Hub →
+          </Link>
+        }
       />
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
@@ -55,31 +62,50 @@ export default async function AdminOverviewPage() {
         />
       </div>
 
-      <section aria-labelledby="last-run" className="mt-6 border-2 border-border bg-card p-4">
-        <h2 id="last-run" className=" mb-4 text-2xl">
-          Last crawl run
-        </h2>
+      <section aria-labelledby="last-run" className="mt-6 border-2 border-border bg-card p-5 shadow-hard-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <h2 id="last-run" className="text-xl sm:text-2xl font-display uppercase tracking-wider">
+            Crawl Pipeline Status
+          </h2>
+          <Link
+            href="/admin/runs"
+            className="text-xs font-bold uppercase tracking-wider text-link hover:underline"
+          >
+            View All Crawl Runs →
+          </Link>
+        </div>
+
         {o.last_run ? (
-          <p className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
             <StatusBadge status={o.last_run.status} />
-            <span>{o.last_run.source_name}</span>
+            <span className="font-bold">{o.last_run.source_name}</span>
             <span className="text-muted-foreground">
               {o.last_run.new_count} new · {o.last_run.changed_count} changed ·{" "}
               {o.last_run.failed_count} failed ·{" "}
               {fmtDate(o.last_run.finished_at ?? o.last_run.created_at)}
             </span>
-            <Link href={`/admin/runs/${o.last_run.id}`} className="text-link underline">
-              Details
+            <Link href={`/admin/runs/${o.last_run.id}`} className="text-link underline font-medium">
+              Run Details
             </Link>
-          </p>
+          </div>
         ) : (
-          <p className="mt-2 text-sm text-muted-foreground">
-            No runs yet.{" "}
-            <Link href="/admin/sources" className="text-link underline">
-              Enable a source
-            </Link>{" "}
-            and press Run now.
-          </p>
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 border border-border bg-success/15 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-success">
+                ● Automated Pipeline Scheduled
+              </span>
+              <span className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Nightly Sync (02:00 UTC via GitHub Actions)
+              </span>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Automated scrapers crawl university listings nightly. You can also trigger an immediate scrape from the{" "}
+              <Link href="/admin/imports" className="text-link underline font-medium">
+                Data Imports &amp; Crawl Hub
+              </Link>
+              .
+            </p>
+          </div>
         )}
       </section>
 

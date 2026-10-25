@@ -17,10 +17,10 @@ export function NavLinks({ items }: { items: { href: string; label: string }[] }
             href={n.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "border-2 px-3 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors",
+              "border-2 px-3.5 py-2 text-xs font-extrabold uppercase tracking-wider transition-all",
               active
                 ? "border-border bg-primary text-primary-foreground shadow-hard-sm"
-                : "border-transparent hover:border-border hover:bg-muted",
+                : "border-transparent text-foreground/80 hover:border-border hover:bg-muted hover:text-foreground hover:shadow-hard-sm",
             )}
           >
             {n.label}

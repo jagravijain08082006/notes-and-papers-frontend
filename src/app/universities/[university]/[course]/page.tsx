@@ -1,9 +1,10 @@
 import Link from "next/link";
+import { CalendarDays } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { EmptyState } from "@/components/shared/empty-state";
+import { InteractiveCardLink } from "@/components/shared/interactive-card";
 import { JsonLdScript } from "@/components/shared/json-ld";
-import { Card } from "@/components/ui/card";
 import { getCourse } from "@/lib/api/public";
 import { routes, termLabel } from "@/lib/routes";
 import { buildMetadata, collectionPageLd, courseMeta } from "@/lib/seo";
@@ -27,7 +28,12 @@ export async function generateMetadata(props: PageProps<"/universities/[universi
     title: m.title,
     description: m.description,
     path: routes.course(university, course),
-    noindex: c.paper_count === 0,
+    noindex: false,
+    keywords: [
+      `${c.name} question papers`,
+      `${c.name} ${c.university_name}`,
+      `${c.name} syllabus pyq`,
+    ],
   });
 }
 
@@ -151,22 +157,65 @@ export default async function CoursePage(props: PageProps<"/universities/[univer
               <ul className="grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
                 {g.terms.map((t) => (
                   <li key={t.slug}>
-                    <Card className="h-full transition-transform hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard">
-                      <Link
-                        href={routes.term(university, course, t.slug)}
-                        className="block space-y-1 p-3.5 sm:p-5"
-                      >
-                        <h3 className="text-lg sm:text-2xl font-bold">{termLabel(t.kind, t.number)}</h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground">
-                          {plural(t.subject_count, "subject")} · {plural(t.paper_count, "paper")}
-                        </p>
-                      </Link>
-                    </Card>
+                    <InteractiveCardLink
+                      href={routes.term(university, course, t.slug)}
+                      title={termLabel(t.kind, t.number)}
+                      subtitle={`${plural(t.subject_count, "subject")} · ${plural(t.paper_count, "paper")}`}
+                      icon={<CalendarDays className="size-5" aria-hidden="true" />}
+                    />
                   </li>
                 ))}
               </ul>
             </section>
           ))}
+
+          {/* SUGGESTIONS & RELATED COURSES */}
+          <section className="space-y-5 border-t-2 border-border pt-10">
+            <div className="space-y-1">
+              <span className="eyebrow inline-block bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm">
+                Explore More
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-display uppercase tracking-wider">
+                Popular Courses &amp; Program Suggestions
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Jump to other undergraduate, postgraduate, and professional streams in {c.university_name}.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+              {[
+                { name: "BCA", label: "Bachelor of Computer Apps", slug: "bca" },
+                { name: "B.Sc", label: "Bachelor of Science", slug: "bsc" },
+                { name: "B.Com", label: "Bachelor of Commerce", slug: "bcom" },
+                { name: "B.A.", label: "Bachelor of Arts", slug: "ba" },
+                { name: "B.Ed", label: "Bachelor of Education", slug: "bed" },
+                { name: "BBA", label: "Business Administration", slug: "bba" },
+                { name: "M.Com", label: "Master of Commerce", slug: "mcom" },
+                { name: "M.Sc", label: "Master of Science", slug: "msc" },
+                { name: "M.A.", label: "Master of Arts", slug: "ma" },
+                { name: "MBA", label: "Master of Business Admin", slug: "mba" },
+                { name: "LLB", label: "Bachelor of Legislative Law", slug: "llb" },
+                { name: "PGDCA", label: "Postgrad Computer Apps", slug: "pgdca" },
+              ]
+                .filter((item) => item.slug !== course)
+                .slice(0, 8)
+                .map((item) => (
+                  <Link
+                    key={item.slug}
+                    href={routes.course(university, item.slug)}
+                    className="flex flex-col justify-between border-2 border-border bg-card p-3 shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-primary/20 hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+                  >
+                    <span className="font-display text-lg uppercase tracking-wider text-foreground">
+                      {item.name}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground truncate font-medium">
+                      {item.label}
+                    </span>
+                  </Link>
+                ))}
+            </div>
+          </section>
         </div>
       )}
 

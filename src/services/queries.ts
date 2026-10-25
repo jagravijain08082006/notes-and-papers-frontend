@@ -31,18 +31,54 @@ function qs(params: Record<string, string | number | undefined | null>) {
   return s ? `?${s}` : "";
 }
 
+const inFlightRequests = new Map<string, Promise<unknown>>();
+
 async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
-  const res = await fetch(url, { headers: { Accept: "application/json" }, signal });
-  if (!res.ok) {
-    let message = "Something went wrong. Please try again.";
-    try {
-      message = ((await res.json()) as { error?: { message?: string } }).error?.message ?? message;
-    } catch {
-      /* non-JSON body */
-    }
-    throw new HttpError(res.status, message);
+  if (signal?.aborted) {
+    throw new DOMException("The user aborted a request.", "AbortError");
   }
-  return (await res.json()) as T;
+
+  const existing = inFlightRequests.get(url);
+  if (existing) {
+    if (signal) {
+      return new Promise<T>((resolve, reject) => {
+        const onAbort = () => reject(new DOMException("The user aborted a request.", "AbortError"));
+        signal.addEventListener("abort", onAbort, { once: true });
+        (existing as Promise<T>).then(
+          (val) => {
+            signal.removeEventListener("abort", onAbort);
+            resolve(val);
+          },
+          (err) => {
+            signal.removeEventListener("abort", onAbort);
+            reject(err);
+          },
+        );
+      });
+    }
+    return existing as Promise<T>;
+  }
+
+  const promise = (async () => {
+    try {
+      const res = await fetch(url, { headers: { Accept: "application/json" }, signal });
+      if (!res.ok) {
+        let message = "Something went wrong. Please try again.";
+        try {
+          message = ((await res.json()) as { error?: { message?: string } }).error?.message ?? message;
+        } catch {
+          /* non-JSON body */
+        }
+        throw new HttpError(res.status, message);
+      }
+      return (await res.json()) as T;
+    } finally {
+      inFlightRequests.delete(url);
+    }
+  })();
+
+  inFlightRequests.set(url, promise);
+  return promise;
 }
 
 /** GET /api/universities */

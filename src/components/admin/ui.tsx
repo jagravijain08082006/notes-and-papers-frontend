@@ -46,7 +46,7 @@ export function StatCard({
       <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
       <p
         className={cn(
-          "mt-2 text-3xl font-extrabold tabular-nums tracking-tight",
+          "mt-2 text-3xl font-extrabold tabular-nums tracking-normal",
           tone === "warn" && "text-amber-600 dark:text-amber-400",
           tone === "bad" && "text-destructive",
         )}

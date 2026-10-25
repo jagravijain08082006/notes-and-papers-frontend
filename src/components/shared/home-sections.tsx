@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, GraduationCap, RefreshCw, ScrollText, Shuffle } from "lucide-react";
+import { ArrowRight, GraduationCap, RefreshCw, School, ScrollText, Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useExams, useLatestPapers, useUniversities } from "@/hooks/use-catalog";
 import type { ExamSummary, Paginated, PaperSummary, UniversityListItem } from "@/lib/api/types";
-import { getExamDomain } from "@/lib/exam-categories";
+import { cleanExamTitle, getExamDomain } from "@/lib/exam-categories";
 import { routes, yearRange } from "@/lib/routes";
 import { cn, plural } from "@/lib/utils";
 import { EmptyState } from "./empty-state";
@@ -54,7 +54,7 @@ export function SectionHeading({
       {href && (
         <Link
           href={href}
-          className="flex items-center gap-1.5 border-b-2 border-border pb-0.5 text-xs font-bold uppercase tracking-wide hover:bg-primary shrink-0"
+          className="inline-flex items-center gap-2 border-2 border-border bg-primary px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm transition-all hover:shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5 shrink-0"
         >
           {linkLabel ?? "See all"} <ArrowRight className="size-4" aria-hidden="true" />
         </Link>
@@ -86,62 +86,199 @@ function TileSkeletons() {
   );
 }
 
-/** Universities with their biggest courses. Data: GET /api/universities (server-rendered first, refreshed on load). */
+const POPULAR_SCHOOL_BOARDS = [
+  {
+    slug: "uni-rajasthanboard",
+    name: "RBSE Rajasthan Board (BSER)",
+    subtitle: "Secondary & Higher Secondary · State Board",
+    href: "/exams/uni-rajasthanboard",
+    tags: [
+      { label: "Class 10th Secondary", href: "/search?q=RBSE+Class+10" },
+      { label: "Class 12th Science", href: "/search?q=RBSE+Class+12+Science" },
+      { label: "Class 12th Commerce", href: "/search?q=RBSE+Class+12+Commerce" },
+      { label: "Class 12th Arts", href: "/search?q=RBSE+Class+12+Arts" },
+      { label: "Model Papers", href: "/search?q=RBSE+Model+Paper" },
+    ],
+  },
+  {
+    slug: "uni-cbseboardonline",
+    name: "CBSE Central Board",
+    subtitle: "Class 10th & 12th · All India Board",
+    href: "/exams/uni-cbseboardonline",
+    tags: [
+      { label: "Class 10th Board", href: "/search?q=CBSE+Class+10" },
+      { label: "Class 12th Science", href: "/search?q=CBSE+Class+12+Science" },
+      { label: "Class 12th Commerce", href: "/search?q=CBSE+Class+12+Commerce" },
+      { label: "Class 12th Humanities", href: "/search?q=CBSE+Class+12+Arts" },
+      { label: "Sample Papers", href: "/search?q=CBSE+Sample+Paper" },
+    ],
+  },
+  {
+    slug: "uni-upboardonline",
+    name: "UP Board (UPMSP)",
+    subtitle: "High School & Intermediate · Prayagraj",
+    href: "/exams/uni-upboardonline",
+    tags: [
+      { label: "Class 10 High School", href: "/search?q=UP+Board+Class+10" },
+      { label: "Class 12 Intermediate", href: "/search?q=UP+Board+Class+12" },
+      { label: "Model Papers", href: "/search?q=UP+Board+Model+Paper" },
+    ],
+  },
+  {
+    slug: "uni-icseonline",
+    name: "ICSE & ISC Board (CISCE)",
+    subtitle: "Class 10th ICSE & 12th ISC · All India",
+    href: "/exams/uni-icseonline",
+    tags: [
+      { label: "Class 10 ICSE", href: "/search?q=ICSE+Class+10" },
+      { label: "Class 12 ISC", href: "/search?q=ISC+Class+12" },
+      { label: "Specimen Papers", href: "/search?q=ICSE+Specimen+Paper" },
+    ],
+  },
+  {
+    slug: "uni-mpboardonline",
+    name: "MP Board (MPBSE)",
+    subtitle: "High School & HSS · Bhopal MP",
+    href: "/exams/uni-mpboardonline",
+    tags: [
+      { label: "Class 10th Board", href: "/search?q=MP+Board+Class+10" },
+      { label: "Class 12th Board", href: "/search?q=MP+Board+Class+12" },
+      { label: "Model Papers", href: "/search?q=MP+Board+Model+Paper" },
+    ],
+  },
+  {
+    slug: "cg-open-school",
+    name: "CG Open School Board",
+    subtitle: "11 Papers Available · State Open Board",
+    href: "/exams/cg-open-school",
+    tags: [
+      { label: "Class 10th Open", href: "/exams/cg-open-school" },
+      { label: "Class 12th Open", href: "/exams/cg-open-school" },
+    ],
+  },
+];
+
+const ACADEMIC_TABS = [
+  { id: "all", label: "All (Universities & Boards)" },
+  { id: "universities", label: "Universities" },
+  { id: "boards", label: "School Boards (RBSE, CBSE...)" },
+];
+
+/** Universities & School Boards with courses and classes. */
 export function UniversitiesSection({ initial }: { initial: UniversityListItem[] | null }) {
+  const [activeTab, setActiveTab] = useState("all");
   const { data, isPending, isError, error, refetch } = useUniversities(initial);
   const unis = (data ?? []).filter((u) => u.paper_count > 0);
 
+  const showUnis = activeTab === "all" || activeTab === "universities";
+  const showBoards = activeTab === "all" || activeTab === "boards";
+  const displayedBoards =
+    activeTab === "all" ? POPULAR_SCHOOL_BOARDS.slice(0, 2) : POPULAR_SCHOOL_BOARDS;
+
   return (
     <section aria-labelledby="courses-heading" className="space-y-8">
-      <SectionHeading
-        id="courses-heading"
-        eyebrow="University exams"
-        title="Browse by university"
-        href={routes.universities}
-        linkLabel="All universities"
-      />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <SectionHeading
+          id="courses-heading"
+          eyebrow="University & board exams"
+          title="Browse by university & boards"
+          href={routes.universities}
+          linkLabel="All universities"
+        />
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+        {ACADEMIC_TABS.map((tab) => {
+          const isSelected = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "shrink-0 border-2 border-border px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all shadow-hard-sm hover:-translate-x-px hover:-translate-y-px",
+                isSelected
+                  ? "bg-primary text-primary-foreground shadow-hard"
+                  : "bg-card text-foreground hover:bg-primary/20",
+              )}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
       {isPending ? (
         <TileSkeletons />
       ) : isError && unis.length === 0 ? (
         <ErrorBox message={error.message} onRetry={() => void refetch()} />
-      ) : unis.length > 0 ? (
-        <TileGrid>
-          {unis.map((u) => (
-            <li key={u.slug} className="w-full min-w-0 max-w-full">
-              <div className="brutal flex h-full w-full min-w-0 flex-col justify-between gap-5 p-5">
-                <Link href={routes.university(u.slug)} className="block space-y-3 min-w-0">
-                  <span className="grid size-11 place-items-center border-2 border-border bg-primary">
-                    <GraduationCap className="size-5" aria-hidden="true" />
-                  </span>
-                  <span className="block font-display text-2xl sm:text-3xl uppercase leading-[1.2] break-words">
-                    {u.name}
-                  </span>
-                  <span className="eyebrow block text-muted-foreground truncate">
-                    {plural(u.paper_count, "paper")} · {plural(u.course_count, "course")}
-                  </span>
-                </Link>
-                <ul className="flex flex-wrap gap-2">
-                  {u.top_courses.map((c) => (
-                    <li key={c.slug}>
-                      <Link
-                        href={routes.course(u.slug, c.slug)}
-                        className="eyebrow border-2 border-border px-1.5 py-0.5 hover:bg-primary"
-                      >
-                        {c.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </li>
-          ))}
-        </TileGrid>
       ) : (
-        <EmptyState
-          title="Courses are being added"
-          description="Try the search to look for a specific paper."
-          action={{ href: "/search", label: "Search papers" }}
-        />
+        <TileGrid>
+          {/* Universities */}
+          {showUnis &&
+            unis.map((u) => (
+              <li key={u.slug} className="w-full min-w-0 max-w-full">
+                <div className="brutal brutal-hover flex h-full w-full min-w-0 flex-col justify-between gap-5 p-5 bg-card">
+                  <Link href={routes.university(u.slug)} className="block space-y-3 min-w-0 group">
+                    <span className="grid size-11 place-items-center border-2 border-border bg-primary transition-colors group-hover:bg-accent shadow-hard-sm">
+                      <GraduationCap className="size-5" aria-hidden="true" />
+                    </span>
+                    <span className="block font-display text-2xl sm:text-3xl uppercase leading-[1.2] break-words group-hover:text-link transition-colors">
+                      {u.name}
+                    </span>
+                    <span className="eyebrow block text-muted-foreground truncate">
+                      {plural(u.paper_count, "paper")} · {plural(u.course_count, "course")}
+                    </span>
+                  </Link>
+                  <ul className="flex flex-wrap gap-2">
+                    {u.top_courses.map((c) => (
+                      <li key={c.slug}>
+                        <Link
+                          href={routes.course(u.slug, c.slug)}
+                          className="eyebrow border-2 border-border px-1.5 py-0.5 hover:bg-primary transition-colors"
+                        >
+                          {c.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            ))}
+
+          {/* School Boards (RBSE, CBSE, UP Board, ICSE...) */}
+          {showBoards &&
+            displayedBoards.map((b) => (
+              <li key={b.slug} className="w-full min-w-0 max-w-full">
+                <div className="brutal brutal-hover flex h-full w-full min-w-0 flex-col justify-between gap-5 p-5 bg-card">
+                  <Link href={b.href} className="block space-y-3 min-w-0 group">
+                    <span className="grid size-11 place-items-center border-2 border-border bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground shadow-hard-sm">
+                      <School className="size-5" aria-hidden="true" />
+                    </span>
+                    <span className="block font-display text-2xl sm:text-3xl uppercase leading-[1.2] break-words group-hover:text-link transition-colors">
+                      {b.name}
+                    </span>
+                    <span className="eyebrow block text-muted-foreground truncate">
+                      {b.subtitle}
+                    </span>
+                  </Link>
+                  <ul className="flex flex-wrap gap-2">
+                    {b.tags.map((t) => (
+                      <li key={t.label}>
+                        <Link
+                          href={t.href}
+                          className="eyebrow border-2 border-border px-1.5 py-0.5 hover:bg-primary transition-colors"
+                        >
+                          {t.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            ))}
+        </TileGrid>
       )}
     </section>
   );
@@ -217,6 +354,8 @@ export function ExamsSection({ initial }: { initial: ExamSummary[] | null }) {
         <TileGrid>
           {filteredExams.map((e, i) => {
             const domain = getExamDomain(e);
+            const DomainIcon = domain.icon;
+            const cleanTitle = cleanExamTitle(e.name, e.slug);
             return (
               <li key={e.slug} className="w-full min-w-0 max-w-full">
                 <Link
@@ -227,7 +366,7 @@ export function ExamsSection({ initial }: { initial: ExamSummary[] | null }) {
                     <span
                       className={`grid size-11 place-items-center border-2 border-border ${i % 2 ? "bg-accent" : "bg-primary"}`}
                     >
-                      <ScrollText className="size-5" aria-hidden="true" />
+                      <DomainIcon className="size-5" aria-hidden="true" />
                     </span>
                     <span className="eyebrow border border-border/40 px-1.5 py-0.5 text-[11px] text-muted-foreground">
                       {e.kind === "board" ? "School Board" : domain.label}
@@ -235,7 +374,7 @@ export function ExamsSection({ initial }: { initial: ExamSummary[] | null }) {
                   </span>
                   <span className="min-w-0">
                     <span className="line-clamp-2 block font-display text-2xl uppercase leading-snug break-words">
-                      {e.name}
+                      {cleanTitle}
                     </span>
                     <span className="eyebrow mt-3 flex items-center justify-between border-t border-border/30 pt-2 text-muted-foreground">
                       <span className="font-bold text-foreground">{plural(e.paper_count, "paper")}</span>
@@ -305,7 +444,7 @@ export function LatestPapersSection({
           </button>
           <Link
             href="/search?sort=latest"
-            className="flex items-center gap-1.5 border-b-2 border-border pb-0.5 text-xs font-bold uppercase tracking-wide hover:bg-primary"
+            className="inline-flex items-center gap-2 border-2 border-border bg-card px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-primary hover:shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5"
           >
             Search all <ArrowRight className="size-4" aria-hidden="true" />
           </Link>

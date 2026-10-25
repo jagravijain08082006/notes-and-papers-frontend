@@ -14,6 +14,7 @@ interface InstantSyncButtonProps {
   className?: string;
   label?: string;
   showIcon?: boolean;
+  inProgress?: boolean;
 }
 
 export function InstantSyncButton({
@@ -22,9 +23,11 @@ export function InstantSyncButton({
   className,
   label = "Instant Sync",
   showIcon = true,
+  inProgress = false,
 }: InstantSyncButtonProps) {
   const router = useRouter();
   const [running, setRunning] = useState(false);
+  const active = running || inProgress;
 
   async function handleSync() {
     if (running) return;
@@ -68,19 +71,20 @@ export function InstantSyncButton({
       variant={variant}
       size={size}
       onClick={handleSync}
-      disabled={running}
+      disabled={active}
       aria-label="Run instant sync cron job on GitHub Actions"
       className={cn(
         "gap-2 font-bold uppercase tracking-wide text-xs shadow-hard-sm hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 transition-all shrink-0",
+        active && "opacity-75 cursor-not-allowed",
         className,
       )}
     >
-      {running ? (
+      {active ? (
         <RefreshCw className="size-3.5 animate-spin text-current" aria-hidden="true" />
       ) : showIcon ? (
         <Zap className="size-3.5 fill-current text-current" aria-hidden="true" />
       ) : null}
-      <span>{running ? "Dispatching..." : label}</span>
+      <span>{running ? "Dispatching..." : inProgress ? "Sync In Progress..." : label}</span>
     </Button>
   );
 }

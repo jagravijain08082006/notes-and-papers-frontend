@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: LayoutProps<"/admin">) {
     return <NoPermission need="an admin or moderator account" />;
   return (
     <div className="grid gap-6 min-w-0 max-w-full w-full overflow-x-clip lg:grid-cols-[14rem_1fr]">
-      <aside className="min-w-0 max-w-full w-full lg:sticky lg:top-24 lg:self-start">
+      <aside className="min-w-0 max-w-full w-full lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto scroll-slim">
         <p className="mb-2 hidden px-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground lg:block">
           {me.role === "admin" ? "Admin" : "Moderation"}
         </p>
