@@ -14,5 +14,11 @@
 - **Googlebot Host directive warning (Resolved):** Google Search Console flagged non-standard `Host:` directive in `robots.txt`. Removed from `src/app/robots.ts` so Googlebot parses directives cleanly with zero warnings.
 - **Dynamic sitemap localhost:3010 leak (Resolved):** Sitemaps were resolving base URL from fallback during build. Refactored `sitemap.xml` and `/sitemaps/[type]/[file]` to dynamically derive `baseUrl` from incoming `req.url` request origin, ensuring all 4,139+ paper URLs emit canonical `https://notesandpapers.dpdns.org`.
 - **Paper download action hero redesign (Resolved):** Paper download card was low-contrast and awkward. Replaced with high-impact hero section with verified vault & watermark-free badges, matched outline bookmark/report buttons, trust indicators, large CTA, and online preview link.
+- **Google Search "hidden from public indexing" (Resolved):** Conditional `noindex` directives across `universities/[university]`, `exams/[slug]`, and course/term routes previously sent `noindex` when paper counts were zero or backend was cold. Replaced with unconditional `index: true, follow: true` and rich snippet directives (`max-snippet:-1, max-image-preview:large`) in `src/lib/seo.ts`.
+- **Google snippet showing "DigitalPlat Domain" (Resolved):** Site name was being attributed to dynamic DNS domain host. Embedded `WebSite` JSON-LD schema into `<head>` in `src/app/layout.tsx` with explicit `name: "Notes & Papers"`, `alternateName`, `applicationName`, and `og:site_name`.
+- **Missing search result favicon / generic globe (Resolved):** Google Search requires root-level and 48px-multiple icons. Added `/icon-192.png`, `/favicon.ico`, `/icon.png`, and `/apple-touch-icon.png` in `public/` and linked them in `<head>`.
+- **Competitor crawler link contamination (Resolved):** Live preview and paper titles sometimes contained third-party crawler URLs (a2zsubject, uroroonline, etc.). Sanitized via `src/lib/sanitize-preview.ts`.
+- **Duplicate API calls on typing/browsing (Resolved):** Added `useDebounce` hook (450ms search, 250ms catalog) and in-flight request coalescing map in `src/services/queries.ts` (`getJson`).
+- **Sequential paper numbering and count badges (Resolved):** Added `Paper #{index + 1}` badges and `BOARD_CLEAN_NAMES` normalization in `src/lib/exam-categories.ts`.
 
 

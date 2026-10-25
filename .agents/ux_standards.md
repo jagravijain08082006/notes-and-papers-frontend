@@ -22,3 +22,8 @@ Rules live in `src/lib/validation.ts` (Zod). Validate on blur, then on change.
 Form checklist: red `*` after label + `aria-required`; inline error below the field (icon + red text) shown only after
 the field is touched; submit `disabled` until valid and not submitting; Enter submits; backend errors surface as
 `toast.error`, never inline.
+
+## Typography & Touch Targets
+- **Minimum Input Font Size (Strict):** Every `<input>`, `<textarea>`, and `<select>` MUST have `font-size: 16px` minimum (`text-base` / `text-[16px]`). Prevents iOS Safari and mobile Chrome from automatically zooming in and skewing responsive layouts.
+- **Minimum Touch Targets:** Interactive buttons, tabs, and filter pills must be >= 40px height (`h-10` or `h-11`) with adequate tap padding on mobile.
+- **Theme Defaults:** Light mode is default; dark mode switches on explicit toggle and persists via `next-themes` and `localStorage`.
