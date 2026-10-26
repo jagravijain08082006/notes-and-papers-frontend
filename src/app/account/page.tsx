@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { ArrowRight, Bookmark, Download, LayoutDashboard, Upload } from "lucide-react";
 import { Avatar } from "@/components/profile/avatar";
 import { ProfileForm } from "@/components/profile/profile-form";
+import { MascotGuide } from "@/components/account/mascot-guide";
 import { SignOutButton } from "@/components/shared/sign-out-button";
 import { getMe } from "@/lib/api/server";
 
@@ -52,6 +53,8 @@ export default async function AccountPage() {
         </div>
         <SignOutButton />
       </header>
+
+      <MascotGuide user={me} />
 
       <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {links.map(({ href, label, hint, icon: Icon }) => (

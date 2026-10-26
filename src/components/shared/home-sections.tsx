@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, GraduationCap, RefreshCw, School, ScrollText, Shuffle } from "lucide-react";
+import { ArrowRight, GraduationCap, RefreshCw, School, Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useExams, useLatestPapers, useUniversities } from "@/hooks/use-catalog";

@@ -14,7 +14,6 @@ const SIZE = 20;
 
 export async function generateMetadata(props: PageProps<"/notes">) {
   const sp = await props.searchParams;
-  const data = await load(1, "");
   return buildMetadata({
     title: "Notes for Rajasthan University | Notes & Papers",
     description: "Student notes for Rajasthan University subjects, free to read and download.",

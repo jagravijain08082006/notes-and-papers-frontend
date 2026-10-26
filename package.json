@@ -16,6 +16,7 @@
     "cf:typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
+    "@bible-strong/avatar-react": "^0.1.0",
     "@dicebear/collection": "^9.4.2",
     "@dicebear/core": "^9.4.3",
     "@hookform/resolvers": "^5.9.1",
