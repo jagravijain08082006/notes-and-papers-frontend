@@ -38,6 +38,18 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(destination, 301);
   }
 
+  // Rewrite shorthand sitemap URLs submitted in Google Search Console (e.g. /papers/1.xml -> /sitemaps/papers/1.xml)
+  const sitemapShorthand = request.nextUrl.pathname.match(
+    /^\/(papers|courses|subjects|exams|static)\/(\d+\.xml)$/
+  );
+  if (sitemapShorthand) {
+    const destination = new URL(
+      `/sitemaps/${sitemapShorthand[1]}/${sitemapShorthand[2]}`,
+      request.url
+    );
+    return NextResponse.rewrite(destination);
+  }
+
   const access = request.cookies.get(ACCESS_COOKIE)?.value;
   const refresh = request.cookies.get(REFRESH_COOKIE)?.value;
   let tokens: TokenPair | null = null;

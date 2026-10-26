@@ -32,6 +32,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/:type(papers|courses|subjects|exams|static)/:file(\\d+\\.xml)",
+        destination: "/sitemaps/:type/:file",
+      },
+    ];
+  },
   async headers() {
     return [
       {

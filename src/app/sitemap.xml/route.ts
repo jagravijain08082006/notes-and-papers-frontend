@@ -13,8 +13,11 @@ export async function GET(req: Request) {
   const results = await Promise.allSettled(API_SITEMAP_TYPES.map((t) => getSitemapPage(t, 1)));
   results.forEach((r, i) => {
     if (r.status !== "fulfilled") return; // API down: omit that type rather than fail the whole index
-    const pages = Math.max(1, r.value.total_pages);
-    for (let n = 1; n <= pages; n++) {
+    const totalPages = r.value.total_pages;
+    const itemsCount = r.value.items?.length ?? 0;
+    // Skip empty sitemaps (e.g. notes with 0 published items) so Google never errors on an empty <urlset>
+    if (totalPages <= 0 || itemsCount === 0) return;
+    for (let n = 1; n <= totalPages; n++) {
       items.push({ loc: `${baseUrl}/sitemaps/${API_SITEMAP_TYPES[i]}/${n}.xml`, lastmod: now });
     }
   });

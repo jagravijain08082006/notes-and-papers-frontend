@@ -19,7 +19,15 @@ export async function GET(req: Request, ctx: RouteContext<"/sitemaps/[type]/[fil
 
   try {
     const data = await getSitemapPage(type, page);
-    return xmlResponse(urlsetXml(data.items, baseUrl));
+    // Never return an empty <urlset></urlset> because Google Search Console flags it as "1 error: Empty sitemap"
+    const items =
+      data.items.length > 0
+        ? data.items
+        : type === "notes"
+          ? [{ path: "/notes", lastmod: new Date().toISOString() }]
+          : [];
+    if (items.length === 0) return new Response("Not found", { status: 404 });
+    return xmlResponse(urlsetXml(items, baseUrl));
   } catch {
     return new Response("Sitemap temporarily unavailable", { status: 503 });
   }
