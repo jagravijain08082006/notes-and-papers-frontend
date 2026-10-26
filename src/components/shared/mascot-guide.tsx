@@ -57,10 +57,10 @@ export function MascotGuide() {
     {
       animation: "happy",
       badge: "Welcome",
-      title: `Welcome, ${userName}! Meet Notey 👋`,
+      title: `Welcome, ${userName}! 👋`,
       speech:
-        "I'm Notey, your personal study companion at Notes & Papers! Our vault features over 7,800+ previous year question papers for Rajasthan University (UNIRAJ), RTU Kota, UPSC, and state boards—100% free with clean, watermark-free PDFs.",
-      tip: "Let's take a quick 45-second tour of how to get the most out of your vault.",
+        "I'm Notey, your study guide! Notes & Papers gives you 7,800+ previous year papers for Rajasthan University (UNIRAJ), RTU Kota, and competitive exams—100% free with clean, watermark-free PDFs.",
+      tip: "Everything is free with your student account.",
       action: {
         href: "/universities",
         label: "Browse Universities",
@@ -69,11 +69,11 @@ export function MascotGuide() {
     },
     {
       animation: "searching",
-      badge: "Finding Papers",
-      title: "1. Lightning-Fast Paper Search",
+      badge: "Search",
+      title: "1. Instant Paper Search 🔍",
       speech:
-        "Looking for a specific subject or semester? You can search by course (BCA, BSc, B.Tech, BCom), semester number, or exact paper code (like 6E7102 or 2-4E2032).",
-      tip: "Pro Tip: Use the top search bar anytime to jump straight to your subject.",
+        "Search papers by course (BCA, BSc, B.Tech, BCom), semester number, or exact paper code (like 6E7102 or 2-4E2032).",
+      tip: "Use the top search bar anytime to jump straight to your subject.",
       action: {
         href: "/search",
         label: "Try Search",
@@ -83,23 +83,23 @@ export function MascotGuide() {
     {
       animation: "proud",
       badge: "Clean PDFs",
-      title: "2. Clean, Watermark-Free Downloads",
+      title: "2. Clean Watermark-Free PDFs 📄",
       speech:
-        "Every question paper can be previewed directly inside your browser before downloading. No annoying watermarks covering formulas or diagrams.",
-      tip: "All papers you download are logged under your 'Downloads' tab for instant offline reference.",
+        "Preview every question paper in your browser before saving. All downloads are clean and high-resolution with zero watermarks.",
+      tip: "Downloaded papers stay organized in your Downloads tab.",
       action: {
         href: "/downloads",
-        label: "View Downloads",
+        label: "My Downloads",
         icon: BookOpen,
       },
     },
     {
       animation: "excited",
       badge: "Bookmarks",
-      title: "3. Save Target Papers with Bookmarks",
+      title: "3. Bookmark for Exam Revision 🔖",
       speech:
-        "Preparing for upcoming end-semesters or midterms? Click the bookmark ribbon on any paper to save it to your personal vault for fast revision anytime.",
-      tip: "Keep all your exam papers grouped in one place so you never lose them before exam night.",
+        "Preparing for upcoming midterms or finals? Tap the bookmark ribbon on any paper to save it to your personal vault for fast revision.",
+      tip: "Keep all your exam papers in one place before exam night.",
       action: {
         href: "/bookmarks",
         label: "My Bookmarks",
@@ -108,11 +108,11 @@ export function MascotGuide() {
     },
     {
       animation: "working",
-      badge: "Community",
-      title: "4. Share Papers & Notes with Peers",
+      badge: "Uploads",
+      title: "4. Share Papers & Study Notes 🚀",
       speech:
-        "Got recent semester question papers or clean handwritten revision notes? Click 'Upload' to share them! Every submission is reviewed by moderators and credited to you.",
-      tip: "Help fellow students in your college and expand the open academic vault together.",
+        "Have recent semester papers or clean handwritten notes? Tap 'Upload' to share. Every upload is verified and credited to you!",
+      tip: "Help fellow students in your college succeed together.",
       action: {
         href: "/upload",
         label: "Upload a Paper",
@@ -121,11 +121,11 @@ export function MascotGuide() {
     },
     {
       animation: "celebrate",
-      badge: "Ready!",
-      title: "5. You're All Set to Excel!",
+      badge: "All Set!",
+      title: "5. You're Ready to Ace Exams! 🎓",
       speech:
-        "Take a moment to update your university and college in your profile below. That helps us tailor course recommendations to your degree. Click on me at the side of your screen anytime for a reminder!",
-      tip: "Good luck with your exam preparations—let's turn your study sessions into success!",
+        "Update your university and college in your profile to get tailored recommendations. Tap me at the side of your screen anytime for a refresher!",
+      tip: "Good luck with your exam preparations!",
     },
   ];
 
@@ -151,7 +151,6 @@ export function MascotGuide() {
   }, [storageKey]);
 
   useEffect(() => {
-    // Only check for auto-open if not in admin
     if (pathname.startsWith("/admin")) return;
 
     let hasSeen = false;
@@ -162,7 +161,6 @@ export function MascotGuide() {
     }
 
     if (!hasSeen) {
-      // Auto-open modal once per user on their first visit
       const timer = setTimeout(() => {
         setIsOpen(true);
         setModalAnim("waking");
@@ -194,7 +192,7 @@ export function MascotGuide() {
     };
   }, [isOpen, closeModal, resetInactivity]);
 
-  // Hide on admin routes completely
+  // Hide completely on admin routes
   if (!isMounted || pathname.startsWith("/admin")) return null;
 
   const current = steps[currentStep] ?? steps[0];
@@ -234,12 +232,12 @@ export function MascotGuide() {
     setModalAnim("celebrate");
     setTimeout(() => {
       closeModal();
-    }, 1500);
+    }, 1400);
   };
 
   return (
     <>
-      {/* Intact Floating Mascot at the Side of the Screen (All pages except admin) */}
+      {/* Intact Floating Mascot at the Side of the Screen */}
       <aside
         aria-label="Notey study companion"
         className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-1.5 sm:bottom-6 sm:right-6 pointer-events-auto"
@@ -249,53 +247,53 @@ export function MascotGuide() {
           <button
             type="button"
             onClick={openModal}
-            className="group flex items-center gap-1.5 border-2 border-border bg-primary px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 cursor-pointer animate-bounce [animation-duration:3s]"
-            title="Click Notey for website guide"
+            className="group flex items-center gap-1.5 border-2 border-border bg-primary px-2.5 py-1 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 cursor-pointer animate-bounce [animation-duration:3.5s]"
+            title="Click Notey for quick site guide"
           >
-            <Sparkles className="size-3.5" aria-hidden="true" />
-            <span>Guide Tour</span>
+            <Sparkles className="size-3" aria-hidden="true" />
+            <span>Site Guide</span>
           </button>
         )}
 
-        {/* Mascot Avatar Widget */}
+        {/* Mascot Avatar Widget (Compact on mobile) */}
         <div className="relative group">
           <NoteyAvatar
             animation={floatingAnim}
-            size={84}
+            size={64}
             onClick={openModal}
             onAnimationEnd={(endedAnim) => {
               if (endedAnim === "waking") setFloatingAnim("idle");
             }}
-            className="transition-transform hover:scale-110 active:scale-95 drop-shadow-lg"
+            className="transition-transform hover:scale-110 active:scale-95 drop-shadow-md cursor-pointer"
           />
           <span className="sr-only">Open website tour guide</span>
         </div>
       </aside>
 
-      {/* Website Tour Modal Dialog */}
+      {/* Website Tour Modal Dialog (Mobile-Optimized & Clean) */}
       {isOpen && (
         <div
           role="presentation"
           onClick={(e) => {
             if (e.target === e.currentTarget) closeModal();
           }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 overflow-y-auto animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-3.5 sm:p-5 overflow-y-auto animate-in fade-in duration-200"
         >
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-tour-heading"
-            className="relative w-full max-w-2xl border-2 sm:border-4 border-border bg-card p-5 sm:p-7 shadow-hard-lg space-y-6 my-auto"
+            className="relative w-full max-w-lg border-2 sm:border-3 border-border bg-card p-4 sm:p-6 shadow-hard-lg space-y-4 my-auto max-h-[92dvh] overflow-y-auto"
           >
             {/* Modal Top Bar */}
-            <div className="flex items-center justify-between border-b-2 border-border pb-3.5">
-              <div className="flex items-center gap-2.5">
-                <span className="eyebrow inline-flex items-center gap-1.5 border-2 border-border bg-primary px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm">
-                  <Sparkles className="size-3.5" aria-hidden="true" />
-                  Study Companion
+            <div className="flex items-center justify-between border-b-2 border-border pb-3">
+              <div className="flex items-center gap-2">
+                <span className="eyebrow inline-flex items-center gap-1 border border-border bg-primary px-2 py-0.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm">
+                  <Sparkles className="size-3" aria-hidden="true" />
+                  Guide
                 </span>
-                <span className="eyebrow text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  Step {currentStep + 1} of {steps.length} · {current.badge}
+                <span className="eyebrow text-[11px] sm:text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  {currentStep + 1} of {steps.length} · {current.badge}
                 </span>
               </div>
 
@@ -303,7 +301,7 @@ export function MascotGuide() {
               <button
                 type="button"
                 onClick={closeModal}
-                className="grid size-8 place-items-center border-2 border-border bg-card text-foreground transition-all hover:bg-muted hover:shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
+                className="grid size-7 sm:size-8 place-items-center border-2 border-border bg-card text-foreground transition-all hover:bg-muted hover:shadow-hard-sm active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
                 title="Close guide"
                 aria-label="Close guide modal"
               >
@@ -311,75 +309,76 @@ export function MascotGuide() {
               </button>
             </div>
 
-            {/* Modal Center: Mascot + Speech Bubble */}
-            <div className="grid items-center gap-6 sm:grid-cols-[auto_1fr]">
-              {/* Animated Mascot */}
-              <div className="flex flex-col items-center justify-center gap-2">
+            {/* Mobile-Friendly Main Row: Mascot alongside Content */}
+            <div className="flex items-start gap-3.5 sm:gap-5">
+              {/* Animated Mascot (Compact 72px on mobile, 96px on desktop) */}
+              <div className="flex flex-col items-center justify-center shrink-0 pt-1">
                 <NoteyAvatar
                   animation={modalAnim}
-                  size={135}
+                  size={76}
                   onAnimationEnd={(endedAnim) => {
                     if (endedAnim === "waking") setModalAnim("happy");
                   }}
                 />
-                <span className="eyebrow text-[10px] uppercase tracking-wider text-muted-foreground">
+                <span className="eyebrow mt-1 text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
                   Notey
                 </span>
               </div>
 
-              {/* Interactive Speech Card */}
-              <div className="relative border-2 border-border bg-background p-4 sm:p-5 shadow-hard-sm space-y-3.5">
-                {/* Speech bubble pointer on desktop */}
-                <div
-                  className="hidden sm:block absolute -left-2.5 top-1/2 -translate-y-1/2 size-4 rotate-45 border-l-2 border-b-2 border-border bg-background"
-                  aria-hidden="true"
-                />
-
-                <div className="space-y-2">
-                  <h2
-                    id="modal-tour-heading"
-                    className="text-xl sm:text-2xl font-bold uppercase tracking-wide leading-tight"
-                  >
-                    {current.title}
-                  </h2>
-                  <p className="text-sm sm:text-base leading-relaxed text-foreground/90 font-medium">
-                    {current.speech}
-                  </p>
-                </div>
-
-                {/* Pro Tip Box */}
-                <div className="flex items-start gap-2 border border-border/50 bg-muted/30 p-2.5 text-xs text-muted-foreground">
-                  <HelpCircle className="size-4 shrink-0 mt-0.5 text-primary" aria-hidden="true" />
-                  <span>{current.tip}</span>
-                </div>
+              {/* Speech & Title Content (No clunky nested boxes) */}
+              <div className="flex-1 min-w-0 space-y-2.5">
+                <h2
+                  id="modal-tour-heading"
+                  className="text-lg sm:text-xl font-bold uppercase tracking-wide leading-snug break-words"
+                >
+                  {current.title}
+                </h2>
+                <p className="text-xs sm:text-sm leading-relaxed text-foreground/90 font-medium">
+                  {current.speech}
+                </p>
               </div>
             </div>
 
+            {/* Pro Tip Box: Clean border-l accent */}
+            <div className="flex items-start gap-2 border-l-2 border-primary bg-muted/40 px-3 py-2 text-[11px] sm:text-xs text-muted-foreground">
+              <HelpCircle className="size-3.5 shrink-0 mt-0.5 text-primary" aria-hidden="true" />
+              <span>{current.tip}</span>
+            </div>
+
             {/* Modal Footer Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t-2 border-border pt-4">
+            <div className="flex items-center justify-between gap-2 border-t-2 border-border pt-3">
               {/* Optional Quick Link */}
               {current.action ? (
                 <Link
                   href={current.action.href}
                   onClick={closeModal}
-                  className="inline-flex items-center gap-1.5 border-2 border-border bg-card px-3 py-1.5 text-xs font-bold uppercase tracking-wider shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-muted active:translate-x-0.5 active:translate-y-0.5"
+                  className="inline-flex items-center gap-1.5 border-2 border-border bg-card px-2.5 py-1 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-hard-sm transition-all hover:bg-muted active:translate-x-0.5 active:translate-y-0.5"
                 >
-                  <current.action.icon className="size-3.5" aria-hidden="true" />
+                  <current.action.icon className="size-3" aria-hidden="true" />
                   <span>{current.action.label}</span>
                 </Link>
               ) : (
-                <span />
+                <div className="flex items-center gap-1" aria-hidden="true">
+                  {steps.map((_, idx) => (
+                    <span
+                      key={idx}
+                      className={`h-1.5 transition-all ${
+                        idx === currentStep ? "w-4 bg-primary" : "w-1.5 bg-muted"
+                      }`}
+                    />
+                  ))}
+                </div>
               )}
 
-              {/* Step Navigation */}
-              <div className="flex items-center gap-2 ml-auto">
+              {/* Step Navigation Buttons */}
+              <div className="flex items-center gap-1.5 ml-auto">
                 {currentStep > 0 && (
                   <button
                     type="button"
                     onClick={handlePrev}
-                    className="inline-flex items-center gap-1 border-2 border-border bg-card px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
+                    className="inline-flex items-center gap-1 border-2 border-border bg-card px-2.5 py-1 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-hard-sm transition-all hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
                   >
-                    <ArrowLeft className="size-3.5" aria-hidden="true" />
+                    <ArrowLeft className="size-3" aria-hidden="true" />
                     <span>Back</span>
                   </button>
                 )}
@@ -389,13 +388,13 @@ export function MascotGuide() {
                   onClick={handleNext}
                   onMouseEnter={() => setModalAnim("excited")}
                   onMouseLeave={() => setModalAnim(current.animation)}
-                  className="inline-flex items-center gap-1.5 border-2 border-border bg-primary px-4 py-1.5 text-xs font-bold uppercase tracking-wider shadow-hard-sm text-primary-foreground transition-all hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
+                  className="inline-flex items-center gap-1 border-2 border-border bg-primary px-3 py-1 text-[11px] sm:text-xs font-bold uppercase tracking-wider shadow-hard-sm text-primary-foreground transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
                 >
-                  <span>{currentStep === steps.length - 1 ? "Finish Tour" : "Next Step"}</span>
+                  <span>{currentStep === steps.length - 1 ? "Finish" : "Next"}</span>
                   {currentStep === steps.length - 1 ? (
-                    <CheckCircle2 className="size-3.5" aria-hidden="true" />
+                    <CheckCircle2 className="size-3" aria-hidden="true" />
                   ) : (
-                    <ArrowRight className="size-3.5" aria-hidden="true" />
+                    <ArrowRight className="size-3" aria-hidden="true" />
                   )}
                 </button>
               </div>
