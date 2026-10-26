@@ -93,11 +93,11 @@ const POPULAR_SCHOOL_BOARDS = [
     subtitle: "Secondary & Higher Secondary · State Board",
     href: "/exams/uni-rajasthanboard",
     tags: [
-      { label: "Class 10th Secondary", href: "/search?q=RBSE+Class+10" },
-      { label: "Class 12th Science", href: "/search?q=RBSE+Class+12+Science" },
-      { label: "Class 12th Commerce", href: "/search?q=RBSE+Class+12+Commerce" },
-      { label: "Class 12th Arts", href: "/search?q=RBSE+Class+12+Arts" },
-      { label: "Model Papers", href: "/search?q=RBSE+Model+Paper" },
+      { label: "Class 10th Secondary", href: "/exams/uni-rajasthanboard" },
+      { label: "Class 12th Science", href: "/exams/uni-rajasthanboard" },
+      { label: "Class 12th Commerce", href: "/exams/uni-rajasthanboard" },
+      { label: "Class 12th Arts", href: "/exams/uni-rajasthanboard" },
+      { label: "Model Papers", href: "/exams/uni-rajasthanboard" },
     ],
   },
   {
@@ -106,11 +106,11 @@ const POPULAR_SCHOOL_BOARDS = [
     subtitle: "Class 10th & 12th · All India Board",
     href: "/exams/uni-cbseboardonline",
     tags: [
-      { label: "Class 10th Board", href: "/search?q=CBSE+Class+10" },
-      { label: "Class 12th Science", href: "/search?q=CBSE+Class+12+Science" },
-      { label: "Class 12th Commerce", href: "/search?q=CBSE+Class+12+Commerce" },
-      { label: "Class 12th Humanities", href: "/search?q=CBSE+Class+12+Arts" },
-      { label: "Sample Papers", href: "/search?q=CBSE+Sample+Paper" },
+      { label: "Class 10th Board", href: "/exams/uni-cbseboardonline" },
+      { label: "Class 12th Science", href: "/exams/uni-cbseboardonline" },
+      { label: "Class 12th Commerce", href: "/exams/uni-cbseboardonline" },
+      { label: "Class 12th Humanities", href: "/exams/uni-cbseboardonline" },
+      { label: "Sample Papers", href: "/exams/uni-cbseboardonline" },
     ],
   },
   {
@@ -119,9 +119,9 @@ const POPULAR_SCHOOL_BOARDS = [
     subtitle: "High School & Intermediate · Prayagraj",
     href: "/exams/uni-upboardonline",
     tags: [
-      { label: "Class 10 High School", href: "/search?q=UP+Board+Class+10" },
-      { label: "Class 12 Intermediate", href: "/search?q=UP+Board+Class+12" },
-      { label: "Model Papers", href: "/search?q=UP+Board+Model+Paper" },
+      { label: "Class 10 High School", href: "/exams/uni-upboardonline" },
+      { label: "Class 12 Intermediate", href: "/exams/uni-upboardonline" },
+      { label: "Model Papers", href: "/exams/uni-upboardonline" },
     ],
   },
   {
@@ -130,9 +130,9 @@ const POPULAR_SCHOOL_BOARDS = [
     subtitle: "Class 10th ICSE & 12th ISC · All India",
     href: "/exams/uni-icseonline",
     tags: [
-      { label: "Class 10 ICSE", href: "/search?q=ICSE+Class+10" },
-      { label: "Class 12 ISC", href: "/search?q=ISC+Class+12" },
-      { label: "Specimen Papers", href: "/search?q=ICSE+Specimen+Paper" },
+      { label: "Class 10 ICSE", href: "/exams/uni-icseonline" },
+      { label: "Class 12 ISC", href: "/exams/uni-icseonline" },
+      { label: "Specimen Papers", href: "/exams/uni-icseonline" },
     ],
   },
   {
@@ -141,9 +141,9 @@ const POPULAR_SCHOOL_BOARDS = [
     subtitle: "High School & HSS · Bhopal MP",
     href: "/exams/uni-mpboardonline",
     tags: [
-      { label: "Class 10th Board", href: "/search?q=MP+Board+Class+10" },
-      { label: "Class 12th Board", href: "/search?q=MP+Board+Class+12" },
-      { label: "Model Papers", href: "/search?q=MP+Board+Model+Paper" },
+      { label: "Class 10th Board", href: "/exams/uni-mpboardonline" },
+      { label: "Class 12th Board", href: "/exams/uni-mpboardonline" },
+      { label: "Model Papers", href: "/exams/uni-mpboardonline" },
     ],
   },
   {
@@ -268,6 +268,7 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
                       <li key={t.label}>
                         <Link
                           href={t.href}
+                          aria-label={`${b.name} - ${t.label}`}
                           className="eyebrow border-2 border-border px-1.5 py-0.5 hover:bg-primary transition-colors"
                         >
                           {t.label}

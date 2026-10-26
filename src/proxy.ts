@@ -16,6 +16,28 @@ const PRIVATE = ["/admin", "/account", "/bookmarks", "/downloads", "/upload"];
  * and gates signed-in-only routes. Role checks (admin/moderator) are enforced again by the API and the admin layout.
  */
 export async function proxy(request: NextRequest) {
+  const host = request.headers.get("host") || "";
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  const cfVisitor = request.headers.get("cf-visitor");
+  const isLocal = host.includes("localhost") || host.includes("127.0.0.1") || host.includes("::1");
+
+  const isHttp =
+    !isLocal &&
+    (forwardedProto === "http" ||
+      (cfVisitor ? cfVisitor.includes('"scheme":"http"') : false) ||
+      (!forwardedProto && request.nextUrl.protocol === "http:"));
+  const isWww = host.startsWith("www.");
+
+  // 301 Permanent Redirect for HTTP -> HTTPS and www -> non-www canonical domain
+  if (isHttp || isWww) {
+    const cleanHost = host.replace(/^www\./i, "");
+    const destination = new URL(
+      request.nextUrl.pathname + request.nextUrl.search,
+      `https://${cleanHost || "notesandpapers.dpdns.org"}`
+    );
+    return NextResponse.redirect(destination, 301);
+  }
+
   const access = request.cookies.get(ACCESS_COOKIE)?.value;
   const refresh = request.cookies.get(REFRESH_COOKIE)?.value;
   let tokens: TokenPair | null = null;

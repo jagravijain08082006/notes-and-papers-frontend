@@ -39,7 +39,7 @@ export function buildMetadata({
       ? title
       : `${title} | ${SITE_NAME}`;
   const t = clip(full, 60);
-  const d = clip(description, 155);
+  const d = clip(description, 150);
   const url = absoluteUrl(path);
   return {
     title: { absolute: t },

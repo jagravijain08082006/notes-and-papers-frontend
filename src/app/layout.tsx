@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Free previous year question papers for Rajasthan University (UNIRAJ) and competitive exams like UPSC, SSC, GATE, NEET and UGC NET. Search by course, exam, subject and year.",
+    "Free previous year question papers for Rajasthan University, school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
   applicationName: SITE_NAME,
   keywords: [
     "notes and papers",
@@ -52,7 +52,8 @@ export const metadata: Metadata = {
     locale: "en_IN",
     type: "website",
     title: `${SITE_NAME} - Free Previous Year Question Papers`,
-    description: "Free previous year question papers for Rajasthan University (UNIRAJ) and competitive exams like UPSC, SSC, GATE, NEET and UGC NET.",
+    description:
+      "Free previous year question papers for Rajasthan University, school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
   },
   manifest: "/favicon/site.webmanifest",
   icons: {

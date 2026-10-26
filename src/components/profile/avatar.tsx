@@ -24,7 +24,7 @@ export function Avatar({
     >
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element -- a generated data: URI, nothing to optimise
-        <img src={src} alt={label} className="size-full object-cover" />
+        <img src={src} alt={label || "User avatar"} className="size-full object-cover" />
       ) : (
         <User className="size-1/2" aria-hidden="true" />
       )}

@@ -54,4 +54,12 @@
   2. Placed `WebSite` JSON-LD schema into `<head>` with explicit `name: "Notes & Papers"`, `alternateName: ["Notes & Papers", "NotesAndPapers", "Notes and Papers"]`, `applicationName`, and `og:site_name`.
   3. Added root-level 192x192 PNG (`/icon-192.png`), `/favicon.ico`, `/icon.png`, and `/apple-touch-icon.png` in `public/` and linked them explicitly in `<head>` to satisfy Google Search's multiple-of-48px favicon requirement.
 - **ADR-037 Social Community Engagement Popup.** Created `CommunityPopup` (`src/components/shared/community-popup.tsx`) that slides in from the bottom with links to Telegram ([@notes_and_papers](https://telegram.me/notes_and_papers)) and Instagram ([@exam.notes.and.papers](https://www.instagram.com/exam.notes.and.papers?exln=cmp5ZHRlaWVtY2Nz)), equipped with a 10-second auto-dismiss timer, an immediate dismiss button, and session-aware re-display logic.
+- **ADR-038 Technical SEO & On-Page Hardening (Seobility Audit Resolution).** Resolved all findings from Seobility on-page audit:
+  1. **HTTP -> HTTPS & WWW -> Non-WWW 301 Redirects:** Configured automatic 301 Permanent Redirects in `src/proxy.ts` middleware for requests with `x-forwarded-proto: http`, `cf-visitor: {"scheme":"http"}`, or host starting with `www.`.
+  2. **Strict-Transport-Security (HSTS):** Added `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload` header in `next.config.ts`.
+  3. **Meta Description Character Budget:** Shortened homepage meta description from 176 characters (1015 px) to 141 characters (< 1000 px limit) across `src/app/page.tsx` and `src/app/layout.tsx`. Tightened general clipping ceiling in `src/lib/seo.ts` to 150 characters.
+  4. **Image Alt Attributes:** Added descriptive `alt="Notes & Papers Logo"` to both site header and site footer logo `<Image>` components, and fallback alt text for dynamic avatars.
+  5. **H1 Content Echoing:** Aligned leading hero paragraph in `src/app/page.tsx` to verbatim include `previous year papers` and `turn study into success` directly below `<h1>`.
+  6. **Internal Link Normalization:** Replaced internal tag URLs in `POPULAR_SCHOOL_BOARDS` (which previously pointed to `/search?q=...`) with clean static board routes (`/exams/${b.slug}`) and added unique `aria-label` attributes to prevent repetitive anchor text warnings.
+
 

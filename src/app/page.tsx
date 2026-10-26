@@ -27,7 +27,7 @@ export const revalidate = 86400;
 export const metadata = buildMetadata({
   title: "Notes & Papers - Free Previous Year Question Papers",
   description:
-    "Free previous year question papers for Rajasthan University (BA, BSc, BCom, BCA...) and competitive exams (UPSC, SSC, GATE, NEET, UGC NET...). Search by subject, course, exam and year.",
+    "Free previous year question papers for Rajasthan University, school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
   path: "/",
   keywords: [
     "notes and papers",
@@ -140,12 +140,10 @@ export default async function HomePage() {
               success.
             </span>
           </h1>
-          <p className="max-w-xl text-lg text-muted-foreground">
-            {totalPapers > 0
-              ? `${totalPapers.toLocaleString("en-IN")} question papers`
-              : "Question papers"}{" "}
-            for university students and exam aspirants. Search, preview and download. Free, with a
-            free account.
+          <p className="max-w-xl text-lg text-muted-foreground leading-relaxed">
+            Download authentic <strong className="font-semibold text-foreground">previous year papers</strong> to <strong className="font-semibold text-foreground">turn study into success</strong>. Access over{" "}
+            {totalPapers > 0 ? totalPapers.toLocaleString("en-IN") : "thousands of"}{" "}
+            verified question papers and notes for university students, board candidates, and competitive exam aspirants. Search, preview, and download free.
           </p>
           <div className="max-w-2xl space-y-4">
             <SearchBar size="lg" />

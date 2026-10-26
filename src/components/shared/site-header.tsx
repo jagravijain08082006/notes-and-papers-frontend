@@ -30,7 +30,7 @@ export async function SiteHeader() {
         <Link href="/" className="flex items-center gap-2.5" aria-label={`${SITE_NAME} home`}>
           <Image
             src="/favicon/android-chrome-192x192.png"
-            alt=""
+            alt="Notes & Papers Logo"
             width={36}
             height={36}
             priority

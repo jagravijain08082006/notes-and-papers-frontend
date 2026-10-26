@@ -20,5 +20,10 @@
 - **Competitor crawler link contamination (Resolved):** Live preview and paper titles sometimes contained third-party crawler URLs (a2zsubject, uroroonline, etc.). Sanitized via `src/lib/sanitize-preview.ts`.
 - **Duplicate API calls on typing/browsing (Resolved):** Added `useDebounce` hook (450ms search, 250ms catalog) and in-flight request coalescing map in `src/services/queries.ts` (`getJson`).
 - **Sequential paper numbering and count badges (Resolved):** Added `Paper #{index + 1}` badges and `BOARD_CLEAN_NAMES` normalization in `src/lib/exam-categories.ts`.
+- **HTTP -> HTTPS and WWW -> Non-WWW Redirects (Resolved):** Enabled 301 Permanent Redirects in `src/proxy.ts` middleware and HSTS preload headers in `next.config.ts`, ensuring non-secure or www traffic is seamlessly redirected to canonical HTTPS.
+- **Internal links with dynamic query parameters (Resolved):** Replaced `/search?q=...` links in home school boards section with clean static routes (`/exams/${b.slug}`) with distinct `aria-label` tags.
+- **Meta description length exceeding 1000px budget (Resolved):** Shortened homepage meta description to 141 characters across `page.tsx` and `layout.tsx`, and capped SEO helper to 150 characters.
+- **Missing image alt attributes (Resolved):** Added explicit alt text to site header, site footer, and avatar components.
+- **H1 keywords absent from page content (Resolved):** Updated leading hero paragraph on home page to prominently repeat "previous year papers" and "turn study into success".
 
 

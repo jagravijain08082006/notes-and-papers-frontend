@@ -6,7 +6,7 @@ Last updated: 2026-10-25.
 
 | Part | State |
 |---|---|
-| Frontend | **Live** on Cloudflare Workers on custom domain: [https://notesandpapers.dpdns.org](https://notesandpapers.dpdns.org) (Version ID: `6b2ad4ad-bb12-41b7-85b6-337b6a3a2325`). |
+| Frontend | **Live** on Cloudflare Workers on custom domain: [https://notesandpapers.dpdns.org](https://notesandpapers.dpdns.org) (Version ID: `9bb891a3-d9e2-43cf-946b-7a8cbb701de6`). |
 | KV Incremental Cache | 133 pre-rendered page entries stored in KV namespace `NEXT_INC_CACHE_KV` (`d642f541c5dc4c8a9c8ea3f1747bb1de`). |
 | Static Assets | 78 assets uploaded to Cloudflare Asset Storage (`.open-next/assets`). |
 | Backend (FastAPI) + Postgres | **Live** on Render: [https://backend.notesandpapers.dpdns.org/health](https://backend.notesandpapers.dpdns.org/health) with Supabase PostgreSQL session pooler. |

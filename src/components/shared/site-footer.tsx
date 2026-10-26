@@ -46,7 +46,7 @@ export async function SiteFooter() {
             >
               <Image
                 src="/favicon/android-chrome-192x192.png"
-                alt=""
+                alt="Notes & Papers Logo"
                 width={36}
                 height={36}
                 className="size-9 border-2 border-border"
