@@ -1,4 +1,4 @@
-# Handover (2026-10-26, sixth pass)
+# Handover (2026-10-26, seventh pass)
 
 ## State
 - **Live Production Deployment:** Deployed to Cloudflare Workers on custom domain [https://notesandpapers.dpdns.org](https://notesandpapers.dpdns.org).
@@ -7,7 +7,12 @@
   - Cache: 133 pre-rendered incremental cache entries uploaded to KV namespace `NEXT_INC_CACHE_KV`.
   - Assets: 78 static assets and chunks uploaded to Cloudflare Asset Storage.
 - **Backend Production API:** [https://backend.notesandpapers.dpdns.org/health](https://backend.notesandpapers.dpdns.org/health) (HTTP 200 OK, running on Render).
-- **Build & Health:** Production build (`npm run build`) and Cloudflare OpenNext deploy (`npm run cf:deploy`) pass cleanly with 0 TypeScript/Turbopack errors (47/47 static and dynamic pages generated).
+- **Google Sitelinks, Favicon Strict Compliance & UNIRAJ Keywords (ADR-039):**
+  - **Sitelinks Schema:** Embedded Schema.org `@graph` with `WebSite`, `Organization`, and an array of `SiteNavigationElement` entries in `src/app/layout.tsx` targeting primary courses (`UNIRAJ B.Com`, `B.Sc`, `BCA`, `B.Ed`, `B.A`, `RTU Kota B.Tech`, `RBSE`, `CBSE`).
+  - **Favicon Strict Compliance:** Removed undersized `16x16` and `32x32` tags from `metadata.icons` (preventing Google rejection under Google's 48px+ favicon rule). Placed `src/app/icon.png` (192x192) and `src/app/apple-icon.png` (180x180) for native App Router static metadata serving.
+  - **High-Intent Regional Keywords:** Injected `UNIRAJ`, `UOR`, `RU Jaipur`, and `RTU Kota` into `src/lib/seo.ts` (`courseMeta`), `src/app/universities/[university]/page.tsx` (`generateMetadata` & `<h1>`), and backend `app/ingest/seo_meta.py`.
+  - **Footer Internal Link Equity:** Added a dedicated 5th column "Programmes" in `src/components/shared/site-footer.tsx` linking to high-traffic course pages sitewide.
+- **Build & Health:** Production build (`npm run build`) and Cloudflare OpenNext deploy pass cleanly with 0 TypeScript/Turbopack errors (49/49 static and dynamic pages generated).
 - **Seobility Audit & Server Configuration Hardening (ADR-038):**
   - **301 Permanent Redirects:** Enforced in `src/proxy.ts` middleware for all non-HTTPS (`http://`) and `www.*` requests to the canonical apex (`https://notesandpapers.dpdns.org`). Deployed Cloudflare custom domain trigger for `www.notesandpapers.dpdns.org` so DNS resolves to Cloudflare IPs.
   - **HSTS Preload:** Added `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload` in `next.config.ts`.

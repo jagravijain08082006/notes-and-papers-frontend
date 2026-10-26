@@ -61,5 +61,11 @@
   4. **Image Alt Attributes:** Added descriptive `alt="Notes & Papers Logo"` to both site header and site footer logo `<Image>` components, and fallback alt text for dynamic avatars.
   5. **H1 Content Echoing:** Aligned leading hero paragraph in `src/app/page.tsx` to verbatim include `previous year papers` and `turn study into success` directly below `<h1>`.
   6. **Internal Link Normalization:** Replaced internal tag URLs in `POPULAR_SCHOOL_BOARDS` (which previously pointed to `/search?q=...`) with clean static board routes (`/exams/${b.slug}`) and added unique `aria-label` attributes to prevent repetitive anchor text warnings.
+- **ADR-039 Google Sitelinks Schema, 48px+ Favicon Strictness, and UNIRAJ/UOR Keyword Ingestion.**
+  1. **Google Sitelinks Schema:** Added `@graph` containing `WebSite`, `Organization`, and an array of `SiteNavigationElement` entries in `src/app/layout.tsx` linking directly to primary course landing pages (UNIRAJ B.Com, B.Sc, BCA, B.Ed, B.A, RTU B.Tech, RBSE, CBSE, UPSC) to trigger organic sitelinks in Google Search results.
+  2. **Favicon Strict Compliance:** Removed undersized `16x16` and `32x32` link declarations from `metadata.icons` (which caused Googlebot-Image to reject the favicon based on Google's strict "Do not provide a 16x16px favicon; must be 48x48+" rule). Placed `src/app/icon.png` (192x192) and `src/app/apple-icon.png` (180x180) for native App Router static metadata serving.
+  3. **High-Intent Regional Keyword Targeting:** Enriched `src/lib/seo.ts` (`courseMeta`), `src/app/universities/[university]/page.tsx`, and backend `app/ingest/seo_meta.py` with high-volume search phrases students actually query: `UNIRAJ`, `UOR`, `RU Jaipur`, `Rajasthan University`, and `RTU Kota`.
+  4. **Footer Internal Link Equity:** Added a dedicated 5th column "Programmes" in `src/components/shared/site-footer.tsx` linking to high-traffic course pages from every page of the website.
+
 
 
