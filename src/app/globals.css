@@ -107,34 +107,53 @@
   }
   * {
     border-color: hsl(var(--border));
-    /* Custom scrollbars (Firefox). WebKit/Blink rules are below. */
+    /* Modern sleek scrollbars (Firefox) */
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--primary)) hsl(var(--muted));
+    scrollbar-color: hsl(var(--muted-foreground) / 0.35) transparent;
   }
-  /* Custom scrollbars (Chrome, Edge, Safari): square yellow thumb with a black outline on a paper track. */
+  /* Modern clean scrollbars (Chrome, Edge, Safari): sleek rounded pill thumb, no awkward top/bottom arrows */
   ::-webkit-scrollbar {
-    width: 14px;
-    height: 14px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
-    background: hsl(var(--muted));
-    border-left: 2px solid hsl(var(--border));
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--primary));
-    border: 2px solid hsl(var(--border));
+    background: hsl(var(--muted-foreground) / 0.3);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.2s ease;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--accent));
+    background: hsl(var(--primary));
+    border-radius: 9999px;
+  }
+  /* Completely hide clunky top and bottom stepper arrow buttons */
+  ::-webkit-scrollbar-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
   ::-webkit-scrollbar-corner {
-    background: hsl(var(--muted));
+    background: transparent;
   }
-  /* Slim scrollbars inside menus and lists. */
+  /* Slim scrollbars inside dropdown menus and lists */
   ul[role="listbox"]::-webkit-scrollbar,
   .scroll-slim::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 5px;
+    height: 5px;
+  }
+  /* Utility to completely hide scrollbars while preserving scroll functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
   }
   /* Form controls that are still native use the brand colours. */
   input[type="checkbox"],
