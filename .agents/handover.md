@@ -1,33 +1,32 @@
-# Handover (2026-10-25, fifth pass)
+# Handover (2026-10-26, sixth pass)
 
 ## State
 - **Live Production Deployment:** Deployed to Cloudflare Workers on custom domain [https://notesandpapers.dpdns.org](https://notesandpapers.dpdns.org).
-  - Version ID: `6b2ad4ad-bb12-41b7-85b6-337b6a3a2325`.
+  - Version ID: `bcbc123c-087e-480e-842b-fae82a7adcc5`.
+  - Custom Domains & Triggers: `notesandpapers.dpdns.org` and `www.notesandpapers.dpdns.org` (`custom_domain: true`).
   - Cache: 133 pre-rendered incremental cache entries uploaded to KV namespace `NEXT_INC_CACHE_KV`.
   - Assets: 78 static assets and chunks uploaded to Cloudflare Asset Storage.
 - **Backend Production API:** [https://backend.notesandpapers.dpdns.org/health](https://backend.notesandpapers.dpdns.org/health) (HTTP 200 OK, running on Render).
 - **Build & Health:** Production build (`npm run build`) and Cloudflare OpenNext deploy (`npm run cf:deploy`) pass cleanly with 0 TypeScript/Turbopack errors (47/47 static and dynamic pages generated).
+- **Seobility Audit & Server Configuration Hardening (ADR-038):**
+  - **301 Permanent Redirects:** Enforced in `src/proxy.ts` middleware for all non-HTTPS (`http://`) and `www.*` requests to the canonical apex (`https://notesandpapers.dpdns.org`). Deployed Cloudflare custom domain trigger for `www.notesandpapers.dpdns.org` so DNS resolves to Cloudflare IPs.
+  - **HSTS Preload:** Added `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload` in `next.config.ts`.
+  - **Zero Dynamic Parameter Internal Links:** Replaced search query links (`/search?q=...`) in home school board cards with clean static board routes (`/exams/${b.slug}`) with unique `aria-label` tags.
+  - **Meta Description Budget:** Trimmed homepage meta description to 141 characters across `page.tsx` and `layout.tsx` (well under 1000px budget), and capped generic SEO helper in `seo.ts` to 150 chars.
+  - **Image Alt Attributes:** Added `alt="Notes & Papers Logo"` to both site header and site footer logo `<Image>` tags, and fallback alt text for avatar images.
+  - **H1 Content Echoing:** Aligned leading hero paragraph in `src/app/page.tsx` to verbatim include `previous year papers` and `turn study into success` directly below `<h1>`.
 - **Paper Numbers & Sequential Badges:**
-  - Added `BOARD_CLEAN_NAMES` and `cleanExamTitle` in `src/lib/exam-categories.ts` to normalize crawler names (e.g., `rajasthan-4th-grade` -> "Rajasthan 4th Grade", `uni-rajasthanboard` -> "RBSE Board (Rajasthan BSER)").
+  - Added `BOARD_CLEAN_NAMES` and `cleanExamTitle` in `src/lib/exam-categories.ts` to normalize crawler names.
   - `PaperCard` and `PaperList` display explicit `Paper #{index + 1}` badges when multiple papers exist for a subject or year.
   - Total paper count and section badge counts synchronized in `exams/[slug]/page.tsx`.
 - **School & State Education Boards Integration:**
   - Upgraded home page "Browse by university" into "Browse by university & school boards". Added major boards (RBSE, CBSE, UP Board, ICSE, MP Board, CG Open School) with neo-brutalist cards and filter pills (`All`, `Universities`, `School Boards`).
   - Added dedicated boards section with class/stream tags in `src/app/universities/page.tsx`.
-- **UI/UX & Icon Audit:**
-  - Lucide icons added across all 11 educational categories and pages (`interactive-card.tsx`, `exams-catalog-view.tsx`, `universities/[university]/page.tsx`, `notes/page.tsx`).
+- **UI/UX & Performance:**
   - Enforced minimum 16px font-size (`text-base` / `text-[16px]`) across all inputs, textareas, and selects sitewide to prevent mobile zoom.
-  - Default light theme with dark mode toggle persistence via `next-themes` and `localStorage`.
-  - Added slide-in `CommunityPopup` linking to Telegram (@notes_and_papers) and Instagram (@exam.notes.and.papers) with 10s auto-dismiss and close button.
-  - Link scrubbing in `src/lib/sanitize-preview.ts` removing competitor crawler domains.
-- **Performance & Debouncing:**
-  - Custom `useDebounce` hook in `src/hooks/use-debounce.ts` applied to global search (450ms) and catalog search (250ms) with shimmer skeletons.
+  - Added slide-in `CommunityPopup` linking to Telegram (@notes_and_papers) and Instagram (@exam.notes.and.papers) with 10s auto-dismiss.
   - In-flight request deduplication map in `src/services/queries.ts` (`getJson`) preventing duplicate concurrent fetches.
-  - QueryClient tuned: `staleTime: 5m`, `gcTime: 15m`, `refetchOnWindowFocus: false`.
-- **Google Search & SEO Resolution:**
-  - Removed conditional `noindex` across dynamic routes that previously triggered "hidden from public indexing" flags. Enabled Googlebot rich snippets (`max-snippet:-1, max-image-preview:large`) in `src/lib/seo.ts`.
-  - Solved "DigitalPlat Domain" snippet issue by embedding `WebSite` JSON-LD schema into `<head>` with explicit `name: "Notes & Papers"`, `alternateName`, and `og:site_name`.
-  - Added root-level 192x192 PNG (`/icon-192.png`), `/favicon.ico`, `/icon.png`, and `/apple-touch-icon.png` in `public/` and linked them in `<head>` to fix Google Search globe icon.
+  - Custom `useDebounce` hook in `src/hooks/use-debounce.ts` applied to search (450ms) and catalog (250ms).
 
 ## Known gaps / next
 1. Inspect and Request Indexing for `https://notesandpapers.dpdns.org/` in Google Search Console to refresh Google's index cache.
