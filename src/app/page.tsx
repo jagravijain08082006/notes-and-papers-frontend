@@ -27,7 +27,7 @@ export const revalidate = 86400;
 export const metadata = buildMetadata({
   title: "Notes & Papers - Free Previous Year Question Papers",
   description:
-    "Free previous year question papers for Rajasthan University, school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
+    "Free previous year question papers for Rajasthan University (UNIRAJ / UOR), RTU Kota, school boards (RBSE, CBSE) & competitive exams (UPSC, SSC, NEET, GATE). Download authentic PYQ PDFs free.",
   path: "/",
   keywords: [
     "notes and papers",
@@ -38,7 +38,15 @@ export const metadata = buildMetadata({
     "previous year question papers",
     "free pyq pdf download",
     "rajasthan university question papers",
+    "uniraj question papers",
+    "uor question papers",
+    "uniraj bcom question paper",
+    "uniraj bca papers",
+    "uniraj bsc question paper",
+    "uniraj b.ed papers",
+    "uniraj ba question paper",
     "rtu previous year papers",
+    "rtu kota question papers",
     "cbse sample papers",
     "rbse board papers",
     "upsc previous year papers",
@@ -47,12 +55,17 @@ export const metadata = buildMetadata({
 });
 
 const QUICK = [
-  { label: "BCA", href: "/universities/rajasthan-university/bca" },
-  { label: "BSc Part 1", href: "/universities/rajasthan-university/bsc/part-1" },
-  { label: "UPSC", href: "/exams/upsc" },
-  { label: "NEET", href: "/exams/neet" },
+  { label: "UNIRAJ B.Com", href: "/universities/rajasthan-university/bcom" },
+  { label: "UNIRAJ B.Sc", href: "/universities/rajasthan-university/bsc" },
+  { label: "UNIRAJ BCA", href: "/universities/rajasthan-university/bca" },
+  { label: "UNIRAJ B.Ed", href: "/universities/rajasthan-university/b-ed" },
+  { label: "UNIRAJ B.A", href: "/universities/rajasthan-university/ba" },
+  { label: "RTU B.Tech", href: "/universities/rajasthan-technical-university" },
+  { label: "RBSE Board", href: "/exams/uni-rajasthanboard" },
+  { label: "CBSE Board", href: "/exams/uni-cbseboardonline" },
+  { label: "UPSC PYQ", href: "/exams/upsc" },
+  { label: "NEET UG", href: "/exams/neet" },
   { label: "GATE", href: "/exams/gate" },
-  { label: "UGC NET", href: "/exams/ugc-net" },
 ];
 
 /**

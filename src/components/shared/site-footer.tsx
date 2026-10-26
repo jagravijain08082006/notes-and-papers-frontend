@@ -9,10 +9,23 @@ export async function SiteFooter() {
   const flags = await getNavFlags();
   const COLUMNS = [
     {
+      title: "Programmes",
+      links: [
+        { href: "/universities/rajasthan-university/bcom", label: "UNIRAJ B.Com Papers" },
+        { href: "/universities/rajasthan-university/bsc", label: "UNIRAJ B.Sc Papers" },
+        { href: "/universities/rajasthan-university/bca", label: "UNIRAJ BCA Papers" },
+        { href: "/universities/rajasthan-university/b-ed", label: "UNIRAJ B.Ed Papers" },
+        { href: "/universities/rajasthan-university/ba", label: "UNIRAJ B.A Papers" },
+        { href: "/universities/rajasthan-technical-university", label: "RTU Kota B.Tech" },
+      ],
+    },
+    {
       title: "Explore",
       links: [
         { href: routes.universities, label: "Universities" },
         { href: routes.exams, label: "Competitive exams" },
+        { href: "/exams/uni-rajasthanboard", label: "RBSE Board Papers" },
+        { href: "/exams/uni-cbseboardonline", label: "CBSE Sample Papers" },
         ...(flags.notes ? [{ href: "/notes", label: "Notes" }] : []),
         { href: "/search", label: "Search papers" },
       ],
@@ -37,7 +50,7 @@ export async function SiteFooter() {
   return (
     <footer className="mt-20 border-t-4 border-border bg-card">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
           <div className="space-y-4">
             <Link
               href="/"

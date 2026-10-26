@@ -58,13 +58,10 @@ export const metadata: Metadata = {
   manifest: "/favicon/site.webmanifest",
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/favicon/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon.ico", sizes: "48x48", type: "image/x-icon" },
     ],
-    apple: { url: "/apple-touch-icon.png", sizes: "180x180" },
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   verification: {
     google: "6kg8ml3F16HFts5p3ygtf5Kpr93ve4XNjX5fcRVbPl8",
@@ -91,9 +88,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${display.variable} ${body.variable} ${mono.variable} h-full antialiased`}
     >
       <head>
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/x-icon" sizes="48x48" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <script
           dangerouslySetInnerHTML={{
             __html:
@@ -103,21 +100,101 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <JsonLdScript
           data={{
             "@context": "https://schema.org",
-            "@type": "WebSite",
-            name: SITE_NAME,
-            alternateName: [
-              "Notes & Papers",
-              "NotesAndPapers",
-              "Notes and Papers",
-              "Notes & Papers Academic Vault",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                "@id": `${SITE_URL}/#website`,
+                url: SITE_URL,
+                name: SITE_NAME,
+                alternateName: [
+                  "Notes & Papers",
+                  "NotesAndPapers",
+                  "Notes and Papers",
+                  "Notes & Papers Academic Vault",
+                  "notesandpapers.dpdns.org",
+                ],
+                description:
+                  "Free previous year question papers for Rajasthan University (UNIRAJ), RTU, school boards & competitive exams. Download authentic PYQ PDFs free.",
+                publisher: {
+                  "@type": "Organization",
+                  "@id": `${SITE_URL}/#organization`,
+                  name: SITE_NAME,
+                  url: SITE_URL,
+                  logo: {
+                    "@type": "ImageObject",
+                    url: `${SITE_URL}/icon-192.png`,
+                  },
+                },
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: `${SITE_URL}/search?q={search_term_string}`,
+                  "query-input": "required name=search_term_string",
+                },
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-uniraj`,
+                name: "Rajasthan University (UNIRAJ) Papers",
+                url: `${SITE_URL}/universities/rajasthan-university`,
+                description: "UNIRAJ previous year question papers for BA, BSc, BCom, BCA, B.Ed, MA",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-bcom`,
+                name: "B.Com Question Papers",
+                url: `${SITE_URL}/universities/rajasthan-university/bcom`,
+                description: "UNIRAJ BCom Part 1, 2, 3 previous year question papers",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-bsc`,
+                name: "B.Sc Question Papers",
+                url: `${SITE_URL}/universities/rajasthan-university/bsc`,
+                description: "UNIRAJ BSc Part 1, 2, 3 previous year question papers",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-bca`,
+                name: "BCA Question Papers",
+                url: `${SITE_URL}/universities/rajasthan-university/bca`,
+                description: "UNIRAJ BCA Semester 1 to 6 question papers",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-bed`,
+                name: "B.Ed Question Papers",
+                url: `${SITE_URL}/universities/rajasthan-university/b-ed`,
+                description: "UNIRAJ Bachelor of Education examination papers",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-ba`,
+                name: "B.A Question Papers",
+                url: `${SITE_URL}/universities/rajasthan-university/ba`,
+                description: "UNIRAJ BA Part 1, 2, 3 previous year papers",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-rtu`,
+                name: "RTU Kota B.Tech Papers",
+                url: `${SITE_URL}/universities/rajasthan-technical-university`,
+                description: "Rajasthan Technical University B.Tech engineering papers",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-exams`,
+                name: "Competitive Exams (UPSC, SSC, NEET, GATE)",
+                url: `${SITE_URL}/exams`,
+                description: "Previous year question papers for national & state competitive exams",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-boards`,
+                name: "School Boards (RBSE & CBSE)",
+                url: `${SITE_URL}/exams/uni-rajasthanboard`,
+                description: "Class 10th & 12th board previous year papers and model papers",
+              },
             ],
-            url: SITE_URL,
-            image: `${SITE_URL}/icon-192.png`,
-            potentialAction: {
-              "@type": "SearchAction",
-              target: `${SITE_URL}/search?q={search_term_string}`,
-              "query-input": "required name=search_term_string",
-            },
           }}
         />
       </head>

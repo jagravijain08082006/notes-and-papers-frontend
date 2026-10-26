@@ -82,10 +82,13 @@ export function buildMetadata({
 export function courseMeta(c: CourseDetail) {
   const range = yearRange(c.year_min, c.year_max);
   const terms = c.terms.map((t) => termLabel(t.kind, t.number)).join(", ");
+  const isRU = /rajasthan\s+university/i.test(c.university_name);
+  const isRTU = /rajasthan\s+technical/i.test(c.university_name);
+  const uniTag = isRU ? "UNIRAJ (Rajasthan University)" : isRTU ? "RTU Kota" : c.university_name;
   return {
-    title: `${c.name} Question Papers${range ? ` ${range}` : ""} - ${c.university_name}`,
-    description: `Download ${c.name} previous year question papers of ${c.university_name}${terms ? ` for all terms (${terms})` : ""}. Free PDFs, subject-wise.`,
-    h1: `${c.name} Previous Year Papers`,
+    title: `${c.name} Question Papers${range ? ` ${range}` : ""} - ${uniTag}`,
+    description: `Download authentic ${c.name} previous year question papers of ${c.university_name} (${isRU ? "UNIRAJ / UOR Jaipur" : isRTU ? "RTU Kota" : c.university_name})${terms ? ` across all terms (${terms})` : ""}. Free PDF download, subject-wise.`,
+    h1: `${c.name} Previous Year Papers - ${uniTag}`,
   };
 }
 

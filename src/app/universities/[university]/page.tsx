@@ -33,16 +33,24 @@ export async function generateMetadata(props: PageProps<"/universities/[universi
   const { u, failed } = await load(slug);
   if (!u && !failed) return { title: "University not found", robots: { index: false } };
   const name = u?.name ?? "University";
+  const isRU = slug === "rajasthan-university";
+  const isRTU = slug === "rajasthan-technical-university";
+  const titleDisplay = isRU
+    ? "Rajasthan University (UNIRAJ / UOR) Question Papers"
+    : isRTU
+      ? "Rajasthan Technical University (RTU Kota) Question Papers"
+      : `${name} Question Papers`;
+
   return buildMetadata({
-    title: `${name} Question Papers - All Courses`,
-    description: `Previous year question papers for every ${name} course${
+    title: `${titleDisplay} - All Courses`,
+    description: `Download authentic ${name} (${isRU ? "UNIRAJ / UOR Jaipur" : isRTU ? "RTU Kota" : name}) previous year question papers for all courses${
       u
         ? `: ${u.courses
-            .slice(0, 5)
+            .slice(0, 6)
             .map((c) => c.name)
             .join(", ")} and more`
         : ""
-    }. Free PDFs, subject-wise.`,
+    }. Free PDF downloads, subject & part-wise.`,
     path: routes.university(slug),
     noindex: !u && !failed,
     keywords: [
@@ -50,6 +58,30 @@ export async function generateMetadata(props: PageProps<"/universities/[universi
       `${name} pyq`,
       `${name} previous year papers`,
       `${name} exam papers pdf`,
+      ...(isRU
+        ? [
+            "uniraj question papers",
+            "uor question papers",
+            "uniraj previous year papers",
+            "uor old papers download",
+            "ru jaipur pyq pdf",
+            "uniraj bcom question paper",
+            "uniraj bca question paper",
+            "uniraj bsc question paper",
+            "uniraj ba question paper",
+            "uniraj b.ed question papers",
+            "rajasthan university papers pdf",
+          ]
+        : []),
+      ...(isRTU
+        ? [
+            "rtu kota question papers",
+            "rtu previous year papers",
+            "rtu btech question papers",
+            "rtu btech cs question papers",
+            "rajasthan technical university old papers",
+          ]
+        : []),
     ],
   });
 }
@@ -144,11 +176,15 @@ export default async function UniversityPage(props: PageProps<"/universities/[un
       />
       <header className="space-y-4">
         <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-tight">
-          {u.name} Question Papers
+          {slug === "rajasthan-university"
+            ? `${u.name} (UNIRAJ / UOR) Question Papers`
+            : slug === "rajasthan-technical-university"
+              ? `${u.name} (RTU Kota) Question Papers`
+              : `${u.name} Question Papers`}
         </h1>
         <p className="max-w-3xl text-muted-foreground">
           {u.description ??
-            `Browse ${u.paper_count} previous year question papers across ${u.courses.length} courses of ${u.name}. Pick your course, then your part or semester, then your subject.`}
+            `Browse ${u.paper_count} previous year question papers across ${u.courses.length} courses of ${u.name} (${slug === "rajasthan-university" ? "UNIRAJ / UOR Jaipur" : slug === "rajasthan-technical-university" ? "RTU Kota" : u.name}). Pick your course, then your part or semester, then your subject.`}
         </p>
 
         {hasMultipleCategories && (
