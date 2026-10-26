@@ -65,7 +65,9 @@
   1. **Google Sitelinks Schema:** Added `@graph` containing `WebSite`, `Organization`, and an array of `SiteNavigationElement` entries in `src/app/layout.tsx` linking directly to primary course landing pages (UNIRAJ B.Com, B.Sc, BCA, B.Ed, B.A, RTU B.Tech, RBSE, CBSE, UPSC) to trigger organic sitelinks in Google Search results.
   2. **Favicon Strict Compliance:** Removed undersized `16x16` and `32x32` link declarations from `metadata.icons` (which caused Googlebot-Image to reject the favicon based on Google's strict "Do not provide a 16x16px favicon; must be 48x48+" rule). Placed `src/app/icon.png` (192x192) and `src/app/apple-icon.png` (180x180) for native App Router static metadata serving.
   3. **High-Intent Regional Keyword Targeting:** Enriched `src/lib/seo.ts` (`courseMeta`), `src/app/universities/[university]/page.tsx`, and backend `app/ingest/seo_meta.py` with high-volume search phrases students actually query: `UNIRAJ`, `UOR`, `RU Jaipur`, `Rajasthan University`, and `RTU Kota`.
-  4. **Footer Internal Link Equity:** Added a dedicated 5th column "Programmes" in `src/components/shared/site-footer.tsx` linking to high-traffic course pages from every page of the website.
+- **ADR-040 Scrollbar UX Normalization & Admin Sidebar Scrollbar Elimination.**
+  1. **Global Scrollbar Modernization:** In `src/app/globals.css`, removed the awkward, clunky Windows stepper arrow buttons using `::-webkit-scrollbar-button { display: none !important; }`. Narrowed scrollbar width from 14px to a modern 8px pill thumb with transparent track and smooth gold hover state. Added `.no-scrollbar` cross-browser utility.
+  2. **Admin Sidebar Scrollbar Removal:** In `src/app/admin/layout.tsx`, removed `scroll-slim` and applied `no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden` to the `<aside>` sidebar container so that no scrollbar is displayed in the admin panel while maintaining mouse-wheel scrolling capability.
 
 
 
