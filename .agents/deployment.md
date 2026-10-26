@@ -6,11 +6,11 @@ Last updated: 2026-10-25.
 
 | Part | State |
 |---|---|
-| Frontend | **Live** on Cloudflare Workers on custom domain: [https://notesandpapers.dpdns.org](https://notesandpapers.dpdns.org) (Version ID: `9bb891a3-d9e2-43cf-946b-7a8cbb701de6`). |
+| Frontend | **Live** on Cloudflare Workers on custom domain: [https://notesandpapers.dpdns.org](https://notesandpapers.dpdns.org) (Version ID: `bcbc123c-087e-480e-842b-fae82a7adcc5`). |
 | KV Incremental Cache | 133 pre-rendered page entries stored in KV namespace `NEXT_INC_CACHE_KV` (`d642f541c5dc4c8a9c8ea3f1747bb1de`). |
 | Static Assets | 78 assets uploaded to Cloudflare Asset Storage (`.open-next/assets`). |
 | Backend (FastAPI) + Postgres | **Live** on Render: [https://backend.notesandpapers.dpdns.org/health](https://backend.notesandpapers.dpdns.org/health) with Supabase PostgreSQL session pooler. |
-| Custom domain | Configured in `wrangler.jsonc` under `routes`: `notesandpapers.dpdns.org` (`custom_domain: true`). |
+| Custom domains | Configured in `wrangler.jsonc` under `routes`: `notesandpapers.dpdns.org` and `www.notesandpapers.dpdns.org` (`custom_domain: true`). `www` 301 redirects to apex. |
 | Production Environment | `NEXT_PUBLIC_SITE_URL=https://notesandpapers.dpdns.org`, `NEXT_PUBLIC_API_URL=https://backend.notesandpapers.dpdns.org/api/v1`, `INDEXNOW_KEY=d8e8d88bcb06e2901c2031fe56889b39` configured in `wrangler.jsonc` vars and runtime env fallbacks. |
 | Google Search Console & SEO | Ownership verified (`6kg8ml3F16HFts5p3ygtf5Kpr93ve4XNjX5fcRVbPl8`). Dynamic sitemaps, Googlebot rich snippet directives (`max-snippet:-1, max-image-preview:large`), head `WebSite` Schema, and 192px/favicon root assets deployed. |
 

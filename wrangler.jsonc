@@ -31,6 +31,10 @@
 		{
 			"pattern": "notesandpapers.dpdns.org",
 			"custom_domain": true
+		},
+		{
+			"pattern": "www.notesandpapers.dpdns.org",
+			"custom_domain": true
 		}
 	],
 	"vars": {
