@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/shared/site-header";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { OfflineBanner } from "@/components/shared/offline-banner";
 import { SocialCommunityPopup } from "@/components/shared/social-popup";
+import { MascotGuide } from "@/components/shared/mascot-guide";
 import { JsonLdScript } from "@/components/shared/json-ld";
 import { SITE_NAME, SITE_URL } from "@/lib/env";
 
@@ -216,6 +217,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </main>
           <SiteFooter />
           <SocialCommunityPopup />
+          <MascotGuide />
         </Providers>
       </body>
     </html>
