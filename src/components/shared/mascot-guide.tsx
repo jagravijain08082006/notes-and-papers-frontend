@@ -191,16 +191,16 @@ export function MascotGuide() {
       {/* Intact Floating Mascot at the Bottom-Right Corner (All pages except admin) */}
       <aside
         aria-label="Notey study companion"
-        className="fixed bottom-4 right-4 z-40 sm:bottom-6 sm:right-6 select-none"
+        className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 select-none"
       >
         <NoteyAvatar
           animation={floatingAnim}
-          size={56}
+          size={58}
           onClick={openModal}
           onAnimationEnd={(endedAnim) => {
             if (endedAnim === "waking") setFloatingAnim("idle");
           }}
-          className="rounded-full border-2 border-border bg-primary p-0.5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
+          className="transition-transform hover:scale-110 active:scale-95 cursor-pointer drop-shadow-md"
         />
       </aside>
 

@@ -11,12 +11,12 @@ const Avatar = dynamic(
     ssr: false,
     loading: () => (
       <div
-        className="flex items-center justify-center rounded-full border-2 border-border bg-primary font-bold shadow-hard-sm"
-        style={{ width: 120, height: 120 }}
+        className="flex items-center justify-center rounded-full bg-primary"
+        style={{ width: 60, height: 60 }}
       >
         <div className="flex gap-2">
-          <span className="size-3 rounded-full bg-foreground animate-bounce" />
-          <span className="size-3 rounded-full bg-foreground animate-bounce [animation-delay:150ms]" />
+          <span className="size-2.5 rounded-full bg-foreground" />
+          <span className="size-2.5 rounded-full bg-foreground" />
         </div>
       </div>
     ),
@@ -37,7 +37,7 @@ const getServerSnapshot = () => false;
 
 export function NoteyAvatar({
   animation = "idle",
-  size = 120,
+  size = 60,
   className,
   onAnimationEnd,
   onClick,
@@ -51,12 +51,12 @@ export function NoteyAvatar({
   if (!isMounted) {
     return (
       <div
-        className="flex items-center justify-center rounded-full border-2 border-border bg-primary shadow-hard-sm"
+        className="flex items-center justify-center rounded-full bg-primary"
         style={{ width: size, height: size }}
       >
         <div className="flex gap-2">
-          <span className="size-3 rounded-full bg-foreground" />
-          <span className="size-3 rounded-full bg-foreground" />
+          <span className="size-2.5 rounded-full bg-foreground" />
+          <span className="size-2.5 rounded-full bg-foreground" />
         </div>
       </div>
     );
@@ -66,7 +66,7 @@ export function NoteyAvatar({
     <button
       type="button"
       onClick={onClick}
-      className={`group relative inline-flex cursor-pointer appearance-none border-0 bg-transparent p-0 transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${className ?? ""}`}
+      className={`group relative inline-flex cursor-pointer appearance-none border-0 bg-transparent p-0 transition-transform hover:scale-105 active:scale-95 focus:outline-none focus-visible:outline-none ${className ?? ""}`}
       title="Click Notey for a reaction!"
       aria-label="Notey mascot"
     >
