@@ -13,7 +13,7 @@ export async function GET(req: Request, ctx: RouteContext<"/sitemaps/[type]/[fil
   const page = Number(match[1]);
 
   if (type === "static") {
-    const lastmod = new Date().toISOString();
+    const lastmod = new Date().toISOString().split("T")[0];
     return xmlResponse(urlsetXml(STATIC_PATHS.map((path) => ({ path, lastmod })), baseUrl));
   }
 

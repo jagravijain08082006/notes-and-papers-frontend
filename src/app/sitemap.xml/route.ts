@@ -7,7 +7,7 @@ export const revalidate = 3600;
 export async function GET(req: Request) {
   const origin = new URL(req.url).origin;
   const baseUrl = origin && !origin.includes("localhost") ? origin : SITE_URL;
-  const now = new Date().toISOString();
+  const now = new Date().toISOString().split("T")[0];
   const items = [{ loc: `${baseUrl}/sitemaps/static/1.xml`, lastmod: now }];
 
   const results = await Promise.allSettled(API_SITEMAP_TYPES.map((t) => getSitemapPage(t, 1)));

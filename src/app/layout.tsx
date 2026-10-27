@@ -53,8 +53,14 @@ export const metadata: Metadata = {
     locale: "en_IN",
     type: "website",
     title: `${SITE_NAME} - Free Previous Year Question Papers`,
+    url: `${SITE_URL}/`,
     description:
       "Free previous year question papers for Rajasthan University, school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
+  },
+  appleWebApp: {
+    title: SITE_NAME,
+    capable: true,
+    statusBarStyle: "default",
   },
   manifest: "/favicon/site.webmanifest",
   icons: {
@@ -105,12 +111,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               {
                 "@type": "WebSite",
                 "@id": `${SITE_URL}/#website`,
-                url: SITE_URL,
+                url: `${SITE_URL}/`,
                 name: SITE_NAME,
                 alternateName: [
                   "Notes & Papers",
                   "NotesAndPapers",
                   "Notes and Papers",
+                  "notesandpaper",
+                  "Notes and Paper",
+                  "notesandpapers",
                   "Notes & Papers Academic Vault",
                   "notesandpapers.dpdns.org",
                 ],
@@ -120,7 +129,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   "@type": "Organization",
                   "@id": `${SITE_URL}/#organization`,
                   name: SITE_NAME,
-                  url: SITE_URL,
+                  legalName: SITE_NAME,
+                  url: `${SITE_URL}/`,
+                  sameAs: [`${SITE_URL}/`, "https://www.notesandpapers.dpdns.org/"],
                   logo: {
                     "@type": "ImageObject",
                     url: `${SITE_URL}/icon-192.png`,

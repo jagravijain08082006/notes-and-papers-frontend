@@ -135,13 +135,13 @@ export default async function HomePage() {
   ];
 
   return (
-    <div className="space-y-16 sm:space-y-24 lg:space-y-32">
+    <div className="space-y-10 sm:space-y-20 lg:space-y-28">
       {/* HERO */}
       <section
         aria-labelledby="hero-heading"
-        className="grid items-start gap-10 py-2 lg:grid-cols-[1.4fr_1fr] lg:gap-12 lg:py-10"
+        className="grid items-start gap-8 sm:gap-10 py-1 sm:py-2 lg:grid-cols-[1.4fr_1fr] lg:gap-12 lg:py-10"
       >
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           <p className="eyebrow inline-flex items-center gap-2 border-2 border-border bg-card px-2.5 py-1">
             <span className="size-2 bg-accent" aria-hidden="true" /> Open academic vault
           </p>
@@ -153,21 +153,21 @@ export default async function HomePage() {
               success.
             </span>
           </h1>
-          <p className="max-w-xl text-lg text-muted-foreground leading-relaxed">
+          <p className="max-w-xl text-base sm:text-lg text-muted-foreground leading-relaxed">
             Download authentic <strong className="font-semibold text-foreground">previous year papers</strong> to <strong className="font-semibold text-foreground">turn study into success</strong>. Access over{" "}
             {totalPapers > 0 ? totalPapers.toLocaleString("en-IN") : "thousands of"}{" "}
             verified question papers and notes for university students, board candidates, and competitive exam aspirants. Search, preview, and download free.
           </p>
-          <div className="max-w-2xl space-y-4">
+          <div className="max-w-2xl space-y-3 sm:space-y-4">
             <SearchBar size="lg" />
-            <div className="flex flex-wrap items-center gap-2 pt-1">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 pt-1">
               <span className="eyebrow text-xs text-muted-foreground">Quick links:</span>
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 {QUICK.map((q) => (
                   <Link
                     key={q.label}
                     href={q.href}
-                    className="border-2 border-border bg-card px-2.5 py-1 text-xs font-bold uppercase tracking-wide shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+                    className="border-2 border-border bg-card px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs font-bold uppercase tracking-wide shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
                   >
                     {q.label}
                   </Link>
@@ -179,11 +179,11 @@ export default async function HomePage() {
 
         <aside
           aria-label="Library at a glance"
-          className="brutal space-y-5 border-2 border-border bg-card p-5 shadow-hard-lg transition-transform sm:p-6 lg:rotate-1 hover:rotate-0 lg:sticky lg:top-24 lg:self-start"
+          className="brutal space-y-3 sm:space-y-5 border-2 border-border bg-card p-3.5 sm:p-6 shadow-hard sm:shadow-hard-lg transition-transform lg:rotate-1 hover:rotate-0 lg:sticky lg:top-24 lg:self-start"
         >
-          <div className="flex items-center justify-between border-b-2 border-border pb-3">
-            <p className="eyebrow tracking-wider">Vault metrics</p>
-            <span className="eyebrow flex items-center gap-2 border-2 border-border bg-primary px-2 py-0.5 font-bold shadow-hard-sm">
+          <div className="flex items-center justify-between border-b-2 border-border pb-2.5 sm:pb-3">
+            <p className="eyebrow tracking-wider text-xs sm:text-sm">Vault metrics</p>
+            <span className="eyebrow flex items-center gap-1.5 sm:gap-2 border-2 border-border bg-primary px-2 py-0.5 text-[10px] sm:text-xs font-bold shadow-hard-sm">
               <span className="relative flex size-2">
                 <span className="absolute inline-flex size-full animate-ping rounded-full bg-foreground opacity-75"></span>
                 <span className="relative inline-flex size-2 rounded-full bg-foreground"></span>
@@ -200,20 +200,20 @@ export default async function HomePage() {
               <div
                 key={m.l}
                 className={cn(
-                  "flex flex-col justify-between border-2 border-border p-2.5 sm:p-3.5 transition-all shadow-hard-sm",
+                  "flex flex-col justify-between border-2 border-border p-2 sm:p-3.5 transition-all shadow-hard-sm",
                   m.highlight ? "bg-primary text-primary-foreground" : "bg-background",
                 )}
               >
-                <dd className="font-display text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-wide whitespace-nowrap">
+                <dd className="font-display text-xl xs:text-2xl sm:text-3xl lg:text-4xl leading-tight tracking-wide whitespace-nowrap">
                   {m.v.toLocaleString("en-IN")}
                 </dd>
-                <dt className="eyebrow mt-1 text-[10px] sm:text-xs text-foreground/80 truncate">
+                <dt className="eyebrow mt-1 text-[9px] sm:text-xs text-foreground/80 truncate">
                   {m.l}
                 </dt>
               </div>
             ))}
           </dl>
-          <ul className="space-y-2.5 text-xs sm:text-sm font-medium border-t-2 border-border/40 pt-3">
+          <ul className="hidden sm:block space-y-2.5 text-xs sm:text-sm font-medium border-t-2 border-border/40 pt-3">
             <li className="flex items-center gap-2.5">
               <span className="grid size-5 shrink-0 place-items-center border border-border bg-primary">
                 <ShieldCheck className="size-3.5" aria-hidden="true" />
@@ -231,7 +231,7 @@ export default async function HomePage() {
             href={routes.universities}
             className={cn(
               buttonVariants({ variant: "outline", size: "lg" }),
-              "w-full uppercase font-bold tracking-wider shadow-hard-sm hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5",
+              "hidden sm:inline-flex w-full uppercase font-bold tracking-wider shadow-hard-sm hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5",
             )}
           >
             Explore the catalog <ArrowRight className="size-4" aria-hidden="true" />
@@ -240,33 +240,33 @@ export default async function HomePage() {
       </section>
 
       {/* CATEGORIES */}
-      <section aria-labelledby="cat-heading" className="space-y-8 w-full min-w-0 max-w-full">
-        <div className="space-y-2 min-w-0">
-          <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground">
+      <section aria-labelledby="cat-heading" className="space-y-5 sm:space-y-8 w-full min-w-0 max-w-full">
+        <div className="space-y-1 sm:space-y-2 min-w-0">
+          <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground text-[10px] sm:text-xs">
             Start here
           </p>
-          <h2 id="cat-heading" className="text-3xl sm:text-4xl lg:text-5xl break-words leading-none">
+          <h2 id="cat-heading" className="text-2xl sm:text-4xl lg:text-5xl break-words leading-none">
             Explore the vault by category
           </h2>
         </div>
-        <ul className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4 w-full min-w-0 max-w-full">
+        <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 w-full min-w-0 max-w-full">
           {categories.map((c) => (
             <li key={c.title} className="w-full min-w-0 max-w-full">
-              <Link href={c.href} className="brutal brutal-hover flex h-full flex-col gap-5 p-5 sm:p-6 bg-card w-full min-w-0">
+              <Link href={c.href} className="brutal brutal-hover flex h-full flex-col gap-3 sm:gap-5 p-3.5 sm:p-6 bg-card w-full min-w-0">
                 <span
-                  className={`grid size-12 sm:size-14 place-items-center border-2 border-border ${c.tone}`}
+                  className={`grid size-10 sm:size-14 place-items-center border-2 border-border ${c.tone}`}
                 >
-                  <c.icon className="size-6 sm:size-7" aria-hidden="true" />
+                  <c.icon className="size-5 sm:size-7" aria-hidden="true" />
                 </span>
-                <span className="space-y-2 min-w-0">
-                  <span className="block font-display text-2xl sm:text-3xl uppercase leading-[1.2] break-words">
+                <span className="space-y-1 sm:space-y-2 min-w-0">
+                  <span className="block font-display text-base sm:text-3xl uppercase leading-[1.2] break-words">
                     {c.title}
                   </span>
-                  <span className="block text-sm text-muted-foreground">{c.text}</span>
+                  <span className="hidden sm:block text-sm text-muted-foreground">{c.text}</span>
                 </span>
-                <span className="eyebrow mt-auto flex items-center justify-between border-t-2 border-border pt-3">
+                <span className="eyebrow mt-auto flex items-center justify-between border-t-2 border-border pt-2 sm:pt-3 text-[10px] sm:text-xs">
                   {c.count !== null ? plural(c.count, "paper") : "Browse notes"}
-                  <ArrowRight className="size-4" aria-hidden="true" />
+                  <ArrowRight className="size-3 sm:size-4" aria-hidden="true" />
                 </span>
               </Link>
             </li>
@@ -278,8 +278,8 @@ export default async function HomePage() {
       <UniversitiesSection initial={university} />
       <LatestPapersSection initial={latest} />
 
-      {/* HOW IT WORKS */}
-      <section aria-labelledby="how-heading" className="space-y-8">
+      {/* HOW IT WORKS (Shown on desktop, hidden on mobile for clean quick access) */}
+      <section aria-labelledby="how-heading" className="hidden md:block space-y-8">
         <div className="space-y-2">
           <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground">
             Simple

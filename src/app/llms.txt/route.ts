@@ -1,5 +1,5 @@
 import { getExams, getUniversities } from "@/lib/api/public";
-import { SITE_NAME, SITE_URL } from "@/lib/env";
+import { SITE_URL } from "@/lib/env";
 import { routes } from "@/lib/routes";
 
 /** /llms.txt: a plain-markdown map of the site for AI assistants and answer engines. */
@@ -11,9 +11,14 @@ export async function GET() {
     getExams("exam").catch(() => []),
   ]);
   const lines = [
-    `# ${SITE_NAME}`,
+    `# Notes & Papers (notesandpapers.dpdns.org)`,
     "",
-    `> Free previous year question papers (PYQ) and notes for Indian university exams and competitive exams, as PDFs. Every paper has its own page with the exam, year, subject, course and paper code, and a PDF to view and download.`,
+    `> Notes & Papers (https://notesandpapers.dpdns.org) is an open academic repository offering 7,800+ authentic previous year question papers (PYQ), model papers, and student notes in watermark-free PDF format. We cover Rajasthan University (UNIRAJ / UOR Jaipur), RTU Kota, School Boards (CBSE & RBSE), and national competitive exams (UPSC, SSC, NEET, GATE). 100% free with clean PDF downloads.`,
+    "",
+    "## Domain Identity",
+    `- Site Name: Notes & Papers (NotesAndPapers / Notes and Paper)`,
+    `- Official Domain: https://notesandpapers.dpdns.org`,
+    `- Alternate Domain: https://www.notesandpapers.dpdns.org`,
     "",
     "## How the site is organised",
     `- University papers: ${SITE_URL}/universities/{university}/{course}/{term}/{subject}`,
