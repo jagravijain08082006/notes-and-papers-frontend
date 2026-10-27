@@ -1,6 +1,6 @@
 import { AdminAction } from "@/components/admin/admin-action";
 import { AutoRefresh } from "@/components/admin/auto-refresh";
-import { InstantSyncButton } from "@/components/admin/instant-sync-button";
+import { CrawlSyncConsole, type CrawlConfig } from "@/components/admin/crawl-sync-console";
 import { NoPermission } from "@/components/admin/no-permission";
 import { PageHeader, StatCard, StatusBadge, fmtDate } from "@/components/admin/ui";
 import { authedFetch, getMe } from "@/lib/api/server";
@@ -54,15 +54,20 @@ interface Branding {
 
 export default async function ImportsPage() {
   if ((await getMe())?.role !== "admin") return <NoPermission />;
-  const [data, brand, sync] = await Promise.all([
+  const [data, brand, sync, settings] = await Promise.all([
     authedFetch<Imports>("/admin/imports", {}, "/admin/imports"),
     authedFetch<Branding>("/admin/branding", {}, "/admin/imports"),
     authedFetch<{ jobs: SyncJob[] }>("/admin/sync", {}, "/admin/imports"),
+    authedFetch<Record<string, unknown>>("/admin/settings", {}, "/admin/imports").catch(() => ({})),
   ]);
   const running =
     data.jobs.some((j) => j.status === "queued" || j.status === "running") ||
     brand.jobs.some((j) => j.status === "queued" || j.status === "running") ||
     sync.jobs.some((j) => j.status === "queued" || j.status === "running");
+  const crawlConfig =
+    (settings && typeof settings === "object" && "crawl_config" in settings
+      ? (settings.crawl_config as CrawlConfig)
+      : {}) || {};
 
   return (
     <>
@@ -118,29 +123,16 @@ export default async function ImportsPage() {
       </div>
 
       <section className="mt-10 space-y-5" aria-labelledby="sync-h">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div className="space-y-2">
-            <h2 id="sync-h" className="text-2xl">
-              Daily sync
-            </h2>
-            <p className="max-w-2xl text-sm text-muted-foreground">
-              The nightly job: scrape all three sites, import new papers, flag removed ones, fill
-              search metadata, brand a batch of PDFs and tell the website and search engines. It
-              also runs by itself from GitHub Actions.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <InstantSyncButton label="Instant Sync (GitHub Actions)" inProgress={running} />
-            <AdminAction
-              label="Run local sync"
-              path="/admin/sync"
-              body={{ site: "all", brand_limit: 300 }}
-              success="Local sync started"
-              disabled={running}
-              confirm="Run the full sync now locally? It can take a while."
-            />
-          </div>
+        <div className="space-y-2">
+          <h2 id="sync-h" className="text-2xl">
+            Crawl & Daily Sync Control Console
+          </h2>
+          <p className="max-w-2xl text-sm text-muted-foreground">
+            Configure target runners (FastAPI Server vs GitHub Actions), select sites, set PDF branding batch limits, and trigger instant scrapes.
+          </p>
         </div>
+
+        <CrawlSyncConsole initialConfig={crawlConfig} running={running} />
         {sync.jobs.length > 0 ? (
           <ul className="divide-y border-2 border-border bg-card text-sm">
             {sync.jobs.map((j) => (
