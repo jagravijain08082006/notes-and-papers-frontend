@@ -2,12 +2,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, FileText, Layers, ScrollText } from "lucide-react";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
+import { FaqAccordion } from "@/components/shared/faq-accordion";
 import { JsonLdScript } from "@/components/shared/json-ld";
 import { Badge } from "@/components/ui/badge";
 import { getExam } from "@/lib/api/public";
 import { cleanExamTitle } from "@/lib/exam-categories";
+import { examSeo } from "@/lib/exam-seo";
 import { kindLabel, routes, yearRange } from "@/lib/routes";
-import { buildMetadata, collectionPageLd } from "@/lib/seo";
+import { buildMetadata, collectionPageLd, faqLd } from "@/lib/seo";
 import { plural } from "@/lib/utils";
 import type { ExamSection } from "@/lib/api/types";
 
@@ -17,19 +19,13 @@ export async function generateMetadata(props: PageProps<"/exams/[slug]">) {
   const { slug } = await props.params;
   const e = await getExam(slug).catch(() => null);
   if (!e) return { title: "Exam not found", robots: { index: false } };
-  const name = cleanExamTitle(e.name, slug);
+  const seo = examSeo(slug, e);
   return buildMetadata({
-    title: `${name} Previous Year Question Papers`,
-    description: `${plural(e.paper_count, "paper")} for ${name}${e.year_min ? `, ${yearRange(e.year_min, e.year_max)}` : ""}. Free PDFs, section-wise.`,
+    title: seo.title,
+    description: seo.description,
     path: routes.exam(slug),
     noindex: false,
-    keywords: [
-      `${name} question papers`,
-      `${name} previous year papers`,
-      `${name} pyq pdf`,
-      `${name} exam model paper`,
-      "notes and papers",
-    ],
+    keywords: seo.keywords,
   });
 }
 
@@ -54,6 +50,7 @@ export default async function ExamPage(props: PageProps<"/exams/[slug]">) {
   if (!exam) notFound();
   const path = routes.exam(slug);
   const examTitle = cleanExamTitle(exam.name, slug);
+  const seo = examSeo(slug, exam);
 
   // Compute accurate total papers across all sections
   const totalSectionPapers = exam.sections.reduce(
@@ -79,8 +76,13 @@ export default async function ExamPage(props: PageProps<"/exams/[slug]">) {
           </span>
         </div>
         <h1 className="max-w-5xl text-3xl sm:text-5xl lg:text-7xl break-words leading-tight">
-          {examTitle}
+          {seo.h1}
         </h1>
+        <div className="max-w-3xl space-y-3 text-base text-muted-foreground sm:text-lg">
+          {seo.intro.map((para) => (
+            <p key={para}>{para}</p>
+          ))}
+        </div>
         <p className="flex flex-wrap gap-3">
           <span className="border-2 border-border bg-primary px-3 py-1 text-sm font-bold uppercase tracking-wider shadow-hard-sm">
             {plural(totalDisplayPapers, "paper")}
@@ -142,7 +144,9 @@ export default async function ExamPage(props: PageProps<"/exams/[slug]">) {
               </h2>
               {yearGroups.length > 1 && (
                 <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
-                  <span className="font-bold text-muted-foreground uppercase mr-1">Filter Year:</span>
+                  <span className="font-bold text-muted-foreground uppercase mr-1">
+                    Filter Year:
+                  </span>
                   {yearGroups.map(([yr, yPapers]) => (
                     <a
                       key={yr}
@@ -190,7 +194,9 @@ export default async function ExamPage(props: PageProps<"/exams/[slug]">) {
                                   </span>
                                 )}
                                 {p.year && <Badge tone="primary">{p.year}</Badge>}
-                                {p.kind !== "question_paper" && <Badge tone="accent">{kindLabel(p.kind)}</Badge>}
+                                {p.kind !== "question_paper" && (
+                                  <Badge tone="accent">{kindLabel(p.kind)}</Badge>
+                                )}
                                 {p.session && <Badge>{p.session}</Badge>}
                                 {p.paper_code && <Badge>Code {p.paper_code}</Badge>}
                               </div>
@@ -211,8 +217,23 @@ export default async function ExamPage(props: PageProps<"/exams/[slug]">) {
         );
       })}
 
+      {exam.sections.length > 0 && (
+        <section
+          aria-labelledby="exam-faq"
+          className="max-w-4xl space-y-4 border-t-2 border-border pt-10"
+        >
+          <h2 id="exam-faq" className="text-3xl sm:text-4xl">
+            {seo.short} papers: common questions
+          </h2>
+          <FaqAccordion faqs={seo.faqs} />
+        </section>
+      )}
+
       <JsonLdScript
-        data={[collectionPageLd(`${examTitle} question papers`, path, `Papers for ${examTitle}`)]}
+        data={[
+          collectionPageLd(`${seo.short} previous year question papers`, path, seo.description),
+          faqLd(seo.faqs),
+        ]}
       />
     </div>
   );

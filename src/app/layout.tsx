@@ -148,7 +148,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 "@id": `${SITE_URL}/#nav-uniraj`,
                 name: "Rajasthan University (UNIRAJ) Papers",
                 url: `${SITE_URL}/universities/rajasthan-university`,
-                description: "UNIRAJ previous year question papers for BA, BSc, BCom, BCA, B.Ed, MA",
+                description:
+                  "UNIRAJ previous year question papers for BA, BSc, BCom, BCA, B.Ed, MA",
               },
               {
                 "@type": "SiteNavigationElement",
@@ -201,6 +202,35 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               },
               {
                 "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-universities`,
+                name: "All University Question Papers",
+                url: `${SITE_URL}/universities`,
+                description:
+                  "Previous year question papers of Rajasthan University, RTU Kota and more",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-ssc`,
+                name: "SSC Previous Year Papers",
+                url: `${SITE_URL}/exams/ssc`,
+                description: "SSC CGL, CHSL, MTS, GD previous year question papers PDF",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-sbi-clerk`,
+                name: "SBI Clerk Previous Year Papers",
+                url: `${SITE_URL}/exams/sbi-clerk`,
+                description: "SBI Clerk (Junior Associate) prelims and mains previous year papers",
+              },
+              {
+                "@type": "SiteNavigationElement",
+                "@id": `${SITE_URL}/#nav-cg-open-school`,
+                name: "CG Open School Papers",
+                url: `${SITE_URL}/exams/cg-open-school`,
+                description: "Chhattisgarh State Open School Class 10 and 12 previous year papers",
+              },
+              {
+                "@type": "SiteNavigationElement",
                 "@id": `${SITE_URL}/#nav-boards`,
                 name: "School Boards (RBSE & CBSE)",
                 url: `${SITE_URL}/exams/uni-rajasthanboard`,
@@ -223,7 +253,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           </a>
           <OfflineBanner />
           <SiteHeader />
-          <main id="main" className="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-clip px-3.5 py-8 sm:px-6 sm:py-10 lg:py-14">
+          <main
+            id="main"
+            className="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-clip px-3.5 py-8 sm:px-6 sm:py-10 lg:py-14"
+          >
             {children}
           </main>
           <SiteFooter />

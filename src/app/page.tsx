@@ -25,7 +25,7 @@ import { cn, plural } from "@/lib/utils";
 export const revalidate = 86400;
 
 export const metadata = buildMetadata({
-  title: "Notes & Papers - Free Previous Year Question Papers",
+  title: "Notes & Papers - Previous Year Question Papers PDF",
   description:
     "Free previous year question papers for Rajasthan University (UNIRAJ / UOR), RTU Kota, school boards (RBSE, CBSE) & competitive exams (UPSC, SSC, NEET, GATE). Download authentic PYQ PDFs free.",
   path: "/",
@@ -66,6 +66,11 @@ const QUICK = [
   { label: "UPSC PYQ", href: "/exams/upsc" },
   { label: "NEET UG", href: "/exams/neet" },
   { label: "GATE", href: "/exams/gate" },
+  { label: "SSC", href: "/exams/ssc" },
+  { label: "SBI Clerk", href: "/exams/sbi-clerk" },
+  { label: "CG Open School", href: "/exams/cg-open-school" },
+  { label: "All universities", href: "/universities" },
+  { label: "All exams", href: "/exams" },
 ];
 
 /**
@@ -145,7 +150,10 @@ export default async function HomePage() {
           <p className="eyebrow inline-flex items-center gap-2 border-2 border-border bg-card px-2.5 py-1">
             <span className="size-2 bg-accent" aria-hidden="true" /> Open academic vault
           </p>
-          <h1 id="hero-heading" className="text-4xl xs:text-5xl sm:text-7xl lg:text-8xl break-words leading-none">
+          <h1
+            id="hero-heading"
+            className="text-4xl xs:text-5xl sm:text-7xl lg:text-8xl break-words leading-none"
+          >
             Previous year papers.
             <br />
             Turn study into{" "}
@@ -154,9 +162,12 @@ export default async function HomePage() {
             </span>
           </h1>
           <p className="max-w-xl text-base sm:text-lg text-muted-foreground leading-relaxed">
-            Download authentic <strong className="font-semibold text-foreground">previous year papers</strong> to <strong className="font-semibold text-foreground">turn study into success</strong>. Access over{" "}
-            {totalPapers > 0 ? totalPapers.toLocaleString("en-IN") : "thousands of"}{" "}
-            verified question papers and notes for university students, board candidates, and competitive exam aspirants. Search, preview, and download free.
+            Download authentic{" "}
+            <strong className="font-semibold text-foreground">previous year papers</strong> to{" "}
+            <strong className="font-semibold text-foreground">turn study into success</strong>.
+            Access over {totalPapers > 0 ? totalPapers.toLocaleString("en-IN") : "thousands of"}{" "}
+            verified question papers and notes for university students, board candidates, and
+            competitive exam aspirants. Search, preview, and download free.
           </p>
           <div className="max-w-2xl space-y-3 sm:space-y-4">
             <SearchBar size="lg" />
@@ -240,19 +251,28 @@ export default async function HomePage() {
       </section>
 
       {/* CATEGORIES */}
-      <section aria-labelledby="cat-heading" className="space-y-5 sm:space-y-8 w-full min-w-0 max-w-full">
+      <section
+        aria-labelledby="cat-heading"
+        className="space-y-5 sm:space-y-8 w-full min-w-0 max-w-full"
+      >
         <div className="space-y-1 sm:space-y-2 min-w-0">
           <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground text-[10px] sm:text-xs">
             Start here
           </p>
-          <h2 id="cat-heading" className="text-2xl sm:text-4xl lg:text-5xl break-words leading-none">
+          <h2
+            id="cat-heading"
+            className="text-2xl sm:text-4xl lg:text-5xl break-words leading-none"
+          >
             Explore the vault by category
           </h2>
         </div>
         <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 w-full min-w-0 max-w-full">
           {categories.map((c) => (
             <li key={c.title} className="w-full min-w-0 max-w-full">
-              <Link href={c.href} className="brutal brutal-hover flex h-full flex-col gap-3 sm:gap-5 p-3.5 sm:p-6 bg-card w-full min-w-0">
+              <Link
+                href={c.href}
+                className="brutal brutal-hover flex h-full flex-col gap-3 sm:gap-5 p-3.5 sm:p-6 bg-card w-full min-w-0"
+              >
                 <span
                   className={`grid size-10 sm:size-14 place-items-center border-2 border-border ${c.tone}`}
                 >
