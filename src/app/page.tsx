@@ -348,14 +348,14 @@ export default async function HomePage() {
       {/* CTA */}
       <section
         aria-labelledby="cta-heading"
-        className="border-2 border-border bg-primary p-6 text-primary-foreground shadow-hard-lg sm:p-12"
+        className="border-2 border-border bg-primary p-5 text-primary-foreground shadow-hard sm:p-7"
       >
-        <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
-          <div className="space-y-3">
-            <h2 id="cta-heading" className="text-4xl sm:text-5xl lg:text-6xl">
+        <div className="flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-center">
+          <div className="space-y-2">
+            <h2 id="cta-heading" className="text-2xl sm:text-3xl">
               Can&apos;t find your paper?
             </h2>
-            <p className="max-w-xl font-medium">
+            <p className="max-w-xl text-sm font-medium">
               Tell us which paper is missing, or upload one you have. Every upload is reviewed
               before it goes live.
             </p>
@@ -363,14 +363,14 @@ export default async function HomePage() {
           <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <Link
               href="/contact"
-              className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
             >
               Request a paper
             </Link>
             {flags.uploads && (
               <Link
                 href="/upload"
-                className={cn(buttonVariants({ size: "lg" }), "bg-foreground text-background")}
+                className={cn(buttonVariants({ size: "sm" }), "bg-foreground text-background")}
               >
                 Upload a paper
               </Link>
