@@ -27,12 +27,13 @@ const mono = Space_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} - Free Previous Year Question Papers`,
+    default: `${SITE_NAME} - Previous Year Question Papers PDF`,
     template: `%s | ${SITE_NAME}`,
   },
   description:
     "Free previous year question papers for Rajasthan University, school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
   applicationName: SITE_NAME,
+  appleWebApp: { title: SITE_NAME },
   keywords: [
     "notes and papers",
     "notes and papers dpdns",
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
     siteName: SITE_NAME,
     locale: "en_IN",
     type: "website",
-    title: `${SITE_NAME} - Free Previous Year Question Papers`,
+    title: `${SITE_NAME} - Previous Year Question Papers PDF`,
     url: `${SITE_URL}/`,
     description:
       "Free previous year question papers for Rajasthan University, school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
@@ -114,14 +115,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 url: `${SITE_URL}/`,
                 name: SITE_NAME,
                 alternateName: [
-                  "Notes & Papers",
-                  "NotesAndPapers",
                   "Notes and Papers",
-                  "notesandpaper",
-                  "Notes and Paper",
-                  "notesandpapers",
+                  "NotesAndPapers",
                   "Notes & Papers Academic Vault",
-                  "notesandpapers.dpdns.org",
                 ],
                 description:
                   "Free previous year question papers for Rajasthan University (UNIRAJ), RTU, school boards & competitive exams. Download authentic PYQ PDFs free.",
