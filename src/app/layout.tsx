@@ -33,7 +33,6 @@ export const metadata: Metadata = {
   description:
     "Free previous year question papers for Rajasthan University, school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
   applicationName: SITE_NAME,
-  appleWebApp: { title: SITE_NAME },
   keywords: [
     "notes and papers",
     "notes and papers dpdns",
