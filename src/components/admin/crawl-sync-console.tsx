@@ -36,11 +36,11 @@ interface CrawlSyncConsoleProps {
 }
 
 const SITES = [
-  { id: "all", label: "All Sources", desc: "RBSE, UNIRAJ, RTU Kota & PYQ" },
+  { id: "all", label: "All Rajasthan Core", desc: "RBSE, UNIRAJ & RTU Kota (excludes pyqonline)" },
   { id: "rajasthanboard", label: "Rajasthan Board (RBSE)", desc: "BSER Ajmer · Classes 9th–12th" },
   { id: "uoronline", label: "UNIRAJ (uoronline)", desc: "University of Rajasthan UG & PG" },
   { id: "rtuonline", label: "RTU Kota (rtuonline)", desc: "Rajasthan Technical University" },
-  { id: "pyqonline", label: "PYQ Online", desc: "CBSE & Other School Boards" },
+  { id: "pyqonline", label: "PYQ Online (Explicit Only)", desc: "CBSE & School Boards · Blocked from auto-sync" },
 ] as const;
 
 const LIMITS = [
