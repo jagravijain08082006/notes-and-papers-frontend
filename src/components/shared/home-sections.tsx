@@ -180,8 +180,8 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <SectionHeading
           id="courses-heading"
-          eyebrow="University & board exams"
-          title="Browse by university & boards"
+          eyebrow="Degree courses & curricula"
+          title="Browse university & degree courses"
           href={routes.universities}
           linkLabel="All universities"
         />
@@ -318,10 +318,10 @@ export function ExamsSection({ initial }: { initial: ExamSummary[] | null }) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <SectionHeading
           id="exams-heading"
-          eyebrow="Competitive exams & boards"
-          title="Popular examinations"
+          eyebrow="National & other state archives"
+          title="Competitive exams & all boards"
           href={routes.exams}
-          linkLabel="All exams & boards"
+          linkLabel="All 300+ exams"
         />
       </div>
 

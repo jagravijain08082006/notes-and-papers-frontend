@@ -14,21 +14,26 @@ import { UserMenu } from "./user-menu";
 export async function SiteHeader() {
   const flags = await getNavFlags();
   const NAV = [
-    { href: routes.universities, label: "Universities" },
-    { href: routes.boards, label: "Boards" },
-    { href: routes.exams, label: "Exams" },
+    { href: routes.rbse, label: "RBSE Board" },
+    { href: routes.uniraj, label: "UNIRAJ Jaipur" },
+    { href: routes.rtu, label: "RTU Kota" },
     ...(flags.notes ? [{ href: "/notes", label: "Notes" }] : []),
     { href: "/search", label: "Search" },
   ];
-  const MOBILE = [
-    { href: routes.universities, label: "Universities" },
-    { href: routes.boards, label: "Boards" },
-    { href: routes.categories, label: "Categories" },
-    { href: routes.exams, label: "Exams" },
+  const RAJASTHAN_MOBILE = [
+    { href: routes.rbse, label: "RBSE Rajasthan Board (9th–12th)" },
+    { href: routes.uniraj, label: "UNIRAJ Jaipur (UOR)" },
+    { href: routes.rtu, label: "RTU Kota Engineering" },
+  ];
+  const OTHER_MOBILE = [
+    { href: routes.boards, label: "All School Boards" },
+    { href: routes.universities, label: "All Universities" },
+    { href: routes.exams, label: "Competitive Exams" },
+    { href: routes.categories, label: "Categories Directory" },
     ...(flags.notes ? [{ href: "/notes", label: "Notes" }] : []),
-    { href: "/search", label: "Search" },
+    { href: "/search", label: "Search Papers" },
     ...(flags.uploads ? [{ href: "/upload", label: "Upload" }] : []),
-    { href: "/account", label: "My account" },
+    { href: "/account", label: "My Account" },
   ];
   return (
     <header className="sticky top-0 z-50 border-b-2 border-border bg-background/95 backdrop-blur-md shadow-sm">
@@ -77,17 +82,36 @@ export async function SiteHeader() {
           >
             <nav
               aria-label="Mobile"
-              className="absolute right-0 top-14 w-60 space-y-1 border-2 border-border bg-card p-2 shadow-hard"
+              className="absolute right-0 top-14 w-64 space-y-1 border-2 border-border bg-card p-2 shadow-hard"
             >
-              {MOBILE.map((n) => (
-                <Link
-                  key={n.href}
-                  href={n.href}
-                  className="block px-3 py-2.5 text-sm font-bold uppercase tracking-wide hover:bg-primary"
-                >
-                  {n.label}
-                </Link>
-              ))}
+              <div className="border-b-2 border-border/60 pb-1 mb-1">
+                <p className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                  Rajasthan Core
+                </p>
+                {RAJASTHAN_MOBILE.map((n) => (
+                  <Link
+                    key={n.href}
+                    href={n.href}
+                    className="block px-3 py-2 text-xs font-black uppercase tracking-wide bg-primary/20 hover:bg-primary border border-border/40 my-1 transition-colors"
+                  >
+                    {n.label}
+                  </Link>
+                ))}
+              </div>
+              <div>
+                <p className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
+                  Other Archives
+                </p>
+                {OTHER_MOBILE.map((n) => (
+                  <Link
+                    key={n.href}
+                    href={n.href}
+                    className="block px-3 py-1.5 text-xs font-bold uppercase tracking-wide hover:bg-muted transition-colors"
+                  >
+                    {n.label}
+                  </Link>
+                ))}
+              </div>
             </nav>
           </DetailsMenu>
         </div>

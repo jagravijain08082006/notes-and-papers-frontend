@@ -22,10 +22,12 @@ export async function SiteFooter() {
     {
       title: "Explore",
       links: [
-        { href: routes.universities, label: "Universities" },
-        { href: routes.exams, label: "Competitive exams" },
-        { href: "/exams/uni-rajasthanboard", label: "RBSE Board Papers" },
-        { href: "/exams/uni-cbseboardonline", label: "CBSE Sample Papers" },
+        { href: routes.rbse, label: "RBSE Rajasthan Board" },
+        { href: routes.uniraj, label: "UNIRAJ Jaipur (UOR)" },
+        { href: routes.rtu, label: "RTU Kota Engineering" },
+        { href: routes.boards, label: "All School Boards" },
+        { href: routes.universities, label: "All Universities" },
+        { href: routes.exams, label: "Competitive Exams" },
         ...(flags.notes ? [{ href: "/notes", label: "Notes" }] : []),
         { href: "/search", label: "Search papers" },
       ],
