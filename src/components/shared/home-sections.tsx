@@ -287,13 +287,13 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
 
 const HOME_EXAM_TABS = [
   { id: "all", label: "All Popular" },
+  { id: "school-boards", label: "School Boards (RBSE, CBSE)" },
   { id: "banking-ssc", label: "Banking & SSC" },
   { id: "civil-services", label: "Civil Services" },
   { id: "engineering", label: "Engineering" },
   { id: "medical", label: "Medical & Nursing" },
   { id: "teaching", label: "Teaching & TET" },
   { id: "defence", label: "Defence" },
-  { id: "school-boards", label: "School Boards" },
 ];
 
 /** Popular exams. Data: GET /api/exams (server-rendered first, refreshed on load). */

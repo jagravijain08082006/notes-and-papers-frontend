@@ -18,6 +18,39 @@ interface Profile {
 }
 
 const PROFILES: Record<string, Profile> = {
+  "uni-rajasthanboard": {
+    short: "RBSE Rajasthan Board",
+    also: [
+      "RBSE",
+      "Rajasthan Board",
+      "RBSE Class 10",
+      "RBSE Class 12",
+      "RBSE Class 10 previous year papers",
+      "RBSE Class 12 previous year papers",
+      "BSER Ajmer",
+      "Rajasthan board model papers",
+      "RBSE half yearly question papers",
+    ],
+    intro: [
+      "The Board of Secondary Education, Rajasthan (RBSE / BSER Ajmer) conducts annual examinations for Class 9, Class 10 (Secondary), Class 11, and Class 12 (Senior Secondary across Arts, Science, and Commerce).",
+      "Practicing authentic RBSE previous year question papers, half-yearly test papers, and model papers helps Rajasthan students master the exam blueprint, time management, and repeated question patterns for top scores.",
+    ],
+  },
+  "uni-cbseboardonline": {
+    short: "CBSE Board",
+    also: [
+      "CBSE",
+      "CBSE Class 10",
+      "CBSE Class 12",
+      "Central Board of Secondary Education",
+      "CBSE sample question papers",
+      "CBSE previous year question papers",
+    ],
+    intro: [
+      "The Central Board of Secondary Education (CBSE) conducts the annual Class 10 (Secondary) and Class 12 (Senior School Certificate) board examinations across India.",
+      "Practicing CBSE previous year question papers and official sample papers gives students direct insight into the marking scheme, question typology, and time allocation.",
+    ],
+  },
   ssc: {
     short: "SSC",
     also: ["SSC CGL", "SSC CHSL", "SSC MTS", "SSC GD", "Staff Selection Commission"],

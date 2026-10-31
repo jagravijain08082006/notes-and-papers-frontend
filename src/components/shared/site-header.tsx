@@ -15,12 +15,18 @@ export async function SiteHeader() {
   const flags = await getNavFlags();
   const NAV = [
     { href: routes.universities, label: "Universities" },
+    { href: routes.boards, label: "Boards" },
     { href: routes.exams, label: "Exams" },
     ...(flags.notes ? [{ href: "/notes", label: "Notes" }] : []),
     { href: "/search", label: "Search" },
   ];
   const MOBILE = [
-    ...NAV,
+    { href: routes.universities, label: "Universities" },
+    { href: routes.boards, label: "Boards" },
+    { href: routes.categories, label: "Categories" },
+    { href: routes.exams, label: "Exams" },
+    ...(flags.notes ? [{ href: "/notes", label: "Notes" }] : []),
+    { href: "/search", label: "Search" },
     ...(flags.uploads ? [{ href: "/upload", label: "Upload" }] : []),
     { href: "/account", label: "My account" },
   ];

@@ -11,10 +11,12 @@ import { cn, plural } from "@/lib/utils";
 
 interface ExamsCatalogViewProps {
   exams: ExamSummary[];
+  initialCategory?: string;
+  hideCategoryPills?: boolean;
 }
 
-export function ExamsCatalogView({ exams }: ExamsCatalogViewProps) {
-  const [activeCategory, setActiveCategory] = useState("all");
+export function ExamsCatalogView({ exams, initialCategory = "all", hideCategoryPills = false }: ExamsCatalogViewProps) {
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedQuery = useDebounce(searchQuery.trim().toLowerCase(), 250);
 
@@ -107,38 +109,40 @@ export function ExamsCatalogView({ exams }: ExamsCatalogViewProps) {
         </div>
 
         {/* Category Filter Pills with Icons */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar">
-          {EXAM_DOMAINS.map((domain) => {
-            const count = domainCounts[domain.id] ?? 0;
-            if (domain.id !== "all" && count === 0) return null;
-            const isSelected = activeCategory === domain.id;
-            const DomainIcon = domain.icon;
-            return (
-              <button
-                key={domain.id}
-                type="button"
-                onClick={() => setActiveCategory(domain.id)}
-                className={cn(
-                  "flex shrink-0 items-center gap-2 border-2 border-border px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all shadow-hard-sm hover:-translate-x-px hover:-translate-y-px",
-                  isSelected
-                    ? "bg-primary text-primary-foreground shadow-hard"
-                    : "bg-card text-foreground hover:bg-primary/20",
-                )}
-              >
-                <DomainIcon className="size-3.5 shrink-0" aria-hidden="true" />
-                <span>{domain.label}</span>
-                <span
+        {!hideCategoryPills && (
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 pt-1 no-scrollbar">
+            {EXAM_DOMAINS.map((domain) => {
+              const count = domainCounts[domain.id] ?? 0;
+              if (domain.id !== "all" && count === 0) return null;
+              const isSelected = activeCategory === domain.id;
+              const DomainIcon = domain.icon;
+              return (
+                <button
+                  key={domain.id}
+                  type="button"
+                  onClick={() => setActiveCategory(domain.id)}
                   className={cn(
-                    "px-1.5 py-0.2 text-[10px] font-black border border-border/40",
-                    isSelected ? "bg-foreground text-background" : "bg-muted text-muted-foreground",
+                    "flex shrink-0 items-center gap-2 border-2 border-border px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all shadow-hard-sm hover:-translate-x-px hover:-translate-y-px",
+                    isSelected
+                      ? "bg-primary text-primary-foreground shadow-hard"
+                      : "bg-card text-foreground hover:bg-primary/20",
                   )}
                 >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+                  <DomainIcon className="size-3.5 shrink-0" aria-hidden="true" />
+                  <span>{domain.label}</span>
+                  <span
+                    className={cn(
+                      "px-1.5 py-0.2 text-[10px] font-black border border-border/40",
+                      isSelected ? "bg-foreground text-background" : "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* CASE 1: GROUPED BY DOMAINS ("ALL" VIEW WITHOUT SEARCH) */}

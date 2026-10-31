@@ -12,7 +12,7 @@ import { getLatestPapers, getPaper, getPaperRedirect } from "@/lib/api/public";
 import type { PaperSummary } from "@/lib/api/types";
 import { kindLabel, paperContext, paperHref, routes, subjectHref } from "@/lib/routes";
 import { cleanPreviewExcerpt } from "@/lib/sanitize-preview";
-import { buildMetadata, faqLd, learningResourceLd, paperMeta } from "@/lib/seo";
+import { breadcrumbLd, buildMetadata, faqLd, learningResourceLd, paperMeta } from "@/lib/seo";
 
 export async function paperMetadata(slug: string) {
   const p = await getPaper(slug);
@@ -359,7 +359,7 @@ export async function PaperPage({
         </div>
       </section>
 
-      <JsonLdScript data={[learningResourceLd(p, m.title, m.description), faqLd(faqs)]} />
+      <JsonLdScript data={[learningResourceLd(p, m.title, m.description), breadcrumbLd(crumbs), faqLd(faqs)]} />
     </article>
   );
 }

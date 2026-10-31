@@ -13,6 +13,8 @@ export const isSitemapType = (v: string): v is SitemapType =>
 export const STATIC_PATHS = [
   "/",
   routes.universities,
+  "/boards",
+  routes.categories,
   routes.exams,
   "/notes",
   "/about",

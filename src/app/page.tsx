@@ -69,6 +69,7 @@ const QUICK = [
   { label: "SSC", href: "/exams/ssc" },
   { label: "SBI Clerk", href: "/exams/sbi-clerk" },
   { label: "CG Open School", href: "/exams/cg-open-school" },
+  { label: "All boards", href: "/boards" },
   { label: "All universities", href: "/universities" },
   { label: "All exams", href: "/exams" },
 ];

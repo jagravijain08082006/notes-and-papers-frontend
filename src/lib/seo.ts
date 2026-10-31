@@ -33,13 +33,13 @@ export function buildMetadata({
   keywords,
   type = "website",
 }: MetaInput): Metadata {
-  // "Page | Notes & Papers" when it fits in 60 characters; long titles keep their own words instead of the brand.
+  // "Page | Notes & Papers" when it fits in 68 characters; long titles keep their own words instead of the brand.
   const full =
-    title.includes(SITE_NAME) || title.length + SITE_NAME.length + 3 > 60
+    title.includes(SITE_NAME) || title.length + SITE_NAME.length + 3 > 68
       ? title
       : `${title} | ${SITE_NAME}`;
-  const t = clip(full, 60);
-  const d = clip(description, 150);
+  const t = clip(full, 68);
+  const d = clip(description, 160);
   const url = absoluteUrl(path);
   return {
     title: { absolute: t },
@@ -125,24 +125,36 @@ export function paperMeta(p: PaperDetail) {
     const bits = [p.year ? String(p.year) : "", p.session ?? "", p.language ?? ""]
       .filter(Boolean)
       .join(", ");
+    const hasPaper = /question paper|paper|model paper/i.test(p.title);
+    const candidateTitle = hasPaper
+      ? `${p.title} PDF Download`
+      : `${p.title} Question Paper PDF Download`;
+    const title =
+      p.meta_title && !p.meta_title.endsWith("…") && p.meta_title.length >= p.title.length * 0.8
+        ? p.meta_title
+        : candidateTitle;
+
+    const description =
+      p.meta_description && !p.meta_description.endsWith("…")
+        ? p.meta_description
+        : `Download free PDF of ${p.title}${where && !p.title.includes(where) ? ` (${where})` : ""} previous year question paper${bits ? ` [${bits}]` : ""}. Authentic question paper for exam preparation.`;
+
     return {
-      title:
-        p.meta_title ??
-        `${p.title}${where && !p.title.includes(where) ? ` - ${where}` : ""} | Previous Year Paper PDF`,
-      description:
-        p.meta_description ??
-        `Download the ${p.title}${where ? ` from ${where}` : ""} previous year question paper as a PDF${bits ? ` (${bits})` : ""}. Free with an account, with other years of the same exam on the page.`,
+      title,
+      description,
       h1: p.title,
       label: where,
     };
   }
   return {
     title:
-      p.meta_title ??
-      `${p.subject_name} ${year}Question Paper - ${p.course_name} ${label}${p.university_name ? ` ${p.university_name}` : ""}`,
+      p.meta_title && !p.meta_title.endsWith("…")
+        ? p.meta_title
+        : `${p.subject_name} ${year}Question Paper - ${p.course_name} ${label}${p.university_name ? ` ${p.university_name}` : ""}`,
     description:
-      p.meta_description ??
-      `${p.subject_name} ${p.course_name} ${label} ${year}question paper PDF.${p.paper_code ? ` Paper code ${p.paper_code}.` : ""} View online or download free.`,
+      p.meta_description && !p.meta_description.endsWith("…")
+        ? p.meta_description
+        : `${p.subject_name} ${p.course_name} ${label} ${year}question paper PDF.${p.paper_code ? ` Paper code ${p.paper_code}.` : ""} View online or download free.`,
     h1: `${p.subject_name} ${year}Question Paper`.replace(/\s+/g, " ").trim(),
     label,
   };
@@ -202,21 +214,38 @@ export function faqLd(faqs: { q: string; a: string }[]): JsonLd {
 }
 
 export function learningResourceLd(p: PaperDetail, title: string, description: string): JsonLd {
+  const eduLevel = p.course_name ?? p.section ?? p.exam_name ?? "Secondary Education";
   return {
     "@context": "https://schema.org",
-    "@type": "LearningResource",
+    "@type": ["LearningResource", "DigitalDocument"],
     name: title,
     ...(p.meta_keywords?.length ? { keywords: p.meta_keywords.join(", ") } : {}),
     description,
     url: absoluteUrl(paperHref(p)),
-    learningResourceType: p.kind === "notes" ? "Notes" : "Exam",
-    educationalLevel: p.course_name ?? undefined,
-    inLanguage: "en",
+    learningResourceType: p.kind === "notes" ? "Notes" : "Question Paper",
+    educationalLevel: eduLevel,
+    educationalUse: "Previous Year Question Paper Practice / Exam Preparation",
+    encodingFormat: "application/pdf",
+    inLanguage: p.language === "Hindi" ? "hi" : "en",
     isAccessibleForFree: true,
+    hasDigitalDocumentPermission: {
+      "@type": "DigitalDocumentPermission",
+      permissionType: "https://schema.org/ReadPermission",
+      grantee: { "@type": "Audience", audienceType: "public" },
+    },
+    audience: {
+      "@type": "EducationalAudience",
+      educationalRole: "student",
+    },
     datePublished: p.published_at ?? undefined,
     dateModified: p.updated_at,
     ...(p.year ? { temporalCoverage: String(p.year) } : {}),
-    provider: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    provider: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: absoluteUrl("/favicon/android-chrome-512x512.png"),
+    },
     about: p.course_name
       ? { "@type": "CollegeOrUniversity", name: p.university_name ?? SITE_NAME }
       : { "@type": "Thing", name: p.exam_name ?? p.title },
