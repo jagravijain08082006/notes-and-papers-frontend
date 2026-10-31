@@ -1,7 +1,9 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BookOpen,
   Building2,
+  Download,
   GraduationCap,
   School,
   Search,
@@ -83,6 +85,15 @@ export default async function HomePage() {
   const { university, latest, exams } = await load();
   const flags = await getNavFlags();
 
+  // Dynamic paper counts from DB / API
+  const rbseExam = exams?.find((e) => e.slug === "uni-rajasthanboard");
+  const unirajUni = university?.find((u) => u.slug === "rajasthan-university");
+  const rtuUni = university?.find((u) => u.slug === "rajasthan-technical-university");
+
+  const rbseCount = rbseExam?.paper_count && rbseExam.paper_count > 0 ? rbseExam.paper_count : 1906;
+  const unirajCount = unirajUni?.paper_count && unirajUni.paper_count > 0 ? unirajUni.paper_count : 2379;
+  const rtuCount = rtuUni?.paper_count && rtuUni.paper_count > 0 ? rtuUni.paper_count : 2824;
+
   return (
     <div className="space-y-8 sm:space-y-12 lg:space-y-16">
       {/* COMPACT & CLEAN HERO */}
@@ -133,7 +144,7 @@ export default async function HomePage() {
               <School className="size-5" aria-hidden="true" />
             </span>
             <span className="eyebrow border-2 border-border bg-primary/20 px-2 py-0.5 text-[10px] font-black">
-              1,900+ Papers
+              {rbseCount.toLocaleString("en-IN")} Papers
             </span>
           </div>
           <div className="mt-4 space-y-1">
@@ -158,7 +169,7 @@ export default async function HomePage() {
               <Building2 className="size-5" aria-hidden="true" />
             </span>
             <span className="eyebrow border-2 border-border bg-primary/20 px-2 py-0.5 text-[10px] font-black">
-              2,300+ Papers
+              {unirajCount.toLocaleString("en-IN")} Papers
             </span>
           </div>
           <div className="mt-4 space-y-1">
@@ -183,7 +194,7 @@ export default async function HomePage() {
               <GraduationCap className="size-5" aria-hidden="true" />
             </span>
             <span className="eyebrow border-2 border-border bg-primary/20 px-2 py-0.5 text-[10px] font-black">
-              2,800+ Papers
+              {rtuCount.toLocaleString("en-IN")} Papers
             </span>
           </div>
           <div className="mt-4 space-y-1">

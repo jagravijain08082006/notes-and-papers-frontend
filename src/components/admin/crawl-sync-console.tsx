@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 
 export interface CrawlConfig {
   default_runner?: "server" | "github_actions";
-  default_site?: "all" | "uoronline" | "rtuonline" | "pyqonline";
+  default_site?: "all" | "rajasthanboard" | "uoronline" | "rtuonline" | "pyqonline";
   brand_limit?: number;
   daily_crawling_enabled?: boolean;
   schedule_status?: "active" | "paused_for_quota";
@@ -36,10 +36,11 @@ interface CrawlSyncConsoleProps {
 }
 
 const SITES = [
-  { id: "all", label: "All Sources", desc: "UNIRAJ, RTU Kota & PYQ Online" },
-  { id: "uoronline", label: "UNIRAJ (uoronline)", desc: "University of Rajasthan" },
+  { id: "all", label: "All Sources", desc: "RBSE, UNIRAJ, RTU Kota & PYQ" },
+  { id: "rajasthanboard", label: "Rajasthan Board (RBSE)", desc: "BSER Ajmer · Classes 9th–12th" },
+  { id: "uoronline", label: "UNIRAJ (uoronline)", desc: "University of Rajasthan UG & PG" },
   { id: "rtuonline", label: "RTU Kota (rtuonline)", desc: "Rajasthan Technical University" },
-  { id: "pyqonline", label: "PYQ Online", desc: "CBSE, RBSE & School/State Boards" },
+  { id: "pyqonline", label: "PYQ Online", desc: "CBSE & Other School Boards" },
 ] as const;
 
 const LIMITS = [
@@ -56,7 +57,7 @@ export function CrawlSyncConsole({ initialConfig = {}, running = false }: CrawlS
   const [runner, setRunner] = useState<"server" | "github_actions">(
     initialConfig.default_runner || "server",
   );
-  const [site, setSite] = useState<"all" | "uoronline" | "rtuonline" | "pyqonline">(
+  const [site, setSite] = useState<"all" | "rajasthanboard" | "uoronline" | "rtuonline" | "pyqonline">(
     initialConfig.default_site || "all",
   );
   const [brandLimit, setBrandLimit] = useState<number>(
@@ -145,21 +146,21 @@ export function CrawlSyncConsole({ initialConfig = {}, running = false }: CrawlS
 
   return (
     <div className="border-2 border-border bg-card p-5 shadow-hard-sm space-y-6">
-      {/* Top Banner: Status & 5-Day Schedule Pause Notice */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-2 border-amber-500/30 bg-amber-500/10 p-3.5 text-xs text-amber-900 dark:text-amber-200">
+      {/* Top Banner: Status & Daily Schedule */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-2 border-primary/40 bg-primary/10 p-3.5 text-xs text-foreground">
         <div className="flex items-start gap-2.5">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+          <Clock className="h-4 w-4 shrink-0 text-primary mt-0.5" />
           <div>
             <span className="font-bold uppercase tracking-wider">
-              GitHub Actions Schedule: Paused for 5 Days (Free Quota Guard)
+              Automated Daily Sync: Active (Runs Daily at 02:30 IST / 21:00 UTC)
             </span>
             <p className="mt-0.5 text-muted-foreground leading-relaxed">
-              Automatic nightly cron is temporarily paused until <strong>Nov 01, 2026</strong> to protect your account (1,837 / 2,000 mins used). Use <strong>Crawl on Server</strong> below for unlimited, zero-cost syncs!
+              Every night, GitHub Actions and background sync automatically crawls <strong>Rajasthan Board (RBSE)</strong>, <strong>UNIRAJ (uoronline)</strong>, and <strong>RTU Kota (rtuonline)</strong>. You have full on-demand control below to trigger runs instantly.
             </p>
           </div>
         </div>
-        <Badge tone="default" className="shrink-0 bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-600/40">
-          ⏸️ Cron Paused
+        <Badge tone="primary" className="shrink-0 bg-primary text-primary-foreground font-black">
+          ⚡ Daily Cron Ready
         </Badge>
       </div>
 
