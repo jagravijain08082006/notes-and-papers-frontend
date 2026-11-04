@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { buttonVariants } from "@/components/ui/button";
 import { DetailsMenu } from "@/components/ui/details-menu";
 import { Avatar } from "@/components/profile/avatar";
+import { ProfileNudge } from "@/components/shared/profile-nudge";
 import { useMe } from "@/hooks/use-me";
 import { signOutAction } from "@/services/actions/auth-actions";
 import { cn } from "@/lib/utils";
@@ -29,7 +30,7 @@ export function UserMenu() {
         <Link
           href="/login"
           className={cn(
-            buttonVariants({ variant: "outline", size: "sm" }),
+            buttonVariants({ variant: "ghost", size: "sm" }),
             "hidden xs:inline-flex",
           )}
         >
@@ -37,7 +38,7 @@ export function UserMenu() {
         </Link>
         <Link
           href="/signup"
-          className={cn(buttonVariants({ size: "sm" }), "hidden md:inline-flex")}
+          className={cn(buttonVariants({ size: "sm" }), "hidden xs:inline-flex")}
         >
           Sign up
         </Link>
@@ -55,6 +56,8 @@ export function UserMenu() {
   }
 
   return (
+    <div className="relative">
+    <ProfileNudge me={me} />
     <DetailsMenu
       className="relative"
       summary={
@@ -92,5 +95,6 @@ export function UserMenu() {
         </button>
       </div>
     </DetailsMenu>
+    </div>
   );
 }

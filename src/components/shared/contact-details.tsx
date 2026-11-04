@@ -50,9 +50,9 @@ export function ContactDetails({ className }: { className?: string }) {
           href={TELEGRAM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-link hover:underline hover:decoration-2 hover:underline-offset-4 font-semibold"
+          className="inline-flex items-center gap-2 hover:underline hover:decoration-2 hover:underline-offset-4"
         >
-          <Send className="size-3.5 text-[#229ED9]" aria-hidden="true" /> Telegram: @notes_and_papers
+          <Send className="size-4 text-[#229ED9]" aria-hidden="true" /> @notes_and_papers
         </a>
       </li>
       <li>
@@ -60,9 +60,9 @@ export function ContactDetails({ className }: { className?: string }) {
           href={INSTAGRAM_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 text-link hover:underline hover:decoration-2 hover:underline-offset-4 font-semibold"
+          className="inline-flex items-center gap-2 hover:underline hover:decoration-2 hover:underline-offset-4"
         >
-          <InstagramIcon className="size-3.5 text-[#E1306C]" /> Instagram: @exam.notes.and.papers
+          <InstagramIcon className="size-4 text-[#E1306C]" /> @exam.notes.and.papers
         </a>
       </li>
     </ul>

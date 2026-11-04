@@ -13,7 +13,7 @@ export async function GET() {
   const lines = [
     `# Notes & Papers (notesandpapers.dpdns.org)`,
     "",
-    `> Notes & Papers (https://notesandpapers.dpdns.org) is an open academic repository offering 7,800+ authentic previous year question papers (PYQ), model papers, and student notes in watermark-free PDF format. We cover Rajasthan University (UNIRAJ / UOR Jaipur), RTU Kota, School Boards (CBSE & RBSE), and national competitive exams (UPSC, SSC, NEET, GATE). 100% free with clean PDF downloads.`,
+    `> Notes & Papers (https://notesandpapers.dpdns.org) is an open academic repository offering 7,800+ authentic previous year question papers (PYQ), model papers, and student notes in watermark-free PDF format. We cover Rajasthan University (UNIRAJ / UOR Jaipur), RTU Kota, Rajasthan Board (RBSE), other School Boards (CBSE and more), and national competitive exams (UPSC, SSC, NEET, GATE). 100% free with clean PDF downloads.`,
     "",
     "## Domain Identity",
     `- Site Name: Notes & Papers (NotesAndPapers / Notes and Paper)`,

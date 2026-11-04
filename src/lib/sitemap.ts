@@ -14,6 +14,7 @@ export const STATIC_PATHS = [
   "/",
   routes.universities,
   "/boards",
+  "/rajasthanboard",
   "/rajasthanboard/class-9",
   "/rajasthanboard/class-10",
   "/rajasthanboard/class-11",

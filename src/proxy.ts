@@ -9,7 +9,7 @@ import {
   type TokenPair,
 } from "@/lib/auth/cookies";
 
-const PRIVATE = ["/admin", "/account", "/bookmarks", "/downloads", "/upload"];
+const PRIVATE = ["/admin", "/account", "/bookmarks", "/upload"];
 
 /**
  * Keeps the session alive (swaps the refresh token for a new access token when the old one is about to expire)

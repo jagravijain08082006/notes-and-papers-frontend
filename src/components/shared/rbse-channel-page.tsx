@@ -2,13 +2,9 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { FaqAccordion } from "@/components/shared/faq-accordion";
 import { JsonLdScript } from "@/components/shared/json-ld";
-import { RbseChannelView } from "@/components/shared/rbse-channel-view";
+import { RbseCardGrid, subjectCards } from "@/components/shared/rbse-simple";
 import { getExam } from "@/lib/api/public";
-import {
-  RBSE_CHANNELS,
-  getRbseChannelData,
-  getRbseOverviewCards,
-} from "@/lib/rbse-channels";
+import { RBSE_CHANNELS, getRbseChannelData } from "@/lib/rbse-channels";
 import { buildMetadata, collectionPageLd, faqLd } from "@/lib/seo";
 
 export function generateRbseChannelMetadata(channelSlug: string) {
@@ -83,68 +79,33 @@ export async function RbseChannelPageComponent({ channelSlug }: { channelSlug: s
   if (!exam) notFound();
 
   const channelData = getRbseChannelData(exam, channelSlug);
-  const overviewCards = getRbseOverviewCards(exam);
-  const faqs = FAQS_BY_CHANNEL[channelSlug] ?? FAQS_BY_CHANNEL["class-10"];
-
+  const faqs = (FAQS_BY_CHANNEL[channelSlug] ?? FAQS_BY_CHANNEL["class-10"]).slice(0, 3);
   const path = `/rajasthanboard/${channelSlug}`;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <Breadcrumbs
         items={[
           { name: "Home", path: "/" },
-          { name: "Rajasthan Board (RBSE)", path: "/exams/uni-rajasthanboard" },
+          { name: "Rajasthan Board", path: "/rajasthanboard" },
           { name: channelData.meta.shortTitle, path },
         ]}
       />
 
-      {/* HEADER */}
-      <header className="space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="eyebrow inline-block bg-primary px-2.5 py-1 text-primary-foreground font-black uppercase tracking-wider shadow-hard-sm">
-            {channelData.meta.badge}
-          </span>
-          <span className="eyebrow inline-block bg-accent px-2.5 py-1 text-accent-foreground font-bold uppercase tracking-wider shadow-hard-sm">
-            Rajasthan Board (BSER Ajmer)
-          </span>
-        </div>
-
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tight leading-tight">
+      <header className="space-y-2">
+        <h1 className="text-3xl sm:text-5xl font-display uppercase tracking-tight leading-tight">
           {channelData.meta.title}
         </h1>
-
-        <p className="max-w-3xl text-muted-foreground text-base sm:text-lg">
-          {channelData.meta.desc}
+        <p className="text-muted-foreground">
+          {channelData.totalPapers} papers, {channelData.years.length} years. Pick a subject.
         </p>
-
-        <div className="flex flex-wrap gap-2.5 pt-1">
-          <span className="border-2 border-border bg-primary px-3 py-1 text-xs font-black uppercase tracking-wider shadow-hard-sm">
-            {channelData.totalPapers} Verified Papers
-          </span>
-          <span className="border-2 border-border bg-card px-3 py-1 text-xs font-bold uppercase tracking-wider">
-            {channelData.years.length} Examination Years
-          </span>
-          <span className="border-2 border-border bg-card px-3 py-1 text-xs font-bold uppercase tracking-wider">
-            Watermark-Free Clean PDFs
-          </span>
-        </div>
       </header>
 
-      {/* CHANNEL INTERACTIVE BROWSER */}
-      <RbseChannelView
-        currentChannel={channelSlug}
-        allChannels={overviewCards}
-        subjects={channelData.subjects}
-        subtypeGroups={channelData.subtypeGroups}
-        totalPapers={channelData.totalPapers}
-        availableYears={channelData.years}
-        examSlug="uni-rajasthanboard"
-      />
+      <RbseCardGrid items={subjectCards(channelData.subjects)} icon="subject" />
 
-      {/* FREQUENTLY ASKED QUESTIONS */}
-      <section aria-labelledby="channel-faq" className="max-w-4xl space-y-4 border-t-2 border-border pt-10">
-        <h2 id="channel-faq" className="text-2xl sm:text-3xl font-display uppercase tracking-wide">
-          {channelData.meta.shortTitle} Papers: FAQs &amp; Study Guide
+      <section aria-labelledby="channel-faq" className="max-w-4xl space-y-3 border-t-2 border-border pt-8">
+        <h2 id="channel-faq" className="text-xl sm:text-2xl font-display uppercase tracking-wide">
+          Questions
         </h2>
         <FaqAccordion faqs={faqs} />
       </section>
@@ -158,4 +119,3 @@ export async function RbseChannelPageComponent({ channelSlug }: { channelSlug: s
     </div>
   );
 }
-

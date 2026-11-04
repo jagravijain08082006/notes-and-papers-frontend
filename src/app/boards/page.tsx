@@ -89,7 +89,7 @@ export default async function BoardsPage() {
               </p>
             </div>
             <Link
-              href="/exams/uni-rajasthanboard"
+              href="/rajasthanboard"
               className="inline-flex items-center gap-2 self-start border-2 border-border bg-primary px-5 py-3 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm transition-all hover:shadow-hard hover:-translate-x-0.5 hover:-translate-y-0.5"
             >
               View All RBSE Papers ({rbse.paper_count}) →

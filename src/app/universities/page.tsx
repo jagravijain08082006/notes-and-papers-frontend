@@ -160,7 +160,7 @@ export default async function UniversitiesPage() {
               slug: "uni-rajasthanboard",
               name: "RBSE Rajasthan Board (BSER)",
               subtitle: "Class 10th & 12th · State Board",
-              href: "/exams/uni-rajasthanboard",
+              href: "/rajasthanboard",
               tags: [
                 "Class 10th",
                 "Class 12th Science",

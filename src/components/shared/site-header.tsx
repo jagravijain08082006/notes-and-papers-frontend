@@ -14,16 +14,16 @@ import { UserMenu } from "./user-menu";
 export async function SiteHeader() {
   const flags = await getNavFlags();
   const NAV = [
-    { href: routes.rbse, label: "RBSE Board" },
     { href: routes.uniraj, label: "UNIRAJ Jaipur" },
     { href: routes.rtu, label: "RTU Kota" },
+    { href: routes.rbse, label: "Rajasthan Board" },
     ...(flags.notes ? [{ href: "/notes", label: "Notes" }] : []),
     { href: "/search", label: "Search" },
   ];
   const RAJASTHAN_MOBILE = [
-    { href: routes.rbse, label: "RBSE Rajasthan Board (9th–12th)" },
     { href: routes.uniraj, label: "UNIRAJ Jaipur (UOR)" },
     { href: routes.rtu, label: "RTU Kota Engineering" },
+    { href: routes.rbse, label: "RBSE Rajasthan Board (9th–12th)" },
   ];
   const OTHER_MOBILE = [
     { href: routes.boards, label: "All School Boards" },
@@ -55,15 +55,9 @@ export async function SiteHeader() {
         <NavLinks items={NAV} />
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          {flags.uploads && (
-            <Link
-              href="/upload"
-              className={cn(buttonVariants({ size: "sm" }), "hidden sm:inline-flex")}
-            >
-              Upload
-            </Link>
-          )}
           <ThemeToggle />
+          {/* a thin line separates the theme switch from the account buttons */}
+          <span aria-hidden="true" className="mx-0.5 hidden h-6 w-0.5 bg-border/60 sm:block" />
           <UserMenu />
           {/* <details> keeps the mobile menu working with JavaScript disabled */}
           <DetailsMenu

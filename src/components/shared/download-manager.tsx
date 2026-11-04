@@ -15,7 +15,8 @@ import { PdfPreview } from "@/components/shared/pdf-preview";
 import { PaperList } from "@/components/shared/paper-list";
 import { Button } from "@/components/ui/button";
 import type { PaperDetail, PaperSummary } from "@/lib/api/types";
-import { paperContext, routes } from "@/lib/routes";
+import { rememberDownload } from "@/lib/local-downloads";
+import { paperContext, paperHref, routes } from "@/lib/routes";
 import { track } from "@/lib/track";
 
 export function DownloadManager({
@@ -76,6 +77,9 @@ export function DownloadManager({
       a.click();
       a.remove();
 
+      // Remember it in this browser (not on the server) so the visitor can find it again under "My downloads".
+      rememberDownload({ slug: paper.slug, title: paper.title, href: paperHref(paper) });
+
       setDownloaded(true);
       setProgress(100);
       setStatusMessage("Verified copy saved to your device!");
@@ -85,7 +89,7 @@ export function DownloadManager({
     } finally {
       setIsDownloading(false);
     }
-  }, [paper.slug]);
+  }, [paper]);
 
   // Animated preparation loader
   useEffect(() => {

@@ -1,10 +1,8 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { ArrowLeft, ArrowRight, BookOpen, Calendar, CheckCircle2, GraduationCap } from "lucide-react";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { FaqAccordion } from "@/components/shared/faq-accordion";
 import { JsonLdScript } from "@/components/shared/json-ld";
-import { RbseSubjectView } from "@/components/shared/rbse-subject-view";
+import { RbseYearList } from "@/components/shared/rbse-simple";
 import { getExam } from "@/lib/api/public";
 import {
   RBSE_CHANNELS,
@@ -81,156 +79,32 @@ export async function RbseSubjectPageComponent({
   const faqs = buildSubjectFaqs(
     data.classMeta.shortTitle,
     data.subjectMeta.name,
-    data.subjectMeta.hindiName
-  );
+    data.subjectMeta.hindiName,
+  ).slice(0, 3);
 
   const crumbs = [
     { name: "Home", path: "/" },
-    { name: "Rajasthan Board (RBSE)", path: "/exams/uni-rajasthanboard" },
+    { name: "Rajasthan Board", path: "/rajasthanboard" },
     { name: data.classMeta.shortTitle, path: `/rajasthanboard/${classSlug}` },
     { name: data.subjectMeta.name, path },
   ];
 
-  const yearRangeText =
-    data.years.length > 1
-      ? `${data.years[data.years.length - 1]} – ${data.years[0]}`
-      : data.years.length === 1
-      ? `${data.years[0]}`
-      : "Archive";
-
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <Breadcrumbs items={crumbs} />
 
-      {/* HEADER HERO */}
-      <header className="space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href={`/rajasthanboard/${classSlug}`}
-            className="inline-flex items-center gap-1.5 border-2 border-border bg-card px-2.5 py-1 text-xs font-black uppercase tracking-wider hover:bg-primary transition-colors shadow-hard-sm"
-          >
-            <ArrowLeft className="size-3" />
-            <span>{data.classMeta.shortTitle}</span>
-          </Link>
-          <span className="eyebrow inline-block bg-primary px-2.5 py-1 text-primary-foreground font-black uppercase tracking-wider shadow-hard-sm">
-            {data.subjectMeta.name}
-          </span>
-          <span className="eyebrow inline-block bg-accent px-2.5 py-1 text-accent-foreground font-bold uppercase tracking-wider shadow-hard-sm">
-            {data.subjectMeta.hindiName}
-          </span>
-        </div>
-
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tight leading-tight">
+      <header className="space-y-2">
+        <h1 className="text-2xl sm:text-4xl font-display uppercase tracking-tight leading-tight">
           RBSE {data.classMeta.shortTitle} {data.subjectMeta.name} Papers
         </h1>
-
-        <p className="max-w-3xl text-muted-foreground text-base sm:text-lg">
-          {data.subjectMeta.desc ||
-            `Download authentic Rajasthan Board ${data.classMeta.shortTitle} ${data.subjectMeta.name} past year question papers, official model papers, blueprints & half-yearly papers.`}
-        </p>
-
-        <div className="flex flex-wrap gap-2.5 pt-1">
-          <span className="border-2 border-border bg-primary px-3 py-1 text-xs font-black uppercase tracking-wider shadow-hard-sm">
-            {data.totalPapers} Verified Papers
-          </span>
-          <span className="border-2 border-border bg-card px-3 py-1 text-xs font-bold uppercase tracking-wider">
-            Years: {yearRangeText}
-          </span>
-          <span className="border-2 border-border bg-card px-3 py-1 text-xs font-bold uppercase tracking-wider">
-            Clean Watermark-Free PDFs
-          </span>
-        </div>
+        <p className="text-muted-foreground">{data.totalPapers} papers, newest first.</p>
       </header>
 
-      {/* HORIZONTAL SIBLING SUBJECTS QUICK SWITCHER */}
-      <nav aria-label="Sibling subjects" className="border-y-2 border-border py-3">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs scrollbar-none">
-          <Link
-            href={`/rajasthanboard/${classSlug}`}
-            className="shrink-0 border-2 border-border bg-muted/80 px-3 py-1.5 font-black uppercase tracking-wide hover:bg-primary transition-colors shadow-hard-sm"
-          >
-            ← All {data.classMeta.badge} Subjects
-          </Link>
+      <RbseYearList groups={data.subtypeGroups} />
 
-          {data.siblingSubjects.map((sub) => {
-            const isActive = sub.slug === subjectSlug;
-            return (
-              <Link
-                key={sub.slug}
-                href={sub.href}
-                className={`shrink-0 inline-flex items-center gap-1.5 border-2 border-border px-3 py-1.5 font-bold uppercase tracking-wide transition-all shadow-hard-sm ${
-                  isActive
-                    ? "bg-primary text-primary-foreground font-black shadow-hard -translate-y-0.5"
-                    : "bg-card hover:bg-primary hover:-translate-y-0.5"
-                }`}
-              >
-                <span>{sub.name}</span>
-                <span className="border border-border/40 bg-background/80 px-1 py-0.2 text-[10px] font-black">
-                  {sub.paperCount}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
-
-      {/* PAPERS INTERACTIVE BROWSER */}
-      <RbseSubjectView
-        subtypeGroups={data.subtypeGroups}
-        totalPapers={data.totalPapers}
-        availableYears={data.years}
-        examSlug="uni-rajasthanboard"
-        subjectName={data.subjectMeta.name}
-      />
-
-      {/* EXPLORE OTHER SUBJECTS IN THIS CLASS */}
-      <section aria-labelledby="related-subjects" className="space-y-4 border-t-2 border-border pt-10">
-        <div className="flex items-center justify-between">
-          <h2 id="related-subjects" className="text-xl sm:text-2xl font-display uppercase tracking-wider">
-            Other {data.classMeta.shortTitle} Subjects
-          </h2>
-          <Link
-            href={`/rajasthanboard/${classSlug}`}
-            className="text-xs font-bold uppercase text-link hover:underline inline-flex items-center gap-1"
-          >
-            View All Subjects <ArrowRight className="size-3" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {data.siblingSubjects
-            .filter((s) => s.slug !== subjectSlug)
-            .slice(0, 8)
-            .map((s) => (
-              <Link
-                key={s.slug}
-                href={s.href}
-                className="brutal brutal-hover flex flex-col justify-between p-4 bg-card border-2 border-border group"
-              >
-                <div>
-                  <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground mb-1">
-                    <span>{s.yearsSpan}</span>
-                    <span className="border border-border/40 bg-primary/20 px-1 py-0.2 font-black text-foreground">
-                      {s.paperCount} Papers
-                    </span>
-                  </div>
-                  <h3 className="font-display text-base uppercase leading-snug group-hover:text-link transition-colors">
-                    {s.name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">{s.hindiName}</p>
-                </div>
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-foreground mt-3 group-hover:translate-x-1 transition-transform">
-                  Explore Papers <ArrowRight className="size-3" />
-                </span>
-              </Link>
-            ))}
-        </div>
-      </section>
-
-      {/* FREQUENTLY ASKED QUESTIONS */}
-      <section aria-labelledby="subject-faq" className="max-w-4xl space-y-4 border-t-2 border-border pt-10">
-        <h2 id="subject-faq" className="text-2xl sm:text-3xl font-display uppercase tracking-wide">
-          {data.subjectMeta.name}: FAQs &amp; Preparation Strategy
+      <section aria-labelledby="subject-faq" className="max-w-4xl space-y-3 border-t-2 border-border pt-8">
+        <h2 id="subject-faq" className="text-xl sm:text-2xl font-display uppercase tracking-wide">
+          Questions
         </h2>
         <FaqAccordion faqs={faqs} />
       </section>
@@ -240,7 +114,7 @@ export async function RbseSubjectPageComponent({
           collectionPageLd(
             `RBSE ${data.classMeta.shortTitle} ${data.subjectMeta.name} Papers`,
             path,
-            data.subjectMeta.desc
+            data.subjectMeta.desc,
           ),
           breadcrumbLd(crumbs),
           faqLd(faqs),
@@ -249,4 +123,3 @@ export async function RbseSubjectPageComponent({
     </div>
   );
 }
-

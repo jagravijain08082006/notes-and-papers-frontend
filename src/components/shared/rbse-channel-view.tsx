@@ -169,7 +169,7 @@ export function RbseChannelView({
 
         <div className="flex flex-wrap gap-2 pt-1">
           <Link
-            href="/exams/uni-rajasthanboard"
+            href="/rajasthanboard"
             className={`inline-flex items-center gap-1.5 border-2 border-border px-3.5 py-1.5 text-xs font-black uppercase tracking-wide transition-all shadow-hard-sm ${
               currentChannel === "all"
                 ? "bg-accent text-accent-foreground shadow-hard -translate-y-0.5"

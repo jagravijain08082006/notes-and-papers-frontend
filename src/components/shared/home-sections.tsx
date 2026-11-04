@@ -91,13 +91,13 @@ const POPULAR_SCHOOL_BOARDS = [
     slug: "uni-rajasthanboard",
     name: "RBSE Rajasthan Board (BSER)",
     subtitle: "Secondary & Higher Secondary · State Board",
-    href: "/exams/uni-rajasthanboard",
+    href: "/rajasthanboard",
     tags: [
-      { label: "Class 10th Secondary", href: "/exams/uni-rajasthanboard" },
-      { label: "Class 12th Science", href: "/exams/uni-rajasthanboard" },
-      { label: "Class 12th Commerce", href: "/exams/uni-rajasthanboard" },
-      { label: "Class 12th Arts", href: "/exams/uni-rajasthanboard" },
-      { label: "Model Papers", href: "/exams/uni-rajasthanboard" },
+      { label: "Class 10th Secondary", href: "/rajasthanboard" },
+      { label: "Class 12th Science", href: "/rajasthanboard" },
+      { label: "Class 12th Commerce", href: "/rajasthanboard" },
+      { label: "Class 12th Arts", href: "/rajasthanboard" },
+      { label: "Model Papers", href: "/rajasthanboard" },
     ],
   },
   {
@@ -219,8 +219,11 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
           {showUnis &&
             unis.map((u) => (
               <li key={u.slug} className="w-full min-w-0 max-w-full">
-                <div className="brutal brutal-hover flex h-full w-full min-w-0 flex-col justify-between gap-5 p-5 bg-card">
-                  <Link href={routes.university(u.slug)} className="block space-y-3 min-w-0 group">
+                <Link
+                  href={routes.university(u.slug)}
+                  className="brutal brutal-hover group flex h-full w-full min-w-0 flex-col justify-between gap-5 p-5 bg-card"
+                >
+                  <span className="block space-y-3 min-w-0">
                     <span className="grid size-11 place-items-center border-2 border-border bg-primary transition-colors group-hover:bg-accent shadow-hard-sm">
                       <GraduationCap className="size-5" aria-hidden="true" />
                     </span>
@@ -230,20 +233,15 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
                     <span className="eyebrow block text-muted-foreground truncate">
                       {plural(u.paper_count, "paper")} · {plural(u.course_count, "course")}
                     </span>
-                  </Link>
-                  <ul className="flex flex-wrap gap-2">
+                  </span>
+                  <span className="flex flex-wrap gap-2">
                     {u.top_courses.map((c) => (
-                      <li key={c.slug}>
-                        <Link
-                          href={routes.course(u.slug, c.slug)}
-                          className="eyebrow border-2 border-border px-1.5 py-0.5 hover:bg-primary transition-colors"
-                        >
-                          {c.name}
-                        </Link>
-                      </li>
+                      <span key={c.slug} className="eyebrow border-2 border-border px-1.5 py-0.5">
+                        {c.name}
+                      </span>
                     ))}
-                  </ul>
-                </div>
+                  </span>
+                </Link>
               </li>
             ))}
 
@@ -251,8 +249,11 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
           {showBoards &&
             displayedBoards.map((b) => (
               <li key={b.slug} className="w-full min-w-0 max-w-full">
-                <div className="brutal brutal-hover flex h-full w-full min-w-0 flex-col justify-between gap-5 p-5 bg-card">
-                  <Link href={b.href} className="block space-y-3 min-w-0 group">
+                <Link
+                  href={b.href}
+                  className="brutal brutal-hover group flex h-full w-full min-w-0 flex-col justify-between gap-5 p-5 bg-card"
+                >
+                  <span className="block space-y-3 min-w-0">
                     <span className="grid size-11 place-items-center border-2 border-border bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground shadow-hard-sm">
                       <School className="size-5" aria-hidden="true" />
                     </span>
@@ -262,21 +263,15 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
                     <span className="eyebrow block text-muted-foreground truncate">
                       {b.subtitle}
                     </span>
-                  </Link>
-                  <ul className="flex flex-wrap gap-2">
+                  </span>
+                  <span className="flex flex-wrap gap-2">
                     {b.tags.map((t) => (
-                      <li key={t.label}>
-                        <Link
-                          href={t.href}
-                          aria-label={`${b.name} - ${t.label}`}
-                          className="eyebrow border-2 border-border px-1.5 py-0.5 hover:bg-primary transition-colors"
-                        >
-                          {t.label}
-                        </Link>
-                      </li>
+                      <span key={t.label} className="eyebrow border-2 border-border px-1.5 py-0.5">
+                        {t.label}
+                      </span>
                     ))}
-                  </ul>
-                </div>
+                  </span>
+                </Link>
               </li>
             ))}
         </TileGrid>

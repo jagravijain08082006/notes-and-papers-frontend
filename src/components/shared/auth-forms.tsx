@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -31,6 +32,7 @@ function Submit({ label, busy, disabled }: { label: string; busy: boolean; disab
 
 export function LoginForm({ next = "/account" }: { next?: string }) {
   const router = useRouter();
+  const qc = useQueryClient();
   const online = useOnline();
   const {
     register,
@@ -42,6 +44,8 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
     const res = await loginAction(values);
     if (!res.ok) return void toast.error(res.error); // backend errors are always toasts, never inline
     toast.success("Welcome back!");
+    // The header remembers "signed out" for a minute: tell it to ask again so the profile shows at once.
+    await qc.invalidateQueries({ queryKey: ["me"] });
     router.push(next);
     router.refresh();
   }
@@ -89,7 +93,10 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
       <Submit label="Log in" busy={isSubmitting} disabled={!isValid || isSubmitting || !online} />
       <p className="text-center text-sm text-muted-foreground">
         New here?{" "}
-        <Link href="/signup" className="text-link hover:underline">
+        <Link
+          href={next === "/account" ? "/signup" : `/signup?next=${encodeURIComponent(next)}`}
+          className="text-link hover:underline"
+        >
           Create an account
         </Link>
       </p>
@@ -97,8 +104,9 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
   );
 }
 
-export function SignupForm() {
+export function SignupForm({ next = "/account" }: { next?: string }) {
   const router = useRouter();
+  const qc = useQueryClient();
   const online = useOnline();
   const {
     register,
@@ -112,7 +120,8 @@ export function SignupForm() {
     const res = await signupAction(values);
     if (!res.ok) return void toast.error(res.error);
     toast.success("Account created. You are signed in.");
-    router.push("/account");
+    await qc.invalidateQueries({ queryKey: ["me"] });
+    router.push(next);
     router.refresh();
   }
 
@@ -175,7 +184,10 @@ export function SignupForm() {
       />
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link href="/login" className="text-link hover:underline">
+        <Link
+          href={next === "/account" ? "/login" : `/login?next=${encodeURIComponent(next)}`}
+          className="text-link hover:underline"
+        >
           Log in
         </Link>
       </p>

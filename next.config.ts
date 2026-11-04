@@ -41,8 +41,8 @@ const nextConfig: NextConfig = {
         destination: "/rajasthanboard/:channel",
         permanent: true,
       },
-      // The board's front page stays where it is; /rajasthanboard on its own leads there.
-      { source: "/rajasthanboard", destination: "/exams/uni-rajasthanboard", permanent: false },
+      // The board's front page lives at /rajasthanboard only.
+      { source: "/exams/uni-rajasthanboard", destination: "/rajasthanboard", permanent: true },
     ];
   },
   async rewrites() {

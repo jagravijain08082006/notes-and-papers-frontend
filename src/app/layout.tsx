@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Free previous year question papers for Rajasthan University, school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
+    "Free previous year question papers for UNIRAJ (Rajasthan University), RTU Kota, Rajasthan Board (RBSE), other school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
   applicationName: SITE_NAME,
   keywords: [
     "notes and papers",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: `${SITE_NAME} - Previous Year Question Papers PDF`,
     url: `${SITE_URL}/`,
     description:
-      "Free previous year question papers for Rajasthan University, school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
+      "Free previous year question papers for UNIRAJ (Rajasthan University), RTU Kota, Rajasthan Board (RBSE), other school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
   },
   appleWebApp: {
     title: SITE_NAME,
@@ -228,7 +228,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 "@type": "SiteNavigationElement",
                 "@id": `${SITE_URL}/#nav-boards`,
                 name: "School Boards (RBSE & CBSE)",
-                url: `${SITE_URL}/exams/uni-rajasthanboard`,
+                url: `${SITE_URL}/rajasthanboard`,
                 description: "Class 10th & 12th board previous year papers and model papers",
               },
             ],

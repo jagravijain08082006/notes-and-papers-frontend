@@ -1,21 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
+const GIVE_UP_MS = 30_000; // a click that never leads to a new page must not leave the bar on screen
+
 /**
- * High-performance global route transition progress bar.
- * Provides instant visual feedback on any click/navigation across the entire website.
+ * Global route transition progress bar.
+ * The browser cannot know how long the next page takes, so the bar is an estimate: it moves quickly at first, then keeps
+ * creeping towards 95% (never freezing) until the new page arrives, when it jumps to 100% and fades out.
  */
 export function RouteProgressBar() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const creep = useRef<ReturnType<typeof setInterval> | null>(null);
+  const giveUp = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // When pathname or searchParams change, complete the animation and hide
+  function stopTimers() {
+    if (creep.current) clearInterval(creep.current);
+    if (giveUp.current) clearTimeout(giveUp.current);
+    creep.current = null;
+    giveUp.current = null;
+  }
+
+  // The new page arrived: finish the bar and hide it
   useEffect(() => {
-    let timer: NodeJS.Timeout;
+    stopTimers();
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const raf = requestAnimationFrame(() => {
       setProgress(100);
       timer = setTimeout(() => {
@@ -23,7 +36,6 @@ export function RouteProgressBar() {
         setProgress(0);
       }, 250);
     });
-
     return () => {
       cancelAnimationFrame(raf);
       if (timer) clearTimeout(timer);
@@ -60,21 +72,25 @@ export function RouteProgressBar() {
       const currentUrl = window.location.pathname + window.location.search;
       if (href === currentUrl) return;
 
-      // Start progress animation
+      stopTimers();
       setLoading(true);
       setProgress(25);
-
-      const t1 = setTimeout(() => setProgress((p) => (p < 60 ? 60 : p)), 150);
-      const t2 = setTimeout(() => setProgress((p) => (p < 85 ? 85 : p)), 500);
-
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
+      // Each tick covers 8% of what is left, so it slows down but never stops.
+      creep.current = setInterval(() => {
+        setProgress((p) => (p >= 95 ? p : Math.min(95, p + (95 - p) * 0.08 + 0.3)));
+      }, 400);
+      giveUp.current = setTimeout(() => {
+        stopTimers();
+        setLoading(false);
+        setProgress(0);
+      }, GIVE_UP_MS);
     }
 
     document.addEventListener("click", handleClick, { capture: true });
-    return () => document.removeEventListener("click", handleClick, { capture: true });
+    return () => {
+      document.removeEventListener("click", handleClick, { capture: true });
+      stopTimers();
+    };
   }, []);
 
   if (!loading && progress === 0) return null;

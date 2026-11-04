@@ -24,15 +24,11 @@ import { cn } from "@/lib/utils";
 export const revalidate = 86400;
 
 export const metadata = buildMetadata({
-  title: "Rajasthan Board, UNIRAJ & RTU Kota Question Papers PDF | Notes & Papers",
+  title: "UNIRAJ, RTU Kota & Rajasthan Board Question Papers PDF | Notes & Papers",
   description:
-    "Free previous year question papers for Rajasthan Board (RBSE Classes 9-12), University of Rajasthan (UNIRAJ Jaipur B.Com, B.Sc, BCA, BA, B.Ed) & RTU Kota B.Tech. Download authentic watermark-free PYQ PDFs.",
+    "Free previous year question papers for University of Rajasthan (UNIRAJ Jaipur B.Com, B.Sc, BCA, BA, B.Ed), RTU Kota B.Tech & Rajasthan Board (RBSE Classes 9-12), plus notes. Download authentic watermark-free PYQ PDFs.",
   path: "/",
   keywords: [
-    "rajasthan board question papers",
-    "rbse 10th previous year papers",
-    "rbse 12th question papers",
-    "rbse model papers",
     "rajasthan university question papers",
     "uniraj question papers",
     "uor jaipur previous year papers",
@@ -44,6 +40,11 @@ export const metadata = buildMetadata({
     "rtu previous year papers",
     "rtu kota question papers",
     "rtu btech question papers",
+    "rajasthan board question papers",
+    "rbse 10th previous year papers",
+    "rbse 12th question papers",
+    "rbse model papers",
+    "rajasthan university notes",
     "notes and papers",
     "notes and papers dpdns",
     "notesandpapers",
@@ -52,12 +53,12 @@ export const metadata = buildMetadata({
 });
 
 const QUICK = [
-  { label: "RBSE 10th", href: "/rajasthanboard/class-10" },
-  { label: "RBSE 12th", href: "/rajasthanboard/class-12" },
   { label: "UNIRAJ B.Com", href: "/universities/rajasthan-university/bcom" },
   { label: "UNIRAJ B.Sc", href: "/universities/rajasthan-university/bsc" },
   { label: "UNIRAJ BCA", href: "/universities/rajasthan-university/bca" },
   { label: "RTU B.Tech", href: "/universities/rajasthan-technical-university" },
+  { label: "RBSE 10th", href: "/rajasthanboard/class-10" },
+  { label: "RBSE 12th", href: "/rajasthanboard/class-12" },
   { label: "Other Exams", href: "/exams" },
 ];
 
@@ -96,36 +97,38 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-8 sm:space-y-12 lg:space-y-16">
-      {/* COMPACT & CLEAN HERO */}
+      {/* HERO: simple and centred. The search is the one thing on it. */}
       <section
         aria-labelledby="hero-heading"
-        className="mx-auto max-w-4xl text-center space-y-4 pt-2 pb-2 sm:pt-6 sm:pb-3"
+        className="mx-auto max-w-3xl py-4 text-center sm:py-8 lg:py-10"
       >
-        <div className="inline-flex items-center gap-2 border-2 border-border bg-card px-3 py-1 text-xs font-bold uppercase tracking-wider shadow-hard-sm">
-          <span className="size-2 bg-accent" aria-hidden="true" />
-          RBSE · UNIRAJ · RTU Kota
-        </div>
+        <div className="space-y-4">
+          <div className="inline-flex items-center gap-2 border-2 border-border bg-card px-3 py-1 text-xs font-bold uppercase tracking-wider shadow-hard-sm">
+            <span className="size-2 bg-accent" aria-hidden="true" />
+            UNIRAJ · RTU Kota · Rajasthan Board
+          </div>
 
-        <h1
-          id="hero-heading"
-          className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-display uppercase tracking-tight leading-none"
-        >
-          Previous Year Papers
-        </h1>
+          <h1
+            id="hero-heading"
+            className="font-display text-4xl uppercase leading-none tracking-tight xs:text-5xl sm:text-6xl lg:text-7xl"
+          >
+            Previous Year Papers
+          </h1>
 
-        <div className="max-w-2xl mx-auto space-y-3 pt-1">
-          <SearchBar size="lg" />
-          <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
-            <span className="text-xs text-muted-foreground font-bold uppercase">Popular:</span>
-            {QUICK.map((q) => (
-              <Link
-                key={q.label}
-                href={q.href}
-                className="border-2 border-border bg-card px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
-              >
-                {q.label}
-              </Link>
-            ))}
+          <div className="mx-auto max-w-2xl space-y-3 pt-1">
+            <SearchBar size="lg" />
+            <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+              <span className="text-xs font-bold uppercase text-muted-foreground">Popular:</span>
+              {QUICK.map((q) => (
+                <Link
+                  key={q.label}
+                  href={q.href}
+                  className="border-2 border-border bg-card px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5"
+                >
+                  {q.label}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -133,57 +136,8 @@ export default async function HomePage() {
       {/* RAJASTHAN 3 CORE CARDS */}
       <section
         aria-label="Rajasthan Core Portals"
-        className="grid grid-cols-1 gap-4 sm:grid-cols-3 max-w-5xl mx-auto w-full"
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto w-full"
       >
-        <div
-          className="brutal flex flex-col justify-between p-5 bg-card border-2 border-border shadow-hard"
-        >
-          <div className="flex items-center justify-between">
-            <span className="grid size-11 place-items-center border-2 border-border bg-accent text-accent-foreground shadow-hard-sm">
-              <School className="size-5" aria-hidden="true" />
-            </span>
-            <span className="eyebrow border-2 border-border bg-primary/20 px-2 py-0.5 text-[10px] font-black">
-              {rbseCount.toLocaleString("en-IN")} Papers
-            </span>
-          </div>
-          <div className="mt-4 space-y-1">
-            <Link href={routes.rbse}>
-              <h2 className="font-display text-2xl uppercase hover:text-link transition-colors leading-tight">
-                RBSE Board
-              </h2>
-            </Link>
-            <p className="text-xs text-muted-foreground">
-              Classes 9th to 12th · Model Papers
-            </p>
-            <div className="flex flex-wrap gap-1.5 pt-2">
-              <Link
-                href="/rajasthanboard/class-10"
-                className="border border-border bg-background px-2 py-0.5 text-[10px] font-bold uppercase shadow-hard-sm hover:bg-primary hover:-translate-y-px transition-all"
-              >
-                Class 10th
-              </Link>
-              <Link
-                href="/rajasthanboard/class-12"
-                className="border border-border bg-background px-2 py-0.5 text-[10px] font-bold uppercase shadow-hard-sm hover:bg-primary hover:-translate-y-px transition-all"
-              >
-                Class 12th
-              </Link>
-              <Link
-                href="/rajasthanboard/model-papers"
-                className="border border-border bg-background px-2 py-0.5 text-[10px] font-bold uppercase shadow-hard-sm hover:bg-primary hover:-translate-y-px transition-all"
-              >
-                Model Papers
-              </Link>
-            </div>
-          </div>
-          <Link
-            href={routes.rbse}
-            className="eyebrow mt-4 inline-flex items-center gap-1 text-xs font-bold text-foreground hover:text-link transition-colors"
-          >
-            Browse All RBSE Papers <ArrowRight className="size-3.5" aria-hidden="true" />
-          </Link>
-        </div>
-
         <Link
           href={routes.uniraj}
           className="brutal brutal-hover flex flex-col justify-between p-5 bg-card border-2 border-border group shadow-hard"
@@ -231,6 +185,52 @@ export default async function HomePage() {
           </div>
           <span className="eyebrow mt-4 inline-flex items-center gap-1 text-xs font-bold text-foreground">
             Browse Papers <ArrowRight className="size-3.5" aria-hidden="true" />
+          </span>
+        </Link>
+
+        <Link
+          href={routes.rbse}
+          className="brutal brutal-hover flex flex-col justify-between p-5 bg-card border-2 border-border group shadow-hard"
+        >
+          <div className="flex items-center justify-between">
+            <span className="grid size-11 place-items-center border-2 border-border bg-accent text-accent-foreground shadow-hard-sm">
+              <School className="size-5" aria-hidden="true" />
+            </span>
+            <span className="eyebrow border-2 border-border bg-primary/20 px-2 py-0.5 text-[10px] font-black">
+              {rbseCount.toLocaleString("en-IN")} Papers
+            </span>
+          </div>
+          <div className="mt-4 space-y-1">
+            <h2 className="font-display text-2xl uppercase group-hover:text-link transition-colors leading-tight">
+              Rajasthan Board
+            </h2>
+            <p className="text-xs text-muted-foreground">RBSE Classes 9th to 12th · Model Papers</p>
+          </div>
+          <span className="eyebrow mt-4 inline-flex items-center gap-1 text-xs font-bold text-foreground">
+            Browse Papers <ArrowRight className="size-3.5" aria-hidden="true" />
+          </span>
+        </Link>
+
+        <Link
+          href="/notes"
+          className="brutal brutal-hover flex flex-col justify-between p-5 bg-card border-2 border-border group shadow-hard"
+        >
+          <div className="flex items-center justify-between">
+            <span className="grid size-11 place-items-center border-2 border-border bg-primary text-primary-foreground shadow-hard-sm">
+              <BookOpen className="size-5" aria-hidden="true" />
+            </span>
+            <span className="eyebrow border-2 border-border bg-primary/20 px-2 py-0.5 text-[10px] font-black">
+              Free
+            </span>
+          </div>
+          <div className="mt-4 space-y-1">
+            <h2 className="font-display text-2xl uppercase group-hover:text-link transition-colors leading-tight">
+              Notes
+            </h2>
+            <p className="text-xs text-muted-foreground">Chapter notes &amp; study material</p>
+          </div>
+          <span className="eyebrow mt-4 inline-flex items-center gap-1 text-xs font-bold text-foreground">
+            Browse Notes <ArrowRight className="size-3.5" aria-hidden="true" />
           </span>
         </Link>
       </section>

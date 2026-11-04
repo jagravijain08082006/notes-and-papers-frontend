@@ -256,6 +256,17 @@
   }
 }
 
+/* Yellow surfaces always carry dark text and icons. In dark mode the page text is light, and some yellow buttons, tabs and
+   icon squares picked it up (white on yellow is hard to read). Only solid yellow is matched, not the faint bg-primary/20 tints. */
+.dark .bg-primary,
+.dark .bg-primary *,
+.dark .hover\:bg-primary:hover,
+.dark .hover\:bg-primary:hover *,
+.dark .group:hover .group-hover\:bg-primary,
+.dark .group:hover .group-hover\:bg-primary * {
+  color: hsl(var(--primary-foreground)) !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;

@@ -15,7 +15,7 @@ export default async function AccountPage() {
   const staff = me.role === "admin" || me.role === "moderator";
   const links = [
     { href: "/bookmarks", label: "Bookmarks", hint: "Papers you saved", icon: Bookmark },
-    { href: "/downloads", label: "Downloads", hint: "Your download history", icon: Download },
+    { href: "/downloads", label: "Downloads", hint: "Saved on this device", icon: Download },
     { href: "/upload", label: "Upload", hint: "Share a paper or notes", icon: Upload },
     ...(staff
       ? [
