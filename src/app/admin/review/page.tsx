@@ -9,11 +9,17 @@ const SIZE = 20;
 
 export default async function ReviewQueuePage(props: PageProps<"/admin/review">) {
   const page = intParam((await props.searchParams).page);
-  const data = await authedFetch<Paginated<AdminPaper>>(
-    "/admin/review-queue",
-    { query: { page, size: SIZE } },
-    "/admin/review",
-  );
+  let data: Paginated<AdminPaper> = { items: [], total: 0, page, size: SIZE };
+  let loadError: string | null = null;
+  try {
+    data = await authedFetch<Paginated<AdminPaper>>(
+      "/admin/review-queue",
+      { query: { page, size: SIZE } },
+      "/admin/review",
+    );
+  } catch (err: unknown) {
+    loadError = err instanceof Error ? err.message : "Failed to load review queue";
+  }
 
   const columns: Column<AdminPaper>[] = [
     {
@@ -49,6 +55,11 @@ export default async function ReviewQueuePage(props: PageProps<"/admin/review">)
         title="Review queue"
         description="Papers the pipeline was not confident about, and user uploads. Open one to check it against the PDF."
       />
+      {loadError && (
+        <div className="border-2 border-red-500 bg-red-500/10 p-4 text-sm text-red-600 font-semibold mb-4">
+          Failed to load review queue: {loadError}
+        </div>
+      )}
       <DataTable
         caption="Papers waiting for review"
         columns={columns}

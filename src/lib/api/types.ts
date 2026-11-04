@@ -5,9 +5,15 @@
  */
 
 export type PaperKind =
-  "question_paper" | "solution" | "syllabus" | "notes" | "mock_test" | "answer_key";
-export type RightsStatus = "owned" | "permitted" | "link_only" | "unknown";
-export type TermKind = "part" | "semester" | "year";
+  | "question_paper"
+  | "solution"
+  | "syllabus"
+  | "notes"
+  | "mock_test"
+  | "answer_key"
+  | (string & {});
+export type RightsStatus = "owned" | "permitted" | "link_only" | "unknown" | (string & {});
+export type TermKind = "part" | "semester" | "year" | (string & {});
 
 export interface Paginated<T> {
   items: T[];
@@ -229,7 +235,7 @@ export interface NoteSummary {
 
 /* ---------- admin ---------- */
 
-export type PaperStatus = "pending_review" | "published" | "unpublished" | "rejected";
+export type PaperStatus = "pending_review" | "published" | "unpublished" | "rejected" | (string & {});
 
 export interface AdminPaper {
   id: string;

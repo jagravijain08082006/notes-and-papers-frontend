@@ -15,11 +15,17 @@ export default async function AdminPapersPage(props: PageProps<"/admin/papers">)
   const q = first(sp.q)?.slice(0, 120);
   const status = enumParam(sp.status, STATUSES);
   const missing = first(sp.missing) === "1" ? "true" : undefined;
-  const data = await authedFetch<Paginated<AdminPaper>>(
-    "/admin/papers",
-    { query: { page, size: SIZE, q, status, missing_from_source: missing } },
-    "/admin/papers",
-  );
+  let data: Paginated<AdminPaper> = { items: [], total: 0, page, size: SIZE };
+  let loadError: string | null = null;
+  try {
+    data = await authedFetch<Paginated<AdminPaper>>(
+      "/admin/papers",
+      { query: { page, size: SIZE, q, status, missing_from_source: missing } },
+      "/admin/papers",
+    );
+  } catch (err: unknown) {
+    loadError = err instanceof Error ? err.message : "Failed to load papers";
+  }
 
   const columns: Column<AdminPaper>[] = [
     {
@@ -101,6 +107,11 @@ export default async function AdminPapersPage(props: PageProps<"/admin/papers">)
           ]}
         />
       </SearchForm>
+      {loadError && (
+        <div className="border-2 border-red-500 bg-red-500/10 p-4 text-sm text-red-600 font-semibold mb-4">
+          Failed to load papers: {loadError}
+        </div>
+      )}
       <DataTable
         caption="Papers"
         columns={columns}
