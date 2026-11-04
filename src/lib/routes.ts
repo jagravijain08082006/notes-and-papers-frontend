@@ -14,6 +14,7 @@ export const routes = {
   download: (slug: string) => `/papers/${slug}/download`,
   boards: "/boards",
   rbse: "/exams/uni-rajasthanboard",
+  rbseChannel: (ch: string) => `/exams/uni-rajasthanboard/${ch}`,
   uniraj: "/universities/rajasthan-university",
   rtu: "/universities/rajasthan-technical-university",
   categories: "/categories",

@@ -52,8 +52,8 @@ export const metadata = buildMetadata({
 });
 
 const QUICK = [
-  { label: "RBSE 10th", href: "/exams/uni-rajasthanboard" },
-  { label: "RBSE 12th", href: "/exams/uni-rajasthanboard" },
+  { label: "RBSE 10th", href: "/exams/uni-rajasthanboard/class-10" },
+  { label: "RBSE 12th", href: "/exams/uni-rajasthanboard/class-12" },
   { label: "UNIRAJ B.Com", href: "/universities/rajasthan-university/bcom" },
   { label: "UNIRAJ B.Sc", href: "/universities/rajasthan-university/bsc" },
   { label: "UNIRAJ BCA", href: "/universities/rajasthan-university/bca" },
@@ -135,9 +135,8 @@ export default async function HomePage() {
         aria-label="Rajasthan Core Portals"
         className="grid grid-cols-1 gap-4 sm:grid-cols-3 max-w-5xl mx-auto w-full"
       >
-        <Link
-          href={routes.rbse}
-          className="brutal brutal-hover flex flex-col justify-between p-5 bg-card border-2 border-border group shadow-hard"
+        <div
+          className="brutal flex flex-col justify-between p-5 bg-card border-2 border-border shadow-hard"
         >
           <div className="flex items-center justify-between">
             <span className="grid size-11 place-items-center border-2 border-border bg-accent text-accent-foreground shadow-hard-sm">
@@ -148,17 +147,42 @@ export default async function HomePage() {
             </span>
           </div>
           <div className="mt-4 space-y-1">
-            <h2 className="font-display text-2xl uppercase group-hover:text-link transition-colors leading-tight">
-              RBSE Board
-            </h2>
+            <Link href={routes.rbse}>
+              <h2 className="font-display text-2xl uppercase hover:text-link transition-colors leading-tight">
+                RBSE Board
+              </h2>
+            </Link>
             <p className="text-xs text-muted-foreground">
               Classes 9th to 12th · Model Papers
             </p>
+            <div className="flex flex-wrap gap-1.5 pt-2">
+              <Link
+                href="/exams/uni-rajasthanboard/class-10"
+                className="border border-border bg-background px-2 py-0.5 text-[10px] font-bold uppercase shadow-hard-sm hover:bg-primary hover:-translate-y-px transition-all"
+              >
+                Class 10th
+              </Link>
+              <Link
+                href="/exams/uni-rajasthanboard/class-12"
+                className="border border-border bg-background px-2 py-0.5 text-[10px] font-bold uppercase shadow-hard-sm hover:bg-primary hover:-translate-y-px transition-all"
+              >
+                Class 12th
+              </Link>
+              <Link
+                href="/exams/uni-rajasthanboard/model-papers"
+                className="border border-border bg-background px-2 py-0.5 text-[10px] font-bold uppercase shadow-hard-sm hover:bg-primary hover:-translate-y-px transition-all"
+              >
+                Model Papers
+              </Link>
+            </div>
           </div>
-          <span className="eyebrow mt-4 inline-flex items-center gap-1 text-xs font-bold text-foreground">
-            Browse Papers <ArrowRight className="size-3.5" aria-hidden="true" />
-          </span>
-        </Link>
+          <Link
+            href={routes.rbse}
+            className="eyebrow mt-4 inline-flex items-center gap-1 text-xs font-bold text-foreground hover:text-link transition-colors"
+          >
+            Browse All RBSE Papers <ArrowRight className="size-3.5" aria-hidden="true" />
+          </Link>
+        </div>
 
         <Link
           href={routes.uniraj}
