@@ -1,19 +1,13 @@
 import { defineCloudflareConfig } from "@opennextjs/cloudflare";
-import kvIncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/kv-incremental-cache";
-import memoryQueue from "@opennextjs/cloudflare/overrides/queue/memory-queue";
-import kvNextTagCache from "@opennextjs/cloudflare/overrides/tag-cache/kv-next-tag-cache";
 
 /**
- * Where Next.js keeps its page cache on Cloudflare:
- * Everything lives in one KV namespace (no R2 or card needed): ISR pages under NEXT_INC_CACHE_KV, and tags
- * (revalidateTag from POST /api/revalidate, called by the backend after an import) under NEXT_TAG_CACHE_KV.
- * Both bindings are declared in wrangler.jsonc. To move the page cache to R2 later, switch to r2-incremental-cache.
- *
- * ISR revalidation queue:
- * Uses memoryQueue with the WORKER_SELF_REFERENCE service binding declared in wrangler.jsonc.
+ * Page caching is done by the edge cache in cache-worker.js (Cloudflare's Cache API: free and unlimited writes), not by
+ * Workers KV. KV's free plan allows only about 1,000 writes a day; every background page rebuild and every deploy wrote to it,
+ * the limit was hit and deploys and pages started failing. With these "dummy" caches the app writes nothing to KV at all.
+ * A page is rebuilt at most once per edge-cache lifetime (1 hour; 6 hours for papers).
  */
 export default defineCloudflareConfig({
-  incrementalCache: kvIncrementalCache,
-  tagCache: kvNextTagCache,
-  queue: memoryQueue,
+  incrementalCache: "dummy",
+  tagCache: "dummy",
+  queue: "dummy",
 });
