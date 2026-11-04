@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Award, GraduationCap, Home } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
+import { NotFoundTv } from "@/components/shared/not-found-tv";
 import { SearchBar } from "@/components/shared/search-bar";
 import { routes } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -14,12 +15,7 @@ export default function NotFound() {
       aria-labelledby="nf-heading"
       className="mx-auto grid max-w-5xl items-center gap-8 py-8 sm:py-14 lg:grid-cols-[auto_1fr] lg:gap-14"
     >
-      <p
-        aria-hidden="true"
-        className="select-none justify-self-center border-2 border-border bg-primary px-6 py-2 font-display text-7xl xs:text-8xl sm:text-[10rem] leading-[1.1] shadow-hard-lg lg:-rotate-2"
-      >
-        404
-      </p>
+      <NotFoundTv />
       <div className="space-y-6">
         <p className="eyebrow inline-block border-2 border-border bg-accent px-2.5 py-1 text-accent-foreground font-bold uppercase tracking-wider text-xs shadow-hard-sm">
           Page not found

@@ -4,7 +4,8 @@ import { SITE_URL } from "@/lib/env";
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: "*", allow: "/", disallow: ["/admin", "/api", "/account", "/search"] },
+      // The download step of a paper is a noindex page: crawlers gain nothing from it and each fetch costs a full render.
+      { userAgent: "*", allow: "/", disallow: ["/admin", "/api", "/account", "/search", "/papers/*/download"] },
       // Answer engines and AI assistants are welcome on the public pages (same private areas stay closed).
       {
         userAgent: [
@@ -20,7 +21,7 @@ export default function robots(): MetadataRoute.Robots {
           "CCBot",
         ],
         allow: "/",
-        disallow: ["/admin", "/api", "/account", "/search"],
+        disallow: ["/admin", "/api", "/account", "/search", "/papers/*/download"],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

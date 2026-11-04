@@ -1,7 +1,8 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "notes-and-papers",
-	"main": ".open-next/worker.js",
+	// cache-worker.js puts the edge cache in front of the generated .open-next/worker.js
+	"main": "cache-worker.js",
 	"compatibility_date": "2026-10-01",
 	"compatibility_flags": [
 		"nodejs_compat",
