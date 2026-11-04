@@ -1,4 +1,4 @@
-import type { ExamDetail, ExamSection, PaperSummary } from "@/lib/api/types";
+import type { ExamDetail, PaperSummary } from "@/lib/api/types";
 
 export interface RbseChannelMeta {
   slug: string;

@@ -18,3 +18,4 @@ export default async function Page(props: {
   const { subject } = await props.params;
   return <RbseSubjectPageComponent classSlug="model-papers" subjectSlug={subject} />;
 }
+
