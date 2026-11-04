@@ -13,6 +13,7 @@ import type { PaperSummary } from "@/lib/api/types";
 import { kindLabel, paperContext, paperHref, routes, subjectHref } from "@/lib/routes";
 import { cleanPreviewExcerpt } from "@/lib/sanitize-preview";
 import { breadcrumbLd, buildMetadata, faqLd, learningResourceLd, paperMeta } from "@/lib/seo";
+import { getRbseSubjectBySlug, matchRbseSubject } from "@/lib/rbse-channels";
 
 export async function paperMetadata(slug: string) {
   const p = await getPaper(slug);
@@ -85,6 +86,29 @@ export async function PaperPage({
         : `It is a ${kindLabel(p.kind).toLowerCase()} listed under ${p.exam_name ?? "its exam"}${p.year ? `, ${p.year}` : ""}.`,
     },
   ];
+  // For RBSE Board papers, detect nested Class & Subject for rich breadcrumbs
+  let rbseClassSlug: string | null = null;
+  let rbseClassTitle: string | null = null;
+  if (p.exam_slug === "uni-rajasthanboard") {
+    const scan = `${p.section ?? ""} ${p.title}`;
+    if (/class\s*10/i.test(scan)) {
+      rbseClassSlug = "class-10";
+      rbseClassTitle = "Class 10th Secondary";
+    } else if (/class\s*12/i.test(scan)) {
+      rbseClassSlug = "class-12";
+      rbseClassTitle = "Class 12th Sr. Secondary";
+    } else if (/class\s*11/i.test(scan)) {
+      rbseClassSlug = "class-11";
+      rbseClassTitle = "Class 11th";
+    } else if (/class\s*9/i.test(scan)) {
+      rbseClassSlug = "class-9";
+      rbseClassTitle = "Class 9th";
+    }
+  }
+  const rbseSubj = rbseClassSlug
+    ? getRbseSubjectBySlug(matchRbseSubject(p.title, p.paper_code ?? undefined))
+    : null;
+
   const crumbs = isCourse
     ? [
         { name: "Home", path: "/" },
@@ -96,6 +120,17 @@ export async function PaperPage({
         { name: m.label, path: routes.term(uniSlug, p.course_slug!, p.term_slug!) },
         { name: p.subject_name ?? "Paper", path: subjectHref(p) },
         { name: p.year ? String(p.year) : "Paper", path: selfPath },
+      ]
+    : p.exam_slug === "uni-rajasthanboard" && rbseClassSlug && rbseSubj
+    ? [
+        { name: "Home", path: "/" },
+        { name: "Rajasthan Board (RBSE)", path: routes.exam(p.exam_slug) },
+        { name: rbseClassTitle!, path: `/exams/${p.exam_slug}/${rbseClassSlug}` },
+        {
+          name: rbseSubj.name,
+          path: `/exams/${p.exam_slug}/${rbseClassSlug}/${rbseSubj.slug}`,
+        },
+        { name: p.title, path: selfPath },
       ]
     : [
         { name: "Home", path: "/" },

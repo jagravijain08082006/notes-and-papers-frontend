@@ -105,7 +105,23 @@ export default async function ExamPage(props: PageProps<"/exams/[slug]">) {
             {plural(exam.sections.length, "section")}
           </span>
         </p>
-        {exam.sections.length > 1 && (
+        {isRbse ? (
+          <nav aria-label="RBSE Classes" className="flex flex-wrap gap-2 pt-1">
+            {overviewCards.map((ch) => (
+              <Link
+                key={ch.slug}
+                href={ch.href}
+                className="inline-flex items-center gap-1.5 border-2 border-border bg-card px-3 py-1.5 text-xs font-black uppercase tracking-wide hover:bg-primary shadow-hard-sm transition-all"
+              >
+                <Layers className="size-3 text-muted-foreground" aria-hidden="true" />
+                <span>{ch.shortTitle}</span>
+                <span className="border border-border/40 bg-primary/20 px-1 py-0.2 text-[10px] font-black">
+                  {ch.paperCount}
+                </span>
+              </Link>
+            ))}
+          </nav>
+        ) : exam.sections.length > 1 ? (
           <nav aria-label="Sections" className="flex flex-wrap gap-2 pt-1">
             {exam.sections.map((s, i) => {
               const count = s.papers?.length ?? s.paper_count;
@@ -124,7 +140,7 @@ export default async function ExamPage(props: PageProps<"/exams/[slug]">) {
               );
             })}
           </nav>
-        )}
+        ) : null}
       </header>
 
       {isRbse && rbseData ? (
@@ -178,6 +194,24 @@ export default async function ExamPage(props: PageProps<"/exams/[slug]">) {
                             {sub.label}: {sub.count}
                           </span>
                         ))}
+                      </div>
+                    )}
+
+                    {c.topSubjects && c.topSubjects.length > 0 && (
+                      <div className="space-y-1 pt-2 border-t border-border/40">
+                        <span className="text-[10px] font-black uppercase text-muted-foreground tracking-wider">
+                          Key Subjects:
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {c.topSubjects.map((sub) => (
+                            <span
+                              key={sub.slug}
+                              className="border border-border/60 bg-background px-1.5 py-0.5 text-[10px] font-bold text-foreground"
+                            >
+                              {sub.name} ({sub.count})
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>

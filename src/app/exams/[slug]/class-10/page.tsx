@@ -12,3 +12,4 @@ export async function generateMetadata() {
 export default async function Page() {
   return <RbseChannelPageComponent channelSlug="class-10" />;
 }
+

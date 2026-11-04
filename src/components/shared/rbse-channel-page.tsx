@@ -134,6 +134,7 @@ export async function RbseChannelPageComponent({ channelSlug }: { channelSlug: s
       <RbseChannelView
         currentChannel={channelSlug}
         allChannels={overviewCards}
+        subjects={channelData.subjects}
         subtypeGroups={channelData.subtypeGroups}
         totalPapers={channelData.totalPapers}
         availableYears={channelData.years}
@@ -157,3 +158,4 @@ export async function RbseChannelPageComponent({ channelSlug }: { channelSlug: s
     </div>
   );
 }
+
