@@ -52,8 +52,8 @@ export const metadata = buildMetadata({
 });
 
 const QUICK = [
-  { label: "RBSE 10th", href: "/exams/uni-rajasthanboard/class-10" },
-  { label: "RBSE 12th", href: "/exams/uni-rajasthanboard/class-12" },
+  { label: "RBSE 10th", href: "/rajasthanboard/class-10" },
+  { label: "RBSE 12th", href: "/rajasthanboard/class-12" },
   { label: "UNIRAJ B.Com", href: "/universities/rajasthan-university/bcom" },
   { label: "UNIRAJ B.Sc", href: "/universities/rajasthan-university/bsc" },
   { label: "UNIRAJ BCA", href: "/universities/rajasthan-university/bca" },
@@ -157,19 +157,19 @@ export default async function HomePage() {
             </p>
             <div className="flex flex-wrap gap-1.5 pt-2">
               <Link
-                href="/exams/uni-rajasthanboard/class-10"
+                href="/rajasthanboard/class-10"
                 className="border border-border bg-background px-2 py-0.5 text-[10px] font-bold uppercase shadow-hard-sm hover:bg-primary hover:-translate-y-px transition-all"
               >
                 Class 10th
               </Link>
               <Link
-                href="/exams/uni-rajasthanboard/class-12"
+                href="/rajasthanboard/class-12"
                 className="border border-border bg-background px-2 py-0.5 text-[10px] font-bold uppercase shadow-hard-sm hover:bg-primary hover:-translate-y-px transition-all"
               >
                 Class 12th
               </Link>
               <Link
-                href="/exams/uni-rajasthanboard/model-papers"
+                href="/rajasthanboard/model-papers"
                 className="border border-border bg-background px-2 py-0.5 text-[10px] font-bold uppercase shadow-hard-sm hover:bg-primary hover:-translate-y-px transition-all"
               >
                 Model Papers

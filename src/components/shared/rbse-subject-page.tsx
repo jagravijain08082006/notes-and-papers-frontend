@@ -19,7 +19,7 @@ export function generateRbseSubjectMetadata(classSlug: string, subjectSlug: stri
 
   const title = `RBSE ${classMeta.shortTitle} ${subjectMeta.name} Question Papers PDF | Model Papers & Blueprints`;
   const description = `Download free RBSE ${classMeta.shortTitle} ${subjectMeta.name} (${subjectMeta.hindiName}) past year question papers PDF (2010-2026), official BSER Ajmer model papers, blueprints & half-yearly papers.`;
-  const path = `/exams/uni-rajasthanboard/${classSlug}/${subjectSlug}`;
+  const path = `/rajasthanboard/${classSlug}/${subjectSlug}`;
 
   const keywords = [
     `rbse ${classSlug} ${subjectSlug} question papers`,
@@ -77,7 +77,7 @@ export async function RbseSubjectPageComponent({
     notFound();
   }
 
-  const path = `/exams/uni-rajasthanboard/${classSlug}/${subjectSlug}`;
+  const path = `/rajasthanboard/${classSlug}/${subjectSlug}`;
   const faqs = buildSubjectFaqs(
     data.classMeta.shortTitle,
     data.subjectMeta.name,
@@ -87,7 +87,7 @@ export async function RbseSubjectPageComponent({
   const crumbs = [
     { name: "Home", path: "/" },
     { name: "Rajasthan Board (RBSE)", path: "/exams/uni-rajasthanboard" },
-    { name: data.classMeta.shortTitle, path: `/exams/uni-rajasthanboard/${classSlug}` },
+    { name: data.classMeta.shortTitle, path: `/rajasthanboard/${classSlug}` },
     { name: data.subjectMeta.name, path },
   ];
 
@@ -106,7 +106,7 @@ export async function RbseSubjectPageComponent({
       <header className="space-y-4">
         <div className="flex flex-wrap items-center gap-2">
           <Link
-            href={`/exams/uni-rajasthanboard/${classSlug}`}
+            href={`/rajasthanboard/${classSlug}`}
             className="inline-flex items-center gap-1.5 border-2 border-border bg-card px-2.5 py-1 text-xs font-black uppercase tracking-wider hover:bg-primary transition-colors shadow-hard-sm"
           >
             <ArrowLeft className="size-3" />
@@ -146,7 +146,7 @@ export async function RbseSubjectPageComponent({
       <nav aria-label="Sibling subjects" className="border-y-2 border-border py-3">
         <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs scrollbar-none">
           <Link
-            href={`/exams/uni-rajasthanboard/${classSlug}`}
+            href={`/rajasthanboard/${classSlug}`}
             className="shrink-0 border-2 border-border bg-muted/80 px-3 py-1.5 font-black uppercase tracking-wide hover:bg-primary transition-colors shadow-hard-sm"
           >
             ← All {data.classMeta.badge} Subjects
@@ -190,7 +190,7 @@ export async function RbseSubjectPageComponent({
             Other {data.classMeta.shortTitle} Subjects
           </h2>
           <Link
-            href={`/exams/uni-rajasthanboard/${classSlug}`}
+            href={`/rajasthanboard/${classSlug}`}
             className="text-xs font-bold uppercase text-link hover:underline inline-flex items-center gap-1"
           >
             View All Subjects <ArrowRight className="size-3" />

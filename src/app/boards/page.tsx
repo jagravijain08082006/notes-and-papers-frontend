@@ -98,10 +98,10 @@ export default async function BoardsPage() {
 
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { label: "Class 10th Secondary", desc: "Board Final & Half Yearly", path: "/exams/uni-rajasthanboard/class-10" },
-              { label: "Class 12th Sr. Secondary", desc: "Science, Commerce, Arts", path: "/exams/uni-rajasthanboard/class-12" },
-              { label: "Class 9th Secondary", desc: "Pre-Board & Annual", path: "/exams/uni-rajasthanboard/class-9" },
-              { label: "Class 11th Higher Secondary", desc: "Compulsory & Optional", path: "/exams/uni-rajasthanboard/class-11" },
+              { label: "Class 10th Secondary", desc: "Board Final & Half Yearly", path: "/rajasthanboard/class-10" },
+              { label: "Class 12th Sr. Secondary", desc: "Science, Commerce, Arts", path: "/rajasthanboard/class-12" },
+              { label: "Class 9th Secondary", desc: "Pre-Board & Annual", path: "/rajasthanboard/class-9" },
+              { label: "Class 11th Higher Secondary", desc: "Compulsory & Optional", path: "/rajasthanboard/class-11" },
             ].map((c) => (
               <Link
                 key={c.label}

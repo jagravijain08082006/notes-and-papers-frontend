@@ -16,7 +16,7 @@ export function generateRbseChannelMetadata(channelSlug: string) {
   return buildMetadata({
     title: meta.seoTitle,
     description: meta.seoDesc,
-    path: `/exams/uni-rajasthanboard/${channelSlug}`,
+    path: `/rajasthanboard/${channelSlug}`,
     keywords: meta.keywords,
   });
 }
@@ -86,7 +86,7 @@ export async function RbseChannelPageComponent({ channelSlug }: { channelSlug: s
   const overviewCards = getRbseOverviewCards(exam);
   const faqs = FAQS_BY_CHANNEL[channelSlug] ?? FAQS_BY_CHANNEL["class-10"];
 
-  const path = `/exams/uni-rajasthanboard/${channelSlug}`;
+  const path = `/rajasthanboard/${channelSlug}`;
 
   return (
     <div className="space-y-10">

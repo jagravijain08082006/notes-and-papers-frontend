@@ -30,6 +30,19 @@ const nextConfig: NextConfig = {
         destination: "/universities/rajasthan-university",
         permanent: true,
       },
+      // Rajasthan Board class and subject pages moved to a shorter address.
+      {
+        source: "/exams/uni-rajasthanboard/:channel(class-9|class-10|class-11|class-12|model-papers)/:subject",
+        destination: "/rajasthanboard/:channel/:subject",
+        permanent: true,
+      },
+      {
+        source: "/exams/uni-rajasthanboard/:channel(class-9|class-10|class-11|class-12|model-papers)",
+        destination: "/rajasthanboard/:channel",
+        permanent: true,
+      },
+      // The board's front page stays where it is; /rajasthanboard on its own leads there.
+      { source: "/rajasthanboard", destination: "/exams/uni-rajasthanboard", permanent: false },
     ];
   },
   async rewrites() {

@@ -567,7 +567,7 @@ export function getRbseClassSubjects(exam: ExamDetail, classSlug: string): RbseC
       paperCount: data.papers.length,
       yearsSpan,
       subtypes,
-      href: `/exams/uni-rajasthanboard/${classSlug}/${def.slug}`,
+      href: `/rajasthanboard/${classSlug}/${def.slug}`,
     });
   }
 
@@ -815,7 +815,7 @@ export function getRbseOverviewCards(exam: ExamDetail) {
       paperCount,
       subBreakdown,
       topSubjects: subjects.map((s) => ({ name: s.name, count: s.paperCount, slug: s.slug })),
-      href: `/exams/uni-rajasthanboard/${ch.slug}`,
+      href: `/rajasthanboard/${ch.slug}`,
     };
   });
 }

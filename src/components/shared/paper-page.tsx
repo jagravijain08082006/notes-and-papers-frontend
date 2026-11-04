@@ -125,10 +125,10 @@ export async function PaperPage({
     ? [
         { name: "Home", path: "/" },
         { name: "Rajasthan Board (RBSE)", path: routes.exam(p.exam_slug) },
-        { name: rbseClassTitle!, path: `/exams/${p.exam_slug}/${rbseClassSlug}` },
+        { name: rbseClassTitle!, path: `/rajasthanboard/${rbseClassSlug}` },
         {
           name: rbseSubj.name,
-          path: `/exams/${p.exam_slug}/${rbseClassSlug}/${rbseSubj.slug}`,
+          path: `/rajasthanboard/${rbseClassSlug}/${rbseSubj.slug}`,
         },
         { name: p.title, path: selfPath },
       ]

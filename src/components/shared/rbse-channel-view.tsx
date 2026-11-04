@@ -183,7 +183,7 @@ export function RbseChannelView({
             return (
               <Link
                 key={ch.slug}
-                href={`/exams/uni-rajasthanboard/${ch.slug}`}
+                href={`/rajasthanboard/${ch.slug}`}
                 className={`inline-flex items-center gap-1.5 border-2 border-border px-3.5 py-1.5 text-xs font-black uppercase tracking-wide transition-all shadow-hard-sm ${
                   isActive
                     ? "bg-primary text-primary-foreground shadow-hard -translate-y-0.5"
@@ -604,7 +604,7 @@ export function RbseChannelView({
             .map((c) => (
               <Link
                 key={c.slug}
-                href={`/exams/uni-rajasthanboard/${c.slug}`}
+                href={`/rajasthanboard/${c.slug}`}
                 className="brutal brutal-hover flex flex-col justify-between p-4 bg-card border-2 border-border group"
               >
                 <div>
