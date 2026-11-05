@@ -1,0 +1,20 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "notes-and-papers-app",
+	"main": "app-worker.js",
+	"compatibility_date": "2026-10-01",
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"keep_names": false,
+	// Reached only through the service binding of the front Worker (wrangler.jsonc), never directly from the internet.
+	"workers_dev": false,
+	"preview_urls": false,
+	"assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+	"services": [{ "binding": "WORKER_SELF_REFERENCE", "service": "notes-and-papers-app" }],
+	"keep_vars": true,
+	"vars": {
+		"INDEXNOW_KEY": "d8e8d88bcb06e2901c2031fe56889b39",
+		"NEXT_PUBLIC_SITE_URL": "https://notesandpapers.dpdns.org",
+		"NEXT_PUBLIC_API_URL": "https://backend.notesandpapers.dpdns.org/api/v1"
+	},
+	"observability": { "enabled": true }
+}

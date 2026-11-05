@@ -1,7 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "notes-and-papers",
-	// cache-worker.js puts the edge cache in front of the generated .open-next/worker.js
+	// Front door: edge cache + retries in front of the app Worker (wrangler.app.jsonc)
 	"main": "cache-worker.js",
 	"compatibility_date": "2026-10-01",
 	"compatibility_flags": [
@@ -13,19 +13,17 @@
 		"directory": ".open-next/assets",
 		"binding": "ASSETS"
 	},
-	// Lets the worker call itself (used by the adapter for ISR revalidation).
+	// The Next.js app runs in its own Worker (wrangler.app.jsonc). This front Worker calls it and retries when it is killed for
+	// CPU time (see cache-worker.js). Deploy the app Worker first: npm run cf:deploy does both in order.
 	"services": [
-		{
-			"binding": "WORKER_SELF_REFERENCE",
-			"service": "notes-and-papers"
-		}
+		{ "binding": "APP", "service": "notes-and-papers-app" }
 	],
-	// Page cache: one KV namespace used by both bindings. Created with:
-	//   npx wrangler kv namespace create NEXT_TAG_CACHE_KV
-	"kv_namespaces": [
-		{ "binding": "NEXT_TAG_CACHE_KV", "id": "d642f541c5dc4c8a9c8ea3f1747bb1de" },
-		{ "binding": "NEXT_INC_CACHE_KV", "id": "d642f541c5dc4c8a9c8ea3f1747bb1de" }
+	// Saved pages (schema.sql). Created with: npx wrangler d1 create np-pages
+	"d1_databases": [
+		{ "binding": "DB", "database_name": "np-pages", "database_id": "6a632035-6726-499a-8435-8c737f881b79" }
 	],
+	// Daily cleanup of saved pages from older deploys (see scheduled() in cache-worker.js).
+	"triggers": { "crons": ["17 3 * * *"] },
 	// Variables and secrets set in the Cloudflare dashboard (INDEXNOW_KEY, REVALIDATE_SECRET) survive every deploy.
 	"keep_vars": true,
 	// Tells the Worker which deploy it is, so saved pages from an older deploy (which point at CSS and JS files that no
