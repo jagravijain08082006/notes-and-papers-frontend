@@ -24,10 +24,13 @@ function ttlFor(path) {
   return HOUR;
 }
 
-function cacheKey(url) {
+function cacheKey(url, deploy) {
   const u = new URL(url);
   for (const k of [...u.searchParams.keys()]) if (TRACKING.test(k)) u.searchParams.delete(k);
   u.searchParams.sort();
+  // A saved page names the CSS and JS files of the deploy that built it, and those files are deleted by the next deploy.
+  // Each deploy therefore gets its own entries; the old ones are simply never asked for again.
+  u.searchParams.set("__deploy", deploy);
   return new Request(u.toString(), { method: "GET" });
 }
 
@@ -67,7 +70,7 @@ export default {
     if (!cacheable) return openNext.fetch(request, env, ctx);
 
     const cache = caches.default;
-    const key = cacheKey(request.url);
+    const key = cacheKey(request.url, env.CF_VERSION_METADATA?.id ?? "dev");
     const hit = await cache.match(key);
     if (hit) {
       const ageSeconds = (Date.now() - Number(hit.headers.get("x-edge-saved-at") || 0)) / 1000;

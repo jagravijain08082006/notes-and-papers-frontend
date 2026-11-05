@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { track } from "@/lib/track";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useSearch } from "@/hooks/use-catalog";
 import type { FacetBucket } from "@/lib/api/types";
 import { parsePositiveInt, routes } from "@/lib/routes";
@@ -15,6 +14,7 @@ import { ErrorBox } from "./home-sections";
 import { Pagination } from "./pagination";
 import { PaperList, PaperListSkeleton } from "./paper-list";
 import { SearchBar } from "./search-bar";
+import { SearchProgress } from "./search-progress";
 import { SearchSuggestionsHub } from "./search-suggestions-hub";
 import { Select } from "@/components/ui/select";
 
@@ -100,8 +100,8 @@ export function SearchView() {
       {!active ? (
         <SearchSuggestionsHub onSelectQuery={(query) => update({ q: query })} />
       ) : isPending ? (
-        <div aria-busy="true" className="space-y-3">
-          <Skeleton className="h-4 w-24" />
+        <div aria-busy="true" className="space-y-5">
+          <SearchProgress query={params.q} />
           <PaperListSkeleton />
         </div>
       ) : isError && !data ? (
@@ -121,7 +121,8 @@ export function SearchView() {
           aria-busy={isFetching}
           className={isFetching ? "opacity-70 transition-opacity" : ""}
         >
-          <p className="eyebrow mb-4 text-muted-foreground">
+          {isFetching && <SearchProgress query={params.q} />}
+          <p className="eyebrow mb-4 mt-4 text-muted-foreground">
             {data.total.toLocaleString("en-IN")} result{data.total === 1 ? "" : "s"} found
             {data.suggestions.length > 0 && (
               <>

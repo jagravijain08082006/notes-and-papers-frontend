@@ -88,16 +88,18 @@ function TileSkeletons() {
 
 const POPULAR_SCHOOL_BOARDS = [
   {
-    slug: "uni-rajasthanboard",
-    name: "RBSE Rajasthan Board (BSER)",
-    subtitle: "Secondary & Higher Secondary · State Board",
-    href: "/rajasthanboard",
+    // Rajasthan Board has its own card at the top of the page; this one leads to every other exam.
+    slug: "other-exams",
+    name: "Other Exams",
+    subtitle: "Competitive exams · UPSC, SSC, NEET, GATE",
+    href: "/exams",
     tags: [
-      { label: "Class 10th Secondary", href: "/rajasthanboard" },
-      { label: "Class 12th Science", href: "/rajasthanboard" },
-      { label: "Class 12th Commerce", href: "/rajasthanboard" },
-      { label: "Class 12th Arts", href: "/rajasthanboard" },
-      { label: "Model Papers", href: "/rajasthanboard" },
+      { label: "SSC", href: "/exams/ssc" },
+      { label: "SBI Clerk", href: "/exams/sbi-clerk" },
+      { label: "UPSC", href: "/exams/upsc" },
+      { label: "GATE", href: "/exams/gate" },
+      { label: "NEET", href: "/exams/neet" },
+      { label: "All exams", href: "/exams" },
     ],
   },
   {

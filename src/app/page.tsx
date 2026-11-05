@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils";
 export const revalidate = 86400;
 
 export const metadata = buildMetadata({
-  title: "UNIRAJ, RTU Kota & Rajasthan Board Question Papers PDF | Notes & Papers",
+  title: "UNIRAJ, RTU & Rajasthan Board Question Papers PDF | Notes & Papers",
   description:
     "Free previous year question papers for University of Rajasthan (UNIRAJ Jaipur B.Com, B.Sc, BCA, BA, B.Ed), RTU Kota B.Tech & Rajasthan Board (RBSE Classes 9-12), plus notes. Download authentic watermark-free PYQ PDFs.",
   path: "/",

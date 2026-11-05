@@ -58,6 +58,8 @@ export function AdminNav({ role }: { role: Role }) {
             <Link
               key={href}
               href={href}
+              // Admin pages are rarely opened one after another: no background fetch of all 17 pages on every visit.
+              prefetch={false}
               aria-current={active ? "page" : undefined}
               className={cn(
                 "flex shrink-0 items-center gap-2 border-2 border-transparent px-3 py-2 text-xs font-bold uppercase tracking-wide hover:border-border hover:bg-muted transition-colors",

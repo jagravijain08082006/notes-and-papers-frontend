@@ -259,13 +259,15 @@
 /* Yellow surfaces always carry dark text and icons. In dark mode the page text is light, and some yellow buttons, tabs and
    icon squares picked it up (white on yellow is hard to read). Only solid yellow is matched, not the faint bg-primary/20 tints. */
 .dark .bg-primary,
-.dark .bg-primary *,
+.dark .bg-primary :not(:is([class*="bg-card"], [class*="bg-background"], [class*="bg-foreground"], [class*="bg-muted"])):not(:is([class*="bg-card"], [class*="bg-background"], [class*="bg-foreground"], [class*="bg-muted"]) *),
 .dark .hover\:bg-primary:hover,
-.dark .hover\:bg-primary:hover *,
+.dark .hover\:bg-primary:hover :not(:is([class*="bg-card"], [class*="bg-background"], [class*="bg-foreground"], [class*="bg-muted"])):not(:is([class*="bg-card"], [class*="bg-background"], [class*="bg-foreground"], [class*="bg-muted"]) *),
 .dark .group:hover .group-hover\:bg-primary,
-.dark .group:hover .group-hover\:bg-primary * {
+.dark .group:hover .group-hover\:bg-primary :not(:is([class*="bg-card"], [class*="bg-background"], [class*="bg-foreground"], [class*="bg-muted"])):not(:is([class*="bg-card"], [class*="bg-background"], [class*="bg-foreground"], [class*="bg-muted"]) *) {
   color: hsl(var(--primary-foreground)) !important;
 }
+/* ...except for a button or tag that has its own dark/light background inside a yellow area (for example "Request a paper"
+   on the yellow call-to-action): it keeps its own text colour, and so does everything inside it. */
 
 @media (prefers-reduced-motion: reduce) {
   * {

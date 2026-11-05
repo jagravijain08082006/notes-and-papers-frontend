@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bookmark, Download, LayoutDashboard, LogOut, User } from "lucide-react";
+import { Bookmark, Download, LogOut, User } from "lucide-react";
 import { toast } from "sonner";
 import { buttonVariants } from "@/components/ui/button";
 import { DetailsMenu } from "@/components/ui/details-menu";
@@ -46,7 +46,6 @@ export function UserMenu() {
     );
   }
 
-  const staff = me.role === "admin" || me.role === "moderator";
   async function signOut() {
     await signOutAction();
     qc.clear();
@@ -85,11 +84,6 @@ export function UserMenu() {
         <Link href="/downloads" className={item}>
           <Download className="size-4" aria-hidden="true" /> Downloads
         </Link>
-        {staff && (
-          <Link href="/admin" className={item}>
-            <LayoutDashboard className="size-4" aria-hidden="true" /> Admin
-          </Link>
-        )}
         <button type="button" onClick={signOut} className={item}>
           <LogOut className="size-4" aria-hidden="true" /> Sign out
         </button>

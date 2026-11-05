@@ -92,12 +92,18 @@ export function courseMeta(c: CourseDetail) {
   };
 }
 
+/** "UNIRAJ" or "RTU Kota" for the two Rajasthan universities, otherwise the university's own name. */
+function universityTag(name: string) {
+  return /rajasthan\s+university/i.test(name) ? "UNIRAJ" : /rajasthan\s+technical/i.test(name) ? "RTU Kota" : name;
+}
+
 export function termMeta(t: TermDetail) {
   const label = termLabel(t.term.kind, t.term.number);
   const range = yearRange(t.year_min, t.year_max);
+  const uni = universityTag(t.university.name);
   return {
-    title: `${t.course.name} ${label} Previous Year Papers - UNIRAJ`,
-    description: `${t.paper_count} papers across ${t.subjects.length} subjects for ${t.course.name} ${label}${range ? `, years ${range}` : ""}.`,
+    title: `${t.course.name} ${label} Previous Year Papers - ${uni}`,
+    description: `Download ${t.paper_count} previous year question papers for ${t.course.name} ${label} of ${t.university.name} (${uni}), across ${t.subjects.length} subjects${range ? `, ${range}` : ""}. Free PDFs, subject-wise.`,
     h1: `${t.course.name} ${label} Question Papers`,
     label,
   };
@@ -107,9 +113,10 @@ export function subjectMeta(s: SubjectDetail) {
   const label = termLabel(s.term.kind, s.term.number);
   const range = yearRange(s.subject.year_min, s.subject.year_max);
   const years = new Set(s.papers.map((p) => p.year).filter(Boolean)).size;
+  const uni = universityTag(s.university.name);
   return {
     title: `${s.subject.name} ${s.course.name} ${label} Question Papers${range ? ` ${range}` : ""}`,
-    description: `${s.subject.name} previous year papers for ${s.course.name} ${label}, ${years} year${years === 1 ? "" : "s"} available.`,
+    description: `Download ${s.subject.name} previous year question papers (PDF) for ${s.course.name} ${label}, ${uni}: ${years} year${years === 1 ? "" : "s"} available${range ? `, ${range}` : ""}. Free and clean.`,
     h1: `${s.subject.name} Question Papers`,
     label,
     years,
