@@ -300,7 +300,10 @@ export async function PaperPage({
           <h2 id="excerpt-heading" className="text-3xl sm:text-4xl">
             Paper preview
           </h2>
-          <blockquote className="whitespace-pre-line border-2 border-border bg-card p-5 shadow-hard-sm text-sm leading-relaxed">
+          <blockquote
+            lang={/[ऀ-ॿ]/.test(cleanedExcerpt) ? "hi" : undefined}
+            className="whitespace-pre-line border-2 border-border bg-card p-5 shadow-hard-sm text-sm leading-relaxed"
+          >
             {cleanedExcerpt}
           </blockquote>
         </section>

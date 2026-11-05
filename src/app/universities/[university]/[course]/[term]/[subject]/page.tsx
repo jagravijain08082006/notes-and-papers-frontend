@@ -23,7 +23,9 @@ export async function generateMetadata(props: Props) {
     title: m.title,
     description: m.description,
     path: routes.subject(university, course, term, subject),
-    noindex: false,
+    // A subject page with a single paper only repeats that paper's own page: kept out of search results (and out of the
+    // sitemap) so Google sees one strong page instead of two thin ones. Visitors can still reach it.
+    noindex: s.papers.length < 2,
     keywords: [
       `${s.subject.name} question papers`,
       `${s.subject.name} pyq pdf`,
