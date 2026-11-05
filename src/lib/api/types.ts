@@ -320,9 +320,21 @@ export interface AdminReport {
 export interface AdminUser {
   id: string;
   display_name: string | null;
+  email: string | null;
   role: Role;
   is_banned: boolean;
   created_at: string;
+}
+
+export interface AdminUserDetail extends AdminUser {
+  avatar: string | null;
+  phone: string | null;
+  college: string | null;
+  state: string | null;
+  city: string | null;
+  course: string | null;
+  bookmark_count: number;
+  note_count: number;
 }
 
 export interface AdminOverview {

@@ -8,9 +8,15 @@
 // Stale-while-revalidate: a saved page is kept for a day, but it is "fresh" only for its normal lifetime (1 hour, 6 for papers).
 // A visitor who arrives after that still gets the saved copy at once, and the page is rebuilt in the background for the next
 // visitor. So pages stay current without anyone waiting for a render (except the very first visit to a page in a region).
-import openNext from "./.open-next/worker.js";
-
-export { DOQueueHandler, DOShardedTagCache, BucketCachePurge } from "./.open-next/worker.js";
+//
+// The app is loaded only when a page really has to be built (a dynamic import below), never at startup. A saved page is
+// therefore returned without parsing the 7.6 MB bundle at all, which keeps a cold start of a cached page far below the
+// free plan's 10 ms CPU limit. (OpenNext's Durable Object classes are not re-exported: none are bound in wrangler.jsonc.)
+let app;
+async function openNext() {
+  app ??= (await import("./.open-next/worker.js")).default;
+  return app;
+}
 
 const PRIVATE = /^\/(api|admin|account|login|signup|forgot-password|upload|bookmarks|search|_next|cdn-cgi)(\/|$)/;
 const SESSION = /(?:^|;\s*)np_(?:access|refresh)=/;
@@ -36,7 +42,7 @@ function cacheKey(url, deploy) {
 
 /** Renders the page through the app; saves it when it is worth saving. Returns the response for the visitor. */
 async function render(request, env, ctx, cache, key, url) {
-  const res = await openNext.fetch(request, env, ctx);
+  const res = await (await openNext()).fetch(request, env, ctx);
   const type = res.headers.get("content-type") || "";
   const ttl = ttlFor(url.pathname);
   const storable =
@@ -67,7 +73,7 @@ export default {
       !SESSION.test(request.headers.get("cookie") || "") &&
       !request.headers.has("authorization") &&
       !request.headers.has("range");
-    if (!cacheable) return openNext.fetch(request, env, ctx);
+    if (!cacheable) return (await openNext()).fetch(request, env, ctx);
 
     const cache = caches.default;
     const key = cacheKey(request.url, env.CF_VERSION_METADATA?.id ?? "dev");

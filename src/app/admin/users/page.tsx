@@ -1,19 +1,22 @@
+import Link from "next/link";
+import { Eye } from "lucide-react";
 import { DataTable, type Column } from "@/components/admin/data-table";
 import { NoPermission } from "@/components/admin/no-permission";
 import { UserControls } from "@/components/admin/user-controls";
 import { PageHeader, SearchForm, Select, fmtDate } from "@/components/admin/ui";
 import { authedFetch, getMe } from "@/lib/api/server";
 import type { AdminUser, Paginated } from "@/lib/api/types";
-import { enumParam, intParam } from "@/lib/search-params";
+import { enumParam, first, intParam } from "@/lib/search-params";
 
 export default async function UsersPage(props: PageProps<"/admin/users">) {
   const me = await getMe();
   if (me?.role !== "admin") return <NoPermission />;
   const sp = await props.searchParams;
   const role = enumParam(sp.role, ["user", "moderator", "admin"] as const);
+  const q = first(sp.q)?.trim().slice(0, 120);
   const data = await authedFetch<Paginated<AdminUser>>(
     "/admin/users",
-    { query: { role, page: intParam(sp.page), size: 25 } },
+    { query: { role, q, page: intParam(sp.page), size: 25 } },
     "/admin/users",
   );
 
@@ -24,7 +27,7 @@ export default async function UsersPage(props: PageProps<"/admin/users">) {
       cell: (u) => (
         <div>
           <p className="font-medium">{u.display_name ?? "(no name)"}</p>
-          <p className="text-xs text-muted-foreground">{u.id}</p>
+          <p className="break-all text-xs text-muted-foreground">{u.email ?? "no email"}</p>
         </div>
       ),
     },
@@ -37,17 +40,24 @@ export default async function UsersPage(props: PageProps<"/admin/users">) {
     {
       key: "ctl",
       header: "Role / actions",
-      cell: (u) => <UserControls user={u} isSelf={u.id === me.id} />,
+      cell: (u) => (
+        <div className="space-y-2">
+          <UserControls user={u} isSelf={u.id === me.id} />
+          <Link
+            href={`/admin/users/${u.id}`}
+            className="inline-flex h-9 items-center gap-1.5 border-2 border-border bg-card px-3 text-xs font-bold uppercase tracking-wide shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-primary hover:text-primary-foreground hover:shadow-hard"
+          >
+            <Eye className="size-3.5" aria-hidden="true" /> View
+          </Link>
+        </div>
+      ),
     },
   ];
 
   return (
     <>
-      <PageHeader
-        title="Users"
-        description="Change roles and ban abusive accounts. Emails live in Supabase Auth."
-      />
-      <SearchForm action="/admin/users" placeholder="Search users by name, role or ID...">
+      <PageHeader title="Users" description="Change roles, ban abusive accounts, or open a user to see everything on their profile." />
+      <SearchForm action="/admin/users" q={q} placeholder="Search users by name, email or college...">
         <Select
           name="role"
           label="Role"
@@ -66,11 +76,11 @@ export default async function UsersPage(props: PageProps<"/admin/users">) {
         rows={data.items}
         rowKey={(u) => u.id}
         basePath="/admin/users"
-        params={{ role }}
+        params={{ role, q }}
         total={data.total}
         page={data.page}
         size={data.size}
-        emptyTitle="No users yet"
+        emptyTitle={q ? `No users match "${q}"` : "No users yet"}
       />
     </>
   );
