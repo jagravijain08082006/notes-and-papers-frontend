@@ -13,9 +13,23 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // A dropped connection while moving to another page (the page-data request fails) lands here, although the page itself is fine.
+  // Server errors carry a digest; network errors do not. For those, reload the page once by itself: a normal full page load
+  // works even when the in-page navigation did not. The guard stops a loop if the network is really down.
+  const networkError = !error.digest && /network|failed to fetch|load failed|fetch|aborted/i.test(error.message);
+
   useEffect(() => {
     console.error(error);
-  }, [error]);
+    if (!networkError) return;
+    try {
+      const last = Number(sessionStorage.getItem("np-auto-reload") ?? 0);
+      if (Date.now() - last < 15_000) return;
+      sessionStorage.setItem("np-auto-reload", String(Date.now()));
+    } catch {
+      return; // storage blocked: do not risk a reload loop
+    }
+    window.location.reload();
+  }, [error, networkError]);
 
   return (
     <section
@@ -44,7 +58,7 @@ export default function Error({
         <div className="flex flex-wrap gap-3 pt-1">
           <button
             type="button"
-            onClick={reset}
+            onClick={() => (networkError ? window.location.reload() : reset())}
             className={cn(buttonVariants({ variant: "primary", size: "lg" }))}
           >
             Try again
