@@ -13,10 +13,11 @@ import { plural } from "@/lib/utils";
 export const revalidate = 86400;
 export const dynamicParams = true;
 
-// Nothing is built in advance: Cloudflare's free KV allows about 1,000 cache writes a day and every deploy would spend
-// hundreds of them on pre-built pages. These pages are built on their first visit and then cached (see `revalidate`).
-export function generateStaticParams() {
-  return [];
+// Built at deploy time on Vercel (see src/lib/static-params.ts); anything else is built on first visit and then cached.
+export async function generateStaticParams() {
+  return (await prebuiltPaths("courses"))
+    .filter((p) => p.length === 3)
+    .map((p) => ({ university: p[1], course: p[2] }));
 }
 
 export async function generateMetadata(props: PageProps<"/universities/[university]/[course]">) {
@@ -38,6 +39,7 @@ export async function generateMetadata(props: PageProps<"/universities/[universi
 }
 
 import type { TermSummary } from "@/lib/api/types";
+import { prebuiltPaths } from "@/lib/static-params";
 
 interface TermGroup {
   title: string;

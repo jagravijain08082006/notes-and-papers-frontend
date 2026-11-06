@@ -24,6 +24,10 @@ const mono = Space_Mono({
   display: "swap",
 });
 
+// A page may have to wait for the API on Render's free plan to wake up (up to a minute): allow it on Vercel instead of the
+// short default. Pages already built never run this code.
+export const maxDuration = 60;
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {

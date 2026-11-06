@@ -14,42 +14,12 @@ const PRIVATE = ["/admin", "/account", "/bookmarks", "/upload"];
 /**
  * Keeps the session alive (swaps the refresh token for a new access token when the old one is about to expire)
  * and gates signed-in-only routes. Role checks (admin/moderator) are enforced again by the API and the admin layout.
+ *
+ * It does NOT run for a signed-out visitor on a public page (see `config.matcher`), so those pages are served straight from
+ * the host's cache without any code running: that is what makes them instant. (www and http redirects live in next.config.ts,
+ * the sitemap shorthand rewrite too.)
  */
 export async function proxy(request: NextRequest) {
-  const host = request.headers.get("host") || "";
-  const forwardedProto = request.headers.get("x-forwarded-proto");
-  const cfVisitor = request.headers.get("cf-visitor");
-  const isLocal = host.includes("localhost") || host.includes("127.0.0.1") || host.includes("::1");
-
-  const isHttp =
-    !isLocal &&
-    (forwardedProto === "http" ||
-      (cfVisitor ? cfVisitor.includes('"scheme":"http"') : false) ||
-      (!forwardedProto && request.nextUrl.protocol === "http:"));
-  const isWww = host.startsWith("www.");
-
-  // 301 Permanent Redirect for HTTP -> HTTPS and www -> non-www canonical domain
-  if (isHttp || isWww) {
-    const cleanHost = host.replace(/^www\./i, "");
-    const destination = new URL(
-      request.nextUrl.pathname + request.nextUrl.search,
-      `https://${cleanHost || "notesandpapers.dpdns.org"}`
-    );
-    return NextResponse.redirect(destination, 301);
-  }
-
-  // Rewrite shorthand sitemap URLs submitted in Google Search Console (e.g. /papers/1.xml -> /sitemaps/papers/1.xml)
-  const sitemapShorthand = request.nextUrl.pathname.match(
-    /^\/(papers|courses|subjects|exams|static)\/(\d+\.xml)$/
-  );
-  if (sitemapShorthand) {
-    const destination = new URL(
-      `/sitemaps/${sitemapShorthand[1]}/${sitemapShorthand[2]}`,
-      request.url
-    );
-    return NextResponse.rewrite(destination);
-  }
-
   const access = request.cookies.get(ACCESS_COOKIE)?.value;
   const refresh = request.cookies.get(REFRESH_COOKIE)?.value;
   let tokens: TokenPair | null = null;
@@ -90,5 +60,16 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api/|_next/|favicon.ico|robots.txt|sitemap|sitemaps/|indexnow).*)"],
+  matcher: [
+    // Signed-in visitors carry the refresh cookie (np_refresh): their session is kept alive on every page.
+    {
+      source: "/((?!api/|_next/|favicon.ico|robots.txt|sitemap|sitemaps/|indexnow).*)",
+      has: [{ type: "cookie", key: "np_refresh" }],
+    },
+    // Pages that need an account: a signed-out visitor is sent to the login page.
+    "/admin/:path*",
+    "/account/:path*",
+    "/bookmarks/:path*",
+    "/upload/:path*",
+  ],
 };

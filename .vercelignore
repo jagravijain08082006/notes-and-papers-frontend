@@ -1,0 +1,9 @@
+# Cloudflare build output and tooling: not part of a Vercel build
+.open-next
+.wrangler
+cache-worker.js
+app-worker.js
+wrangler*.jsonc
+open-next.config.ts
+schema.sql
+scripts

@@ -9,15 +9,16 @@ import { getUniversity } from "@/lib/api/public";
 import { routes } from "@/lib/routes";
 import { buildMetadata, collectionPageLd, itemListLd } from "@/lib/seo";
 import { plural } from "@/lib/utils";
+import { prebuiltPaths } from "@/lib/static-params";
 
 // Shorter than other pages: if the API was down during a build, the degraded page heals within the hour.
 export const revalidate = 3600;
 export const dynamicParams = true;
 
-// Nothing is built in advance: Cloudflare's free KV allows about 1,000 cache writes a day and every deploy would spend
-// hundreds of them on pre-built pages. These pages are built on their first visit and then cached (see `revalidate`).
-export function generateStaticParams() {
-  return [];
+// Built at deploy time on Vercel (see src/lib/static-params.ts); anything else is built on first visit and then cached.
+export async function generateStaticParams() {
+  const universities = new Set((await prebuiltPaths("courses")).filter((p) => p.length >= 3).map((p) => p[1]));
+  return [...universities].map((university) => ({ university }));
 }
 
 async function load(slug: string) {

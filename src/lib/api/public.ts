@@ -66,7 +66,7 @@ export const listPapers = (params: ListParams) =>
   apiFetch<Paginated<PaperSummary>>("/papers", {
     query: { ...params },
     tags: [tags.home],
-    revalidate: 300,
+    revalidate: 1800,
   });
 
 export const getLatestPapers = (size = 8) =>
@@ -112,9 +112,13 @@ export interface Features {
   link_only_mode: boolean;
 }
 
-/** What the deployment supports. Falls back to "paused" so a broken API never advertises a feature that fails. */
+/**
+ * What the deployment supports. Falls back to "paused" so a broken API never advertises a feature that fails.
+ * Cached for an hour: it is read by the shared header, and the shortest cache time found in a page becomes the page's own,
+ * so a short one here would make every page on the site expire after that time.
+ */
 export const getFeatures = (): Promise<Features> =>
-  apiFetch<Features>("/features", { revalidate: 60 }).catch(() => ({
+  apiFetch<Features>("/features", { revalidate: 3600, tags: ["features"] }).catch(() => ({
     uploads: false,
     stored_files: false,
     link_only_mode: true,
@@ -138,4 +142,4 @@ export interface SiteStats {
   exams: number;
 }
 
-export const getStats = () => apiFetch<SiteStats>("/stats", { tags: [tags.home], revalidate: 600 });
+export const getStats = () => apiFetch<SiteStats>("/stats", { tags: [tags.home], revalidate: 3600 });

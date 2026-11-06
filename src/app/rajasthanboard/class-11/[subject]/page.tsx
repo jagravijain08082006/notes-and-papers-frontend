@@ -5,6 +5,11 @@ import {
 
 export const revalidate = 3600;
 
+// Built on its first visit and cached from then on (an empty list is what turns on that caching for a dynamic page).
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata(props: {
   params: Promise<{ subject: string }>;
 }) {

@@ -1,14 +1,24 @@
 import type { NextConfig } from "next";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 
-// Gives `next dev` access to the Cloudflare bindings declared in wrangler.jsonc.
-initOpenNextCloudflareForDev();
+// Gives `next dev` access to the Cloudflare bindings declared in wrangler.jsonc. Not needed (and skipped) on Vercel.
+if (!process.env.VERCEL) initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  // Cloudflare Workers has no image optimiser without an extra paid product; the site only shows a few small icons.
+  // The site only shows a few small icons, so the image optimiser (and its per-plan quota) is not used on any host.
   images: { unoptimized: true },
   poweredByHeader: false,
+  // Pages are built at deploy time on Vercel (see src/lib/static-params.ts). The API on Render's free plan can take up to a
+  // minute to wake up, so a page may wait for it: give each page build room, and one retry, before the deploy is failed.
+  staticPageGenerationTimeout: 180,
+  experimental: {
+    // Be gentle with the API at deploy time (about 1,300 pages are built): a few at a time, and a failed page is retried
+    // before the deploy is failed.
+    cpus: 3,
+    staticGenerationMaxConcurrency: 3,
+    staticGenerationRetryCount: 3,
+  },
   turbopack: {
     rules: {
       "*.css": {
@@ -20,6 +30,22 @@ const nextConfig: NextConfig = {
   // The first release served one university at /rajasthan-university; keep those links (and their ranking) alive.
   async redirects() {
     return [
+      // www -> the plain domain, and http -> https. Answered here (not in proxy.ts) so ordinary page views never run a function.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.(?<host>.*)" }],
+        destination: "https://:host/:path*",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [
+          { type: "header", key: "x-forwarded-proto", value: "http" },
+          { type: "host", value: "(?<host>.*)" },
+        ],
+        destination: "https://:host/:path*",
+        permanent: true,
+      },
       {
         source: "/rajasthan-university/:path*",
         destination: "/universities/rajasthan-university/:path*",

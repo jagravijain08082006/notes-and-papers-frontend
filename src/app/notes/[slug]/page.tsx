@@ -12,6 +12,11 @@ import { cn } from "@/lib/utils";
 export const revalidate = 3600;
 export const dynamicParams = true;
 
+// Built on its first visit and cached from then on (an empty list is what turns on that caching for a dynamic page).
+export function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata(props: PageProps<"/notes/[slug]">) {
   const { slug } = await props.params;
   const n = await getNote(slug);

@@ -8,9 +8,17 @@ import { getSubject } from "@/lib/api/public";
 import type { PaperSummary } from "@/lib/api/types";
 import { paperHref, routes, yearRange } from "@/lib/routes";
 import { buildMetadata, collectionPageLd, faqLd, itemListLd, subjectMeta } from "@/lib/seo";
+import { prebuiltPaths } from "@/lib/static-params";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
+
+// Subject pages with a single paper are noindex and not in the sitemap, so they are built on first visit only.
+export async function generateStaticParams() {
+  return (await prebuiltPaths("subjects"))
+    .filter((p) => p.length === 5)
+    .map((p) => ({ university: p[1], course: p[2], term: p[3], subject: p[4] }));
+}
 
 type Props = PageProps<"/universities/[university]/[course]/[term]/[subject]">;
 

@@ -33,21 +33,43 @@ export function buildUrl(path: string, query?: Query) {
   return url.toString();
 }
 
+/** Reading from the API is retried: the API runs on a free plan that now and then drops a connection or is still waking up. */
+const RETRY_DELAYS_MS = [400, 1500, 4000];
+const TRANSIENT_STATUS = new Set([502, 503, 504]);
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function fetchWithRetry(url: string, init: RequestInit, safe: boolean): Promise<Response> {
+  const tries = safe ? RETRY_DELAYS_MS.length + 1 : 1; // only GETs: repeating a POST could do the action twice
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const res = await fetch(url, init);
+      if (!TRANSIENT_STATUS.has(res.status) || attempt >= tries - 1) return res;
+    } catch (e) {
+      if (init.signal?.aborted || attempt >= tries - 1) throw e;
+    }
+    await sleep(RETRY_DELAYS_MS[attempt]);
+  }
+}
+
 export async function apiFetch<T>(path: string, opts: ApiOptions = {}): Promise<T> {
   const { query, revalidate = 86400, tags, method = "GET", body, token, signal } = opts;
-  const res = await fetch(buildUrl(path, query), {
-    method,
-    signal,
-    headers: {
-      Accept: "application/json",
-      ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  const res = await fetchWithRetry(
+    buildUrl(path, query),
+    {
+      method,
+      signal,
+      headers: {
+        Accept: "application/json",
+        ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      ...(revalidate === false || process.env.NODE_ENV !== "production"
+        ? { cache: "no-store" as const }
+        : { next: { revalidate, tags: [...(tags ?? []), "catalog"] } }),
     },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-    ...(revalidate === false || process.env.NODE_ENV !== "production"
-      ? { cache: "no-store" as const }
-      : { next: { revalidate, tags: [...(tags ?? []), "catalog"] } }),
-  });
+    method === "GET",
+  );
 
   if (!res.ok) {
     let message = res.statusText || "Request failed";

@@ -17,8 +17,14 @@ import { kindLabel, routes, yearRange } from "@/lib/routes";
 import { buildMetadata, collectionPageLd, faqLd } from "@/lib/seo";
 import { plural } from "@/lib/utils";
 import type { ExamSection } from "@/lib/api/types";
+import { prebuiltPaths } from "@/lib/static-params";
 
 export const revalidate = 3600;
+
+// Built at deploy time on Vercel (see src/lib/static-params.ts); other exams are built on first visit.
+export async function generateStaticParams() {
+  return (await prebuiltPaths("exams")).filter((p) => p.length === 2).map((p) => ({ slug: p[1] }));
+}
 
 export async function generateMetadata(props: PageProps<"/exams/[slug]">) {
   const { slug } = await props.params;
