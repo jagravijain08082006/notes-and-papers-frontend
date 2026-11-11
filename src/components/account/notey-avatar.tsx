@@ -62,6 +62,25 @@ export function NoteyAvatar({
     );
   }
 
+  if (!onClick) {
+    return (
+      <div
+        className={`group relative inline-flex select-none ${className ?? ""}`}
+        title="Notey mascot"
+        aria-hidden="true"
+      >
+        <Avatar
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          definition={noteyDefinition as any}
+          animation={animation}
+          size={size}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          onAnimationEnd={onAnimationEnd as any}
+        />
+      </div>
+    );
+  }
+
   return (
     <button
       type="button"

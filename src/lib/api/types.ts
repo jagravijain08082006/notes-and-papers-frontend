@@ -382,3 +382,16 @@ export interface ExamSection {
 export interface ExamDetail extends ExamSummary {
   sections: ExamSection[];
 }
+
+export interface UserSupportMessage {
+  id: string;
+  reason: string;
+  details: string;
+  status: "open" | "resolved" | "dismissed" | string;
+  created_at: string;
+}
+
+export interface ReportOut {
+  id: string;
+  status: string;
+}

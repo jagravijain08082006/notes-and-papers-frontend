@@ -115,9 +115,9 @@ export function PageHeader({
   actions?: React.ReactNode;
 }) {
   return (
-    <header className="mb-8 flex flex-wrap items-end justify-between gap-4 min-w-0 max-w-full">
-      <div className="space-y-2 min-w-0 max-w-full">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl break-words leading-tight">{title}</h1>
+    <header className="mb-6 flex flex-wrap items-end justify-between gap-4 min-w-0 max-w-full">
+      <div className="space-y-1.5 min-w-0 max-w-full">
+        <h1 className="text-2xl sm:text-3xl font-display font-black uppercase tracking-wide break-words leading-tight">{title}</h1>
         {description && (
           <p className="max-w-2xl text-xs sm:text-sm text-muted-foreground leading-relaxed">{description}</p>
         )}

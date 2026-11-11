@@ -52,6 +52,7 @@ export const contactSchema = z.object({
   name: nameField,
   email: emailField,
   message: messageField,
+  reason: z.string().optional(),
 });
 
 export const reportSchema = z.object({

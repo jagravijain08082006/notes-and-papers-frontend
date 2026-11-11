@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/shared/site-header";
 import { SiteFooter } from "@/components/shared/site-footer";
 import { OfflineBanner } from "@/components/shared/offline-banner";
 import { SocialCommunityPopup } from "@/components/shared/social-popup";
-import { MascotGuide } from "@/components/shared/mascot-guide";
+import { SupportChat } from "@/components/shared/support-chat";
 import { JsonLdScript } from "@/components/shared/json-ld";
 import { SITE_NAME, SITE_URL } from "@/lib/env";
 
@@ -239,7 +239,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="flex min-h-full flex-col overflow-x-hidden">
+      <body className="flex min-h-full flex-col overflow-x-clip">
         <Providers>
           <Suspense fallback={null}>
             <RouteProgressBar />
@@ -254,13 +254,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SiteHeader />
           <main
             id="main"
-            className="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-hidden px-3.5 py-8 sm:px-6 sm:py-10 lg:py-14"
+            className="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-clip px-3.5 py-8 sm:px-6 sm:py-10 lg:py-14"
           >
             {children}
           </main>
           <SiteFooter />
           <SocialCommunityPopup />
-          <MascotGuide />
+          <SupportChat />
         </Providers>
       </body>
     </html>

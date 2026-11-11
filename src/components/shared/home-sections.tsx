@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, GraduationCap, RefreshCw, School, Shuffle } from "lucide-react";
+import { ArrowRight, Award, GraduationCap, RefreshCw, School, Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useExams, useLatestPapers, useUniversities } from "@/hooks/use-catalog";
@@ -88,7 +88,20 @@ function TileSkeletons() {
 
 const POPULAR_SCHOOL_BOARDS = [
   {
-    // Rajasthan Board has its own card at the top of the page; this one leads to every other exam.
+    slug: "school-boards-hub",
+    name: "School Boards",
+    subtitle: "RBSE, CBSE, UP Board, ICSE · Class 10th & 12th",
+    href: "/boards",
+    tags: [
+      { label: "RBSE Board (9th–12th)", href: "/rajasthanboard" },
+      { label: "CBSE All India", href: "/exams/uni-cbseboardonline" },
+      { label: "UP Board (UPMSP)", href: "/exams/uni-upboardonline" },
+      { label: "ICSE & ISC", href: "/exams/uni-icseonline" },
+      { label: "MP Board", href: "/exams/uni-mpboardonline" },
+      { label: "All School Boards", href: "/boards" },
+    ],
+  },
+  {
     slug: "other-exams",
     name: "Other Exams",
     subtitle: "Competitive exams · UPSC, SSC, NEET, GATE",
@@ -100,6 +113,19 @@ const POPULAR_SCHOOL_BOARDS = [
       { label: "GATE", href: "/exams/gate" },
       { label: "NEET", href: "/exams/neet" },
       { label: "All exams", href: "/exams" },
+    ],
+  },
+  {
+    slug: "uni-rajasthanboard",
+    name: "Rajasthan Board (RBSE)",
+    subtitle: "Secondary & Sr. Sec · Ajmer Board",
+    href: "/rajasthanboard",
+    tags: [
+      { label: "Class 10th Board", href: "/rajasthanboard" },
+      { label: "Class 12th Science", href: "/rajasthanboard" },
+      { label: "Class 12th Arts", href: "/rajasthanboard" },
+      { label: "Class 12th Commerce", href: "/rajasthanboard" },
+      { label: "Model Papers", href: "/rajasthanboard" },
     ],
   },
   {
@@ -175,7 +201,9 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
   const showUnis = activeTab === "all" || activeTab === "universities";
   const showBoards = activeTab === "all" || activeTab === "boards";
   const displayedBoards =
-    activeTab === "all" ? POPULAR_SCHOOL_BOARDS.slice(0, 2) : POPULAR_SCHOOL_BOARDS;
+    activeTab === "all"
+      ? POPULAR_SCHOOL_BOARDS.slice(0, 2)
+      : POPULAR_SCHOOL_BOARDS.filter((b) => b.slug !== "other-exams");
 
   return (
     <section aria-labelledby="courses-heading" className="space-y-8">
@@ -257,7 +285,11 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
                 >
                   <span className="block space-y-3 min-w-0">
                     <span className="grid size-11 place-items-center border-2 border-border bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground shadow-hard-sm">
-                      <School className="size-5" aria-hidden="true" />
+                      {b.slug === "other-exams" ? (
+                        <Award className="size-5" aria-hidden="true" />
+                      ) : (
+                        <School className="size-5" aria-hidden="true" />
+                      )}
                     </span>
                     <span className="block font-display text-2xl sm:text-3xl uppercase leading-[1.2] break-words group-hover:text-link transition-colors">
                       {b.name}

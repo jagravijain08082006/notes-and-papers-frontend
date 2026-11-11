@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Eye } from "lucide-react";
+import { Eye, MessageSquare } from "lucide-react";
 import { AdminAction } from "@/components/admin/admin-action";
 import { DataTable, type Column } from "@/components/admin/data-table";
 import { NoPermission } from "@/components/admin/no-permission";
@@ -25,29 +25,29 @@ export default async function UsersPage(props: PageProps<"/admin/users">) {
     {
       key: "name",
       header: "User",
-      className: "min-w-[14rem]",
+      className: "min-w-[11rem] max-w-[14rem]",
       cell: (u) => (
         <div className="space-y-0.5">
           <Link
             href={`/admin/users/${u.id}`}
-            className="font-bold text-foreground hover:text-link hover:underline line-clamp-1 transition-colors"
+            className="text-xs sm:text-sm font-bold text-foreground hover:text-link hover:underline line-clamp-1 transition-colors"
           >
             {u.display_name ?? "(no name)"}
           </Link>
-          <p className="break-all text-xs text-muted-foreground">{u.email ?? "no email"}</p>
+          <p className="break-all text-[11px] text-muted-foreground truncate">{u.email ?? "no email"}</p>
         </div>
       ),
     },
     {
       key: "role",
       header: "Role",
-      className: "w-36 whitespace-nowrap",
+      className: "w-32 whitespace-nowrap",
       cell: (u) => <UserRoleSelect user={u} isSelf={u.id === me.id} compact />,
     },
     {
       key: "banned",
       header: "Status",
-      className: "w-28 whitespace-nowrap",
+      className: "w-24 whitespace-nowrap",
       cell: (u) => (
         <span
           className={
@@ -63,17 +63,27 @@ export default async function UsersPage(props: PageProps<"/admin/users">) {
     {
       key: "joined",
       header: "Joined",
-      className: "w-40 text-xs text-muted-foreground whitespace-nowrap",
+      className: "w-36 text-xs text-muted-foreground whitespace-nowrap",
       cell: (u) => fmtDate(u.created_at),
     },
     {
       key: "ctl",
       header: "Actions",
-      className: "w-44 text-right whitespace-nowrap",
+      className: "w-52 text-right whitespace-nowrap",
       cell: (u) => {
         const isSelf = u.id === me.id;
         return (
           <div className="flex items-center justify-end gap-1.5">
+            {u.email && (
+              <Link
+                href={`/admin/reports?q=${encodeURIComponent(u.email)}`}
+                title="View user chat and queries"
+                className="inline-flex h-8 items-center gap-1 border-2 border-border bg-muted/40 px-2 text-xs font-bold uppercase tracking-wider shadow-hard-sm transition-all hover:bg-primary hover:text-primary-foreground hover:shadow-hard active:translate-x-px active:translate-y-px"
+              >
+                <MessageSquare className="size-3.5" aria-hidden="true" />
+                <span>Chat</span>
+              </Link>
+            )}
             <Link
               href={`/admin/users/${u.id}`}
               className="inline-flex h-8 items-center gap-1 border-2 border-border bg-card px-2.5 text-xs font-bold uppercase tracking-wider shadow-hard-sm transition-all hover:bg-primary hover:text-primary-foreground hover:shadow-hard active:translate-x-px active:translate-y-px"

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -7,7 +8,6 @@ import {
   ClipboardCheck,
   Database,
   FileText,
-  Flag,
   Gauge,
   BookImage,
   History,
@@ -19,8 +19,10 @@ import {
   Settings,
   Users,
   Globe,
+  MessageSquare,
 } from "lucide-react";
-import type { Role } from "@/lib/api/types";
+import { bff } from "@/services/api-client";
+import type { AdminReport, Paginated, Role } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
@@ -28,7 +30,7 @@ const ITEMS = [
   { href: "/admin/review", label: "Review queue", icon: ClipboardCheck },
   { href: "/admin/papers", label: "Papers", icon: FileText },
   { href: "/admin/notes", label: "Notes", icon: Inbox },
-  { href: "/admin/reports", label: "Reports", icon: Flag },
+  { href: "/admin/reports", label: "Support & Queries", icon: MessageSquare },
   { href: "/admin/imports", label: "Crawler", icon: Upload, admin: true },
   { href: "/admin/sources", label: "Sources", icon: Globe, admin: true },
   { href: "/admin/runs", label: "Crawl runs", icon: History, admin: true },
@@ -46,28 +48,62 @@ const ITEMS = [
 export function AdminNav({ role }: { role: Role }) {
   const path = usePathname();
   const items = ITEMS.filter((i) => !i.admin || role === "admin");
+  const [openQueriesCount, setOpenQueriesCount] = useState<number | null>(null);
+
+  // Poll on navigation and every 30s for any new open student support queries
+  useEffect(() => {
+    let cancelled = false;
+
+    const checkOpenQueries = () => {
+      bff<Paginated<AdminReport>>("admin/reports?status=open&size=1")
+        .then((res) => {
+          if (!cancelled && typeof res?.total === "number") {
+            setOpenQueriesCount(res.total);
+          }
+        })
+        .catch(() => {});
+    };
+
+    checkOpenQueries();
+    const interval = setInterval(checkOpenQueries, 30000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [path]);
+
   return (
-    <div className="flex flex-col gap-3 min-w-0 max-w-full w-full overflow-x-hidden">
+    <div className="flex flex-col gap-3 min-w-0 max-w-full w-full">
       <nav
         aria-label="Admin"
         className="flex w-full min-w-0 max-w-full gap-1.5 overflow-x-auto pb-2 border-b-2 border-border/30 lg:border-none lg:flex-col lg:overflow-visible lg:pb-0 scroll-smooth [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
       >
         {items.map(({ href, label, icon: Icon }) => {
           const active = href === "/admin" ? path === href : path.startsWith(href);
+          const isSupport = href === "/admin/reports";
+          const hasUnseen = isSupport && openQueriesCount && openQueriesCount > 0;
+
           return (
             <Link
               key={href}
               href={href}
-              // Admin pages are rarely opened one after another: no background fetch of all 17 pages on every visit.
               prefetch={false}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex shrink-0 items-center gap-2 border-2 border-transparent px-3 py-2 text-xs font-bold uppercase tracking-wide hover:border-border hover:bg-muted transition-colors",
+                "flex shrink-0 items-center gap-2 border-2 border-transparent px-3 py-2 text-xs font-bold uppercase tracking-wide hover:border-border hover:bg-muted transition-colors relative",
                 active && "border-border bg-primary text-primary-foreground shadow-hard-sm",
               )}
             >
               <Icon className="size-4 shrink-0" aria-hidden="true" />
               <span className="whitespace-nowrap">{label}</span>
+
+              {/* Real-time unread/open indicator badge */}
+              {hasUnseen ? (
+                <span className="ml-auto inline-flex items-center px-1.5 py-0.2 text-[10px] font-black border border-border bg-destructive text-destructive-foreground shadow-hard-xs animate-pulse">
+                  {openQueriesCount}
+                </span>
+              ) : null}
             </Link>
           );
         })}
@@ -75,4 +111,3 @@ export function AdminNav({ role }: { role: Role }) {
     </div>
   );
 }
-
