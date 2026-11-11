@@ -55,7 +55,9 @@ export async function SiteHeader() {
         <NavLinks items={NAV} />
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <ThemeToggle />
+          <div className="hidden sm:block">
+            <ThemeToggle />
+          </div>
           {/* a thin line separates the theme switch from the account buttons */}
           <span aria-hidden="true" className="mx-0.5 hidden h-6 w-0.5 bg-border/60 sm:block" />
           <UserMenu />
@@ -105,6 +107,20 @@ export async function SiteHeader() {
                     {n.label}
                   </Link>
                 ))}
+              </div>
+              <div className="border-t-2 border-border/60 pt-2.5 mt-2 px-3 flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Theme
+                </span>
+                <ThemeToggle />
+              </div>
+              <div className="border-t-2 border-border/60 pt-2 mt-2">
+                <Link
+                  href="/signup"
+                  className="block w-full text-center py-2 bg-primary text-primary-foreground border-2 border-border font-bold uppercase text-xs shadow-hard-sm hover:shadow-hard transition-all"
+                >
+                  Create Account (Sign Up)
+                </Link>
               </div>
             </nav>
           </DetailsMenu>

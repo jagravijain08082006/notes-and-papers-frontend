@@ -26,23 +26,26 @@ export function UserMenu() {
 
   if (!me) {
     return (
-      <>
+      <div className="flex items-center gap-1.5 sm:gap-2">
         <Link
           href="/login"
           className={cn(
-            buttonVariants({ variant: "ghost", size: "sm" }),
-            "hidden xs:inline-flex",
+            buttonVariants({ variant: "outline", size: "sm" }),
+            "h-8 px-2.5 text-xs font-bold uppercase tracking-wider sm:h-9 sm:px-3",
           )}
         >
           Log in
         </Link>
         <Link
           href="/signup"
-          className={cn(buttonVariants({ size: "sm" }), "hidden xs:inline-flex")}
+          className={cn(
+            buttonVariants({ size: "sm" }),
+            "hidden sm:inline-flex h-9 px-3 text-xs font-bold uppercase tracking-wider",
+          )}
         >
           Sign up
         </Link>
-      </>
+      </div>
     );
   }
 
