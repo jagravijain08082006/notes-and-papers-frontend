@@ -68,6 +68,20 @@
 - **ADR-040 Scrollbar UX Normalization & Admin Sidebar Scrollbar Elimination.**
   1. **Global Scrollbar Modernization:** In `src/app/globals.css`, removed the awkward, clunky Windows stepper arrow buttons using `::-webkit-scrollbar-button { display: none !important; }`. Narrowed scrollbar width from 14px to a modern 8px pill thumb with transparent track and smooth gold hover state. Added `.no-scrollbar` cross-browser utility.
   2. **Admin Sidebar Scrollbar Removal:** In `src/app/admin/layout.tsx`, removed `scroll-slim` and applied `no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden` to the `<aside>` sidebar container so that no scrollbar is displayed in the admin panel while maintaining mouse-wheel scrolling capability.
+- **ADR-041 Support Chat Console & Helpdesk Architecture.** Replaced the static `/admin/reports` table with a dedicated two-pane Helpdesk Chat Console (`SupportChatConsole` in `src/components/admin/support-chat-console.tsx`). Features:
+  1. **Two-Way Thread Grouping:** Isolates student inquiries strictly by verified email/ticket ID so multiple student tickets never merge into one thread.
+  2. **Window Jump Elimination:** Replaced whole-page `scrollIntoView()` with inner-container scrolling `chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight`.
+  3. **Real-Time Unread Indicators:** Implemented a 30s background poll in `AdminNav` with a pulsing red counter badge, and visual unread indicator dots on individual student threads in the console.
+  4. **Student Chat Widget (`SupportChat`):** Student-facing study companion in `src/components/shared/support-chat.tsx` with animated Notey avatar, automated ticket submission, and manual status refresh.
+  5. **Deduplication & Hygiene:** Added `sanitizeMessages` to deduplicate greetings and tour completion alerts on mount, and added a one-click "Clear Chat" history action.
+  6. **Hydration Warning Fix:** Refactored `NoteyAvatar` (`src/components/account/notey-avatar.tsx`) to render semantic `<div>` when `onClick` is omitted, eliminating invalid HTML `<button>` inside `<button>` errors.
+- **ADR-042 Academic Hub 4-Card Hierarchy & Distinct Badging.** Standardized the home page "All (Universities & Boards)" section cards in `src/components/shared/home-sections.tsx` into exact sequence:
+  1. **Rajasthan Technical University (RTU)**
+  2. **Rajasthan University (UNIRAJ)**
+  3. **School Boards Hub** (RBSE, CBSE, UP Board, ICSE, MP Board, All School Boards)
+  4. **Other Exams** (Competitive exams: SSC, SBI Clerk, UPSC, GATE, NEET)
+  Differentiated card icons by using `<School />` for school boards and `<Award />` for competitive examinations.
+- **ADR-043 Next.js BFF Proxy Enforcement for Browser Support APIs.** Browser-side client code must never invoke cross-origin Render backend endpoints directly using `apiFetch`, as Render blocks `localhost:3010` under strict production CORS. All client support calls route through same-origin BFF proxy (`bff("contact", ...)` -> `/api/backend/contact`), which forwards server-to-server. Also removed `status=all` from queries to ensure 100% compliance with FastAPI's strict literal enum validation.
 
 
 

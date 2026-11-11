@@ -1,42 +1,35 @@
-# Handover (2026-10-26, seventh pass)
+# Handover (2026-11-11, eighth pass)
 
 ## State
-- **Live Production Deployment:** Deployed to Cloudflare Workers on custom domain [https://notesandpapers.dpdns.org](https://notesandpapers.dpdns.org).
-  - Version ID: `bcbc123c-087e-480e-842b-fae82a7adcc5`.
-  - Custom Domains & Triggers: `notesandpapers.dpdns.org` and `www.notesandpapers.dpdns.org` (`custom_domain: true`).
-  - Cache: 133 pre-rendered incremental cache entries uploaded to KV namespace `NEXT_INC_CACHE_KV`.
-  - Assets: 78 static assets and chunks uploaded to Cloudflare Asset Storage.
-- **Backend Production API:** [https://backend.notesandpapers.dpdns.org/health](https://backend.notesandpapers.dpdns.org/health) (HTTP 200 OK, running on Render).
-- **Google Sitelinks, Favicon Strict Compliance & UNIRAJ Keywords (ADR-039):**
-  - **Sitelinks Schema:** Embedded Schema.org `@graph` with `WebSite`, `Organization`, and an array of `SiteNavigationElement` entries in `src/app/layout.tsx` targeting primary courses (`UNIRAJ B.Com`, `B.Sc`, `BCA`, `B.Ed`, `B.A`, `RTU Kota B.Tech`, `RBSE`, `CBSE`).
-  - **Favicon Strict Compliance:** Removed undersized `16x16` and `32x32` tags from `metadata.icons` (preventing Google rejection under Google's 48px+ favicon rule). Placed `src/app/icon.png` (192x192) and `src/app/apple-icon.png` (180x180) for native App Router static metadata serving.
-  - **High-Intent Regional Keywords:** Injected `UNIRAJ`, `UOR`, `RU Jaipur`, and `RTU Kota` into `src/lib/seo.ts` (`courseMeta`), `src/app/universities/[university]/page.tsx` (`generateMetadata` & `<h1>`), and backend `app/ingest/seo_meta.py`.
-  - **Footer Internal Link Equity:** Added a dedicated 5th column "Programmes" in `src/components/shared/site-footer.tsx` linking to high-traffic course pages sitewide.
-- **Build & Health:** Production build (`npm run build`) and Cloudflare OpenNext deploy pass cleanly with 0 TypeScript/Turbopack errors (49/49 static and dynamic pages generated).
-- **Seobility Audit & Server Configuration Hardening (ADR-038):**
-  - **301 Permanent Redirects:** Enforced in `src/proxy.ts` middleware for all non-HTTPS (`http://`) and `www.*` requests to the canonical apex (`https://notesandpapers.dpdns.org`). Deployed Cloudflare custom domain trigger for `www.notesandpapers.dpdns.org` so DNS resolves to Cloudflare IPs.
-  - **HSTS Preload:** Added `Strict-Transport-Security: max-age=31536000; includeSubDomains; preload` in `next.config.ts`.
-  - **Zero Dynamic Parameter Internal Links:** Replaced search query links (`/search?q=...`) in home school board cards with clean static board routes (`/exams/${b.slug}`) with unique `aria-label` tags.
-  - **Meta Description Budget:** Trimmed homepage meta description to 141 characters across `page.tsx` and `layout.tsx` (well under 1000px budget), and capped generic SEO helper in `seo.ts` to 150 chars.
-  - **Image Alt Attributes:** Added `alt="Notes & Papers Logo"` to both site header and site footer logo `<Image>` tags, and fallback alt text for avatar images.
-  - **H1 Content Echoing:** Aligned leading hero paragraph in `src/app/page.tsx` to verbatim include `previous year papers` and `turn study into success` directly below `<h1>`.
-- **Paper Numbers & Sequential Badges:**
-  - Added `BOARD_CLEAN_NAMES` and `cleanExamTitle` in `src/lib/exam-categories.ts` to normalize crawler names.
-  - `PaperCard` and `PaperList` display explicit `Paper #{index + 1}` badges when multiple papers exist for a subject or year.
-  - Total paper count and section badge counts synchronized in `exams/[slug]/page.tsx`.
-- **School & State Education Boards Integration:**
-  - Upgraded home page "Browse by university" into "Browse by university & school boards". Added major boards (RBSE, CBSE, UP Board, ICSE, MP Board, CG Open School) with neo-brutalist cards and filter pills (`All`, `Universities`, `School Boards`).
-  - Added dedicated boards section with class/stream tags in `src/app/universities/page.tsx`.
-- **UI/UX & Performance:**
-  - Enforced minimum 16px font-size (`text-base` / `text-[16px]`) across all inputs, textareas, and selects sitewide to prevent mobile zoom.
-  - Added slide-in `CommunityPopup` linking to Telegram (@notes_and_papers) and Instagram (@exam.notes.and.papers) with 10s auto-dismiss.
-  - In-flight request deduplication map in `src/services/queries.ts` (`getJson`) preventing duplicate concurrent fetches.
-  - Custom `useDebounce` hook in `src/hooks/use-debounce.ts` applied to search (450ms) and catalog (250ms).
+- **Live Production Deployments:**
+  - **Vercel Production Deployment:** [https://notes-and-papers-frontend-5ywo31agi-the-coding-giants-projects.vercel.app](https://notes-and-papers-frontend-5ywo31agi-the-coding-giants-projects.vercel.app) (HTTP 200 OK, Git Commit `feebbc9`).
+  - **Custom Domain:** [https://notesandpapers.dpdns.org](https://notesandpapers.dpdns.org) (Cloudflare edge, HTTP 200 OK).
+- **Backend Production API:** [https://backend.notesandpapers.dpdns.org/health](https://backend.notesandpapers.dpdns.org/health) / Render [https://notes-and-papers-backend.onrender.com/healthz](https://notes-and-papers-backend.onrender.com/healthz) (HTTP 200 OK, Git Commit `2fa97f5`).
+- **Support Chat Console & Helpdesk Hub (ADR-041):**
+  - **Two-Pane Admin Helpdesk (`SupportChatConsole`):** Replaced legacy reports table with dedicated two-pane conversation console in `/admin/reports` (`src/components/admin/support-chat-console.tsx`). Features live search across students/queries, unread message indicators, and quick status toggle (`Resolve` / `Reopen`).
+  - **Window Scroll Jumping Eliminated:** Replaced whole-window `scrollIntoView()` with inner-container scrolling `chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight`, preventing page jumps when clicking conversations.
+  - **Individual Student Thread Isolation:** Groups messages strictly by student email/ticket ID so conversations never cross-contaminate.
+  - **Real-Time Notification Badges:** Integrated a 30s polling cycle in `src/components/admin/admin-nav.tsx` displaying a live red pulsing count badge for open queries. Unopened conversations in `SupportChatConsole` display a glowing dot and bold header, automatically marking as seen upon selection.
+- **Guest Support Chat Companion (`SupportChat` - ADR-041):**
+  - **Clean Status Badging:** Removed permanent black status dots from mascot button and header; notification dot renders strictly when an unread admin response arrives.
+  - **Message Deduplication & Reset:** Sanitizes stored messages on mount via `sanitizeMessages`, prevents repeated "Tour completed!" appends, and provides a one-click "Clear Chat" history action (`Trash2`).
+  - **Hydration Fix:** Refactored `NoteyAvatar` (`src/components/account/notey-avatar.tsx`) to render semantic `<div>` when `onClick` is absent, permanently resolving the HTML `<button>` inside `<button>` hydration error.
+- **BFF Same-Origin Proxying for Client APIs (ADR-043):**
+  - Routed all client support actions (`POST /contact`, `GET /contact/my`) through same-origin Next.js BFF proxy (`/api/backend/contact`). Next.js performs server-to-server dispatch to FastAPI, completely bypassing cross-origin CORS limitations on Render.
+  - Fixed FastAPI 422 enum validation by eliminating `status=all` from report fetch queries.
+- **Academic Hub 4-Card Hierarchy (ADR-042):**
+  - Standardized "All (Universities & Boards)" section cards on homepage (`src/components/shared/home-sections.tsx`) into exact sequence:
+    1. **Rajasthan Technical University (RTU)**
+    2. **Rajasthan University (UNIRAJ)**
+    3. **School Boards Hub** (RBSE, CBSE, UP Board, ICSE, MP Board, All School Boards)
+    4. **Other Exams** (Competitive exams: SSC, SBI Clerk, UPSC, GATE, NEET)
+  - Applied distinctive visual styling: `School` icon for boards, `Award` icon for competitive exams.
+- **Build & Health:** Production build (`npm run check`) passes with 0 TypeScript and 0 ESLint errors.
 
 ## Known gaps / next
-1. Inspect and Request Indexing for `https://notesandpapers.dpdns.org/` in Google Search Console to refresh Google's index cache.
+1. Inspect and Request Indexing for top university/board hub URLs in Google Search Console to accelerate crawl queue processing.
 2. Turnstile captcha integration on signup/upload/report (phase 4).
-3. Connect dedicated apex domain (e.g. `notesandpapers.in` or `notesandpapers.com`) when ready for permanent brand equity.
+3. Connect dedicated custom apex domain (e.g. `notesandpapers.in` or `notesandpapers.com`) when ready for permanent brand equity.
 
 ## Read first next time
 `.agents/AGENTS.md`, `decisions.md`, `component_registry.md`, `deployment.md`, `module_index.md`.

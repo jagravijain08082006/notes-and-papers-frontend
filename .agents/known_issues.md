@@ -25,5 +25,10 @@
 - **Meta description length exceeding 1000px budget (Resolved):** Shortened homepage meta description to 141 characters across `page.tsx` and `layout.tsx`, and capped SEO helper to 150 characters.
 - **Missing image alt attributes (Resolved):** Added explicit alt text to site header, site footer, and avatar components.
 - **H1 keywords absent from page content (Resolved):** Updated leading hero paragraph on home page to prominently repeat "previous year papers" and "turn study into success".
+- **Window scroll jumping on conversation select (Resolved):** `chatEndRef.current.scrollIntoView()` scrolled the entire browser window whenever an admin clicked a student thread. Replaced with inner container scroll: `chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight`.
+- **Nested button hydration error (Resolved):** `SupportChat` rendered `<button><NoteyAvatar /></button>` where `NoteyAvatar` also returned a `<button>`. Added conditional check in `NoteyAvatar` to render semantic `<div>` when `onClick` is omitted.
+- **Client CORS block on support inquiries (Resolved):** `apiFetch("/contact/my")` directly targeted Render backend from `localhost:3010`, triggering browser CORS blocks. Switched client calls to same-origin Next.js BFF proxy (`/api/backend/contact`).
+- **Admin reports 422 Unprocessable Entity (Resolved):** FastAPI strictly validated `status: Literal["open", "resolved", "dismissed"]`. Querying `status=all` failed validation. Removed `status=all` from queries and handled filtering client-side.
+- **Persistent black dot and duplicate messages in student chat (Resolved):** Removed hardcoded status dots from mascot button; conditioned indicator strictly on unread admin replies. Added `sanitizeMessages` to deduplicate stored tour completion alerts and added a "Clear Chat" button.
 
 

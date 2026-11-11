@@ -31,6 +31,8 @@
 - **BookmarkButton / ReportDialog (supports variant, size) / PdfPreview:** src/components/shared/{bookmark-button,report-dialog,pdf-preview}.tsx
 - **PaperPage (high-impact hero download card + trust badges):** src/components/shared/paper-page.tsx
 - **UploadForm / ContactForm (min 16px font inputs):** src/components/shared/{upload-form,contact-form}.tsx
+- **SupportChat (floating study companion, interactive tour, quick request chips, deduplicated chat history):** src/components/shared/support-chat.tsx
+- **NoteyAvatar (animated mascot avatar with conditional semantic div/button rendering):** src/components/account/notey-avatar.tsx
 
 ## hooks & lib utilities
 - **useDebounce (delay-based generic debounce hook):** src/hooks/use-debounce.ts
@@ -40,6 +42,8 @@
 - **getJson (in-flight request deduplication map):** src/services/queries.ts
 
 ## admin (src/components/admin)
+- **SupportChatConsole (two-pane helpdesk console, student conversation threads, live unread badges, status actions):** support-chat-console.tsx
+- **ReportReplyDialog (individual ticket reply modal with direct status resolution):** report-reply-dialog.tsx
 - **AdminNav, NoPermission, DataTable (min-w-[54rem] scroll-slim), StatCard, BarChart, StatusBadge, PageHeader, SearchForm (uniform h-11), Select:** admin-nav.tsx, no-permission.tsx, data-table.tsx, ui.tsx
 - **InstantSyncButton (GitHub Actions daily-sync trigger with toast):** instant-sync-button.tsx
 - **AdminAction (button -> API -> toast -> refresh):** admin-action.tsx
