@@ -41,7 +41,6 @@ const TESTS = [
     ok: "Storage works: wrote, read and deleted a test file",
   },
   { id: "telegram", label: "Test Telegram", ok: "Test message sent to the backup channel" },
-  { id: "drive", label: "Test Google Drive", ok: "Google Drive folder is reachable" },
   {
     id: "revalidate",
     label: "Test website refresh",
@@ -52,13 +51,18 @@ const TESTS = [
 export default async function SystemPage() {
   if ((await getMe())?.role !== "admin") return <NoPermission />;
   const sys = await authedFetch<System>("/admin/system", {}, "/admin/system");
-  const groups = [...new Set(sys.checks.map((c) => c.group))];
+
+  // Filter out unused legacy checks (e.g. Google Drive backup, which was replaced by B2 & Telegram)
+  const checks = sys.checks.filter(
+    (c) => !c.label.toLowerCase().includes("google drive"),
+  );
+  const groups = [...new Set(checks.map((c) => c.group))];
 
   return (
     <>
       <PageHeader
         title="System status"
-        description="What is configured on the server and what still needs attention. Secret values are never shown: change them in the server's environment variables (.env locally, the hosting dashboard in production)."
+        description="Server configuration, storage connections, and security health diagnostics. Secret keys are managed in environment variables."
         actions={
           <div className="flex flex-wrap gap-2">
             {TESTS.map((t) => (
@@ -73,11 +77,11 @@ export default async function SystemPage() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 min-w-0 max-w-full w-full">
         <StatCard
           label="Environment"
           value={sys.environment}
-          hint={sys.production ? "production rules on" : "development"}
+          hint={sys.production ? "Production mode enabled" : "Development mode"}
         />
         <StatCard
           label="Needs fixing"
@@ -92,7 +96,7 @@ export default async function SystemPage() {
         <StatCard
           label="PDFs branded"
           value={`${sys.papers.branded.toLocaleString("en-IN")} / ${sys.papers.published.toLocaleString("en-IN")}`}
-          hint="stored in our own storage"
+          hint="Stored in B2 storage vault"
         />
       </div>
 
@@ -105,30 +109,30 @@ export default async function SystemPage() {
         </p>
       )}
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2 min-w-0 max-w-full w-full">
         {groups.map((g) => (
           <section
             key={g}
             aria-labelledby={`g-${g}`}
-            className="border-2 border-border bg-card shadow-hard-sm"
+            className="border-2 border-border bg-card shadow-hard-sm min-w-0 max-w-full overflow-hidden"
           >
-            <h2 id={`g-${g}`} className="border-b-2 border-border px-4 py-3 text-xl">
+            <h2 id={`g-${g}`} className="border-b-2 border-border px-4 py-3 text-lg sm:text-xl font-bold uppercase tracking-wide">
               {g}
             </h2>
             <ul className="divide-y text-sm">
-              {sys.checks
+              {checks
                 .filter((c) => c.group === g)
                 .map((c) => (
-                  <li key={c.label} className="flex items-start gap-3 px-4 py-3">
-                    <Badge className={`mt-0.5 w-14 shrink-0 justify-center ${TONE[c.status]}`}>
+                  <li key={c.label} className="flex items-start gap-3 px-4 py-3 min-w-0">
+                    <Badge className={`mt-0.5 w-14 shrink-0 justify-center font-bold uppercase text-[10px] tracking-wider ${TONE[c.status]}`}>
                       {LABEL[c.status]}
                     </Badge>
                     <span className="min-w-0 flex-1">
-                      <span className="block font-medium">{c.label}</span>
-                      <span className="block break-words text-muted-foreground">{c.detail}</span>
+                      <span className="block font-semibold text-foreground">{c.label}</span>
+                      <span className="block break-words text-xs text-muted-foreground mt-0.5">{c.detail}</span>
                       {c.fix && c.status !== "ok" && (
-                        <span className="mt-1 block break-words text-xs font-medium">
-                          How to fix: {c.fix}
+                        <span className="mt-1 block break-words text-xs font-semibold text-destructive">
+                          Fix: {c.fix}
                         </span>
                       )}
                     </span>

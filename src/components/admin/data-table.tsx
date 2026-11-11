@@ -27,6 +27,7 @@ interface DataTableProps<T> {
   emptyTitle?: string;
   emptyDescription?: string;
   caption: string;
+  minWidth?: string;
 }
 
 function href(base: string, params: Record<string, string | undefined>) {
@@ -49,12 +50,13 @@ export function DataTable<T>({
   emptyTitle = "Nothing here yet",
   emptyDescription = "When there is something to show, it will appear here.",
   caption,
+  minWidth = "min-w-[44rem]",
 }: DataTableProps<T>) {
   if (rows.length === 0) return <EmptyState title={emptyTitle} description={emptyDescription} />;
   return (
-    <div className="space-y-3 min-w-0 max-w-full">
+    <div className="space-y-3 min-w-0 max-w-full w-full overflow-x-hidden">
       <div className="scroll-slim overflow-x-auto border-2 border-border bg-card shadow-hard-sm [-webkit-overflow-scrolling:touch]">
-        <table className="w-full min-w-[54rem] text-left text-sm border-collapse">
+        <table className={`w-full ${minWidth} text-left text-sm border-collapse`}>
           <caption className="sr-only">{caption}</caption>
           <thead className="bg-muted/80 text-xs uppercase tracking-wider font-bold text-foreground border-b-2 border-border">
             <tr>

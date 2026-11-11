@@ -47,7 +47,7 @@ export function AdminNav({ role }: { role: Role }) {
   const path = usePathname();
   const items = ITEMS.filter((i) => !i.admin || role === "admin");
   return (
-    <div className="flex flex-col gap-3 min-w-0 max-w-full">
+    <div className="flex flex-col gap-3 min-w-0 max-w-full w-full overflow-x-hidden">
       <nav
         aria-label="Admin"
         className="flex w-full min-w-0 max-w-full gap-1.5 overflow-x-auto pb-2 border-b-2 border-border/30 lg:border-none lg:flex-col lg:overflow-visible lg:pb-0 scroll-smooth [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"

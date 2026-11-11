@@ -239,7 +239,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="flex min-h-full flex-col overflow-x-clip">
+      <body className="flex min-h-full flex-col overflow-x-hidden">
         <Providers>
           <Suspense fallback={null}>
             <RouteProgressBar />
@@ -254,7 +254,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SiteHeader />
           <main
             id="main"
-            className="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-clip px-3.5 py-8 sm:px-6 sm:py-10 lg:py-14"
+            className="mx-auto w-full max-w-7xl min-w-0 flex-1 overflow-x-hidden px-3.5 py-8 sm:px-6 sm:py-10 lg:py-14"
           >
             {children}
           </main>

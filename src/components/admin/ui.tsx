@@ -42,18 +42,18 @@ export function StatCard({
   tone?: "warn" | "bad";
 }) {
   return (
-    <Card className="p-4 transition-all hover:shadow-hard">
-      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
+    <Card className="p-4 transition-all hover:shadow-hard min-w-0 overflow-hidden">
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground line-clamp-1">{label}</p>
       <p
         className={cn(
-          "mt-2 text-3xl font-extrabold tabular-nums tracking-normal",
+          "mt-2 text-2xl sm:text-3xl font-extrabold tabular-nums tracking-normal break-words leading-tight",
           tone === "warn" && "text-amber-600 dark:text-amber-400",
           tone === "bad" && "text-destructive",
         )}
       >
         {typeof value === "number" ? value.toLocaleString("en-IN") : value}
       </p>
-      {hint && <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>}
+      {hint && <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">{hint}</p>}
     </Card>
   );
 }

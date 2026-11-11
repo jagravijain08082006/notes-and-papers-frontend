@@ -3,42 +3,72 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Select } from "@/components/ui/select";
 import type { AdminUser, Role } from "@/lib/api/types";
+import { cn } from "@/lib/utils";
 import { bff } from "@/services/api-client";
 import { AdminAction } from "./admin-action";
-import { Select } from "@/components/ui/select";
 
-export function UserControls({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
+export function UserRoleSelect({
+  user,
+  isSelf,
+  compact = false,
+}: {
+  user: AdminUser;
+  isSelf: boolean;
+  compact?: boolean;
+}) {
   const router = useRouter();
   const [role, setRole] = useState<Role>(user.role);
+
   async function change(next: Role) {
     const prev = role;
     setRole(next);
     try {
       await bff(`admin/users/${user.id}`, { method: "PATCH", body: { role: next } });
-      toast.success("Role updated");
+      toast.success(`Role updated to ${next}`);
       router.refresh();
     } catch (e) {
       setRole(prev);
       toast.error(e instanceof Error ? e.message : "Could not change the role.");
     }
   }
+
+  if (isSelf) {
+    return (
+      <Badge tone="accent" className="text-[11px] font-bold uppercase tracking-wider">
+        {user.role} (You)
+      </Badge>
+    );
+  }
+
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="inline-flex items-center">
       <label className="sr-only" htmlFor={`role-${user.id}`}>
         Role for {user.display_name ?? user.id}
       </label>
       <Select
         id={`role-${user.id}`}
         value={role}
-        disabled={isSelf}
         onChange={(e) => change(e.target.value as Role)}
-        className="h-9 border-2 border-input bg-card font-medium focus-visible:shadow-hard-sm focus-visible:outline-none placeholder:font-normal placeholder:text-muted-foreground px-2 text-sm"
+        className={cn(
+          "border-2 border-border bg-card font-bold uppercase tracking-wider transition-all focus-visible:outline-none focus-visible:shadow-hard-sm",
+          compact ? "h-8 w-28 px-2 text-xs" : "h-9 w-36 px-2.5 text-sm",
+        )}
       >
-        <option value="user">user</option>
-        <option value="moderator">moderator</option>
-        <option value="admin">admin</option>
+        <option value="user">USER</option>
+        <option value="moderator">MODERATOR</option>
+        <option value="admin">ADMIN</option>
       </Select>
+    </div>
+  );
+}
+
+export function UserControls({ user, isSelf }: { user: AdminUser; isSelf: boolean }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2.5">
+      <UserRoleSelect user={user} isSelf={isSelf} />
       {!isSelf &&
         (user.is_banned ? (
           <AdminAction
@@ -57,7 +87,6 @@ export function UserControls({ user, isSelf }: { user: AdminUser; isSelf: boolea
             variant="destructive"
           />
         ))}
-      {isSelf && <span className="text-xs text-muted-foreground">you</span>}
     </div>
   );
 }
