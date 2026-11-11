@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { ArrowRight, FileText, Layers, ScrollText } from "lucide-react";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { FaqAccordion } from "@/components/shared/faq-accordion";
@@ -57,6 +57,9 @@ function byYear(papers: ExamSection["papers"]) {
 
 export default async function ExamPage(props: PageProps<"/exams/[slug]">) {
   const { slug } = await props.params;
+  if (slug === "uni-rajasthanboard") {
+    redirect("/rajasthanboard");
+  }
   const exam = await getExam(slug);
   if (!exam) notFound();
   const path = routes.exam(slug);

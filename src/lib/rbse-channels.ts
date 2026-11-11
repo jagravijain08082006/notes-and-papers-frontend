@@ -242,6 +242,8 @@ export const RBSE_SUBJECT_DEFINITIONS: RbseSubjectDef[] = [
     keywords: ["biology", "jeev vigyan", "ss-42", "1127"],
     desc: "RBSE Class 12 Biology previous papers PDF (botany & zoology), blueprints, and model examination papers.",
   },
+
+
   {
     slug: "science",
     name: "General Science",
@@ -550,8 +552,8 @@ export function getRbseClassSubjects(exam: ExamDetail, classSlug: string): RbseC
       sortedYears.length > 1
         ? `${sortedYears[0]} – ${sortedYears[sortedYears.length - 1]}`
         : sortedYears.length === 1
-        ? `${sortedYears[0]}`
-        : "Archive";
+          ? `${sortedYears[0]}`
+          : "Archive";
 
     const subtypes = [...data.subtypesMap.entries()].map(([label, count]) => ({
       label,

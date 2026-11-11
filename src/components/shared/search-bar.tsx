@@ -102,14 +102,19 @@ export function SearchBar({
     saveStoredRecents(updated);
   }
 
-  function removeRecent(item: string, e: React.MouseEvent) {
+  // The rows search on mouse PRESS (so the click is not lost when the input loses focus). The remove and clear buttons therefore
+  // act on the press too and stop it from reaching the row; otherwise pressing the cross searched for that term instead.
+  // (The click handler stays for keyboard use: Enter or Space on a focused button sends a click but no press.)
+  function removeRecent(item: string, e: React.SyntheticEvent) {
+    e.preventDefault();
     e.stopPropagation();
     const updated = recents.filter((r) => r !== item);
     setRecents(updated);
     saveStoredRecents(updated);
   }
 
-  function clearAllRecents(e: React.MouseEvent) {
+  function clearAllRecents(e: React.SyntheticEvent) {
+    e.preventDefault();
     e.stopPropagation();
     setRecents([]);
     saveStoredRecents([]);
@@ -275,6 +280,7 @@ export function SearchBar({
                     </span>
                     <button
                       type="button"
+                      onMouseDown={clearAllRecents}
                       onClick={clearAllRecents}
                       className="flex items-center gap-1 hover:text-destructive"
                       aria-label="Clear all recent searches"
@@ -299,8 +305,9 @@ export function SearchBar({
                         </span>
                         <button
                           type="button"
+                          onMouseDown={(e) => removeRecent(item, e)}
                           onClick={(e) => removeRecent(item, e)}
-                          className="ml-2 p-1 text-muted-foreground hover:text-destructive"
+                          className="-mr-1 ml-2 grid size-9 shrink-0 place-items-center text-muted-foreground hover:text-destructive"
                           aria-label={`Remove ${item} from history`}
                         >
                           <X className="size-3.5" aria-hidden="true" />
