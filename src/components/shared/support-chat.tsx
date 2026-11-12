@@ -8,35 +8,16 @@ import {
   ArrowRight,
   CheckCircle2,
   HelpCircle,
-  MessageSquare,
   RotateCw,
   Send,
   Sparkles,
-  Trash2,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { NoteyAvatar } from "@/components/account/notey-avatar";
 import { useMe } from "@/hooks/use-me";
+import type { ChatMessageItem, GuestChatState } from "@/lib/api/types";
 import { bff } from "@/services/api-client";
-import type { ReportOut, UserSupportMessage } from "@/lib/api/types";
-
-interface ChatMessage {
-  id: string;
-  sender: "notey" | "user";
-  text: string;
-  timestamp: number;
-  ticketId?: string;
-  ticketStatus?: "open" | "resolved" | "dismissed";
-}
-
-interface QuickChip {
-  id: string;
-  label: string;
-  icon: string;
-  promptText: string;
-  isGuide?: boolean;
-}
 
 interface TourStep {
   animation: string;
@@ -50,69 +31,62 @@ interface TourStep {
   };
 }
 
-const STORAGE_CHAT_KEY = "np_support_chat_messages_v1";
+const STORAGE_GUEST_ID_KEY = "np_chat_guest_id_v1";
 const STORAGE_EMAIL_KEY = "np_support_chat_guest_email_v1";
+const STORAGE_STARTED_KEY = "np_chat_started_v1";
 
-const QUICK_CHIPS: QuickChip[] = [
+const QUICK_CHIPS = [
   {
     id: "guide",
     label: "Tour",
     icon: "✨",
-    promptText: "Can you give me a tour of Notes & Papers?",
+    promptText: "",
     isGuide: true,
   },
   {
     id: "missing_paper",
     label: "Request Paper",
     icon: "📄",
-    promptText: "I'd like to request a paper: ",
+    promptText: "Hi, I need a question paper: ",
   },
   {
     id: "broken_pdf",
     label: "Report Issue",
     icon: "⚠️",
-    promptText: "I found a broken link or issue with a paper.",
-  },
-  {
-    id: "clean_pdf",
-    label: "Clean PDFs",
-    icon: "📥",
-    promptText: "How do I download clean, ad-free PDFs?",
-  },
-  {
-    id: "suggest_board",
-    label: "Suggest Exam",
-    icon: "🏫",
-    promptText: "I want to suggest adding a new university, board, or exam.",
+    promptText: "Hi, there is an issue with a paper: ",
   },
 ];
-
-function sanitizeMessages(msgs: ChatMessage[]): ChatMessage[] {
-  const seen = new Set<string>();
-  const result: ChatMessage[] = [];
-  let tourCompletedSeen = false;
-
-  for (const msg of msgs) {
-    const textTrim = (msg.text || "").trim();
-    if (textTrim.includes("Tour completed!")) {
-      if (tourCompletedSeen) continue;
-      tourCompletedSeen = true;
-    }
-    if (seen.has(msg.id)) continue;
-    seen.add(msg.id);
-
-    const prev = result[result.length - 1];
-    if (prev && prev.sender === msg.sender && prev.text.trim() === textTrim) {
-      continue;
-    }
-    result.push(msg);
-  }
-  return result;
-}
 
 const emptySubscribe = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
+
+function getOrCreateGuestId(): string {
+  if (typeof window === "undefined") return "";
+  try {
+    let existing = localStorage.getItem(STORAGE_GUEST_ID_KEY);
+    if (!existing) {
+      existing =
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+      localStorage.setItem(STORAGE_GUEST_ID_KEY, existing);
+    }
+    return existing;
+  } catch {
+    return "";
+  }
+}
+
+function fmtMsgTime(iso: string): string {
+  try {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return "";
+  }
+}
 
 export function SupportChat() {
   const pathname = usePathname();
@@ -125,56 +99,36 @@ export function SupportChat() {
   const [modalAnim, setModalAnim] = useState("happy");
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Chat notification state - only true if a genuine unseen admin reply arrives
-  const [hasUnreadNotification, setHasUnreadNotification] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("np_has_unread_notif") === "true";
+  const [guestId] = useState<string>(() => getOrCreateGuestId());
+  const [guestContact, setGuestContact] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      return localStorage.getItem(STORAGE_EMAIL_KEY) || "";
+    } catch {
+      return "";
     }
-    return false;
+  });
+  const [hasStartedChat, setHasStartedChat] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      return localStorage.getItem(STORAGE_STARTED_KEY) === "true";
+    } catch {
+      return false;
+    }
   });
 
-  // Chat state
-  const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(STORAGE_CHAT_KEY);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return sanitizeMessages(parsed);
-          }
-        }
-      } catch {
-        // ignore
-      }
-    }
-    return [
-      {
-        id: "welcome-1",
-        sender: "notey",
-        text: "Hey Scholar! 👋 How can we help you? Pick an option below or type your message.",
-        timestamp: Date.now(),
-      },
-    ];
-  });
+  const [messages, setMessages] = useState<ChatMessageItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [inputText, setInputText] = useState("");
-  const [guestEmail, setGuestEmail] = useState<string>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        return localStorage.getItem(STORAGE_EMAIL_KEY) || "";
-      } catch {
-        // ignore
-      }
-    }
-    return "";
-  });
   const [isSending, setIsSending] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const inactivityTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const userName = user?.display_name?.split(" ")[0] || "Scholar";
+  const effectiveEmail = user?.email || (guestContact.includes("@") ? guestContact.trim() : "");
+  const effectiveName = user?.display_name || (!guestContact.includes("@") ? guestContact.trim() : "");
 
   const tourSteps: TourStep[] = [
     {
@@ -182,102 +136,137 @@ export function SupportChat() {
       badge: "Welcome",
       title: `Welcome, ${userName}! 👋`,
       speech:
-        "I'm Notey, your academic guide! Notes & Papers gives you 7,800+ previous year papers for UNIRAJ, RTU Kota, and exams—100% free with clean PDFs.",
-      tip: "Everything is free with your student account.",
-      action: {
-        href: "/universities",
-        label: "Browse Universities",
-      },
+        "I'm Notey, your study companion! Notes & Papers gives you 7,800+ previous year papers for RTU Kota, UNIRAJ, School Boards & Competitive Exams—100% free with clean PDFs.",
+      tip: "Everything is free—zero paywalls or ads.",
+      action: { href: "/universities", label: "Browse Universities" },
     },
     {
       animation: "searching",
       badge: "Search",
       title: "Instant Paper Search 🔍",
-      speech:
-        "Quickly find papers by course (BCA, BSc, BTech, BCom), semester number, or exact subject code.",
-      tip: "Use the top search bar anytime to jump to your subject.",
-      action: {
-        href: "/search",
-        label: "Try Search",
-      },
+      speech: "Quickly find papers by course (B.Tech, BCA, BSc, BCom), semester number, or exact subject code.",
+      tip: "Use the top search bar anytime to jump right to your subject.",
+      action: { href: "/search", label: "Try Search" },
     },
     {
       animation: "proud",
       badge: "Downloads",
       title: "Clean Watermark-Free PDFs 📄",
-      speech:
-        "Preview every paper in your browser before downloading. High-resolution with zero ads or watermarks.",
-      tip: "Papers stay organized in your Downloads tab.",
-      action: {
-        href: "/downloads",
-        label: "My Downloads",
-      },
+      speech: "Preview every paper in your browser before downloading. High-resolution and exam-ready.",
+      tip: "Signed-in users can view past downloads in their profile.",
+      action: { href: "/downloads", label: "My Downloads" },
     },
     {
       animation: "excited",
       badge: "Bookmarks",
       title: "Save For Exam Night 🔖",
-      speech:
-        "Tap the bookmark icon on any paper to save it to your personal vault for fast revision before exams.",
-      tip: "Keep all your midterm and final papers in one place.",
-      action: {
-        href: "/bookmarks",
-        label: "My Bookmarks",
-      },
-    },
-    {
-      animation: "celebrate",
-      badge: "Uploads",
-      title: "Share & Help Others 🚀",
-      speech:
-        "Have recent semester papers or clean notes? Upload them to help fellow university students succeed!",
-      tip: "Tap me anytime at the bottom right for a refresher.",
-      action: {
-        href: "/upload",
-        label: "Upload Paper",
-      },
+      speech: "Tap the bookmark icon on any paper to save it to your personal vault for fast revision.",
+      tip: "Keep all your important papers organized in one place.",
+      action: { href: "/bookmarks", label: "My Bookmarks" },
     },
   ];
 
-  // Inactivity on floating mascot
+  // Build URL for chat sync
+  const buildChatQuery = useCallback(
+    (markRead: boolean) => {
+      const params = new URLSearchParams();
+      if (guestId) params.set("guest_id", guestId);
+      if (effectiveEmail) params.set("email", effectiveEmail);
+      if (markRead) params.set("mark_read", "true");
+      return `chat?${params.toString()}`;
+    },
+    [guestId, effectiveEmail],
+  );
+
+  // Manual refresh button handler
+  const handleManualRefresh = async () => {
+    if (!guestId && !effectiveEmail) return;
+    setIsSyncing(true);
+    try {
+      const state = await bff<GuestChatState>(buildChatQuery(true));
+      if (state && Array.isArray(state.messages)) {
+        setMessages(state.messages);
+        setUnreadCount(0);
+      }
+    } catch {
+      // Ignore silent failure
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Keep inner message viewport scrolled to bottom (never jumps outer window)
+  useEffect(() => {
+    if (isOpen && mode === "chat" && chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages, isOpen, mode]);
+
+  // Real-time polling: 5s when chat window is open; 25s when closed ONLY if user has previously chatted
+  useEffect(() => {
+    if (!isMounted || pathname.startsWith("/admin")) return;
+    if (!guestId && !effectiveEmail) return;
+
+    let cancelled = false;
+    const poll = (markRead: boolean) => {
+      bff<GuestChatState>(buildChatQuery(markRead))
+        .then((state) => {
+          if (cancelled || !state || !Array.isArray(state.messages)) return;
+          setMessages(state.messages);
+          setUnreadCount(markRead ? 0 : state.unread_by_guest || 0);
+          if (state.messages.length > 0) {
+            setHasStartedChat(true);
+            try {
+              localStorage.setItem(STORAGE_STARTED_KEY, "true");
+            } catch {}
+          }
+        })
+        .catch(() => {});
+    };
+
+    if (isOpen) {
+      poll(true);
+      const timer = setInterval(() => {
+        if (typeof document !== "undefined" && document.visibilityState === "visible") {
+          poll(true);
+        }
+      }, 5000);
+      return () => {
+        cancelled = true;
+        clearInterval(timer);
+      };
+    }
+
+    if (!hasStartedChat && !effectiveEmail) return;
+    poll(false);
+    const bgTimer = setInterval(() => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        poll(false);
+      }
+    }, 25000);
+    return () => {
+      cancelled = true;
+      clearInterval(bgTimer);
+    };
+  }, [isMounted, pathname, isOpen, guestId, effectiveEmail, hasStartedChat, buildChatQuery]);
+
+  // Mascot inactivity & custom events
   const resetInactivity = useCallback(() => {
     if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
     inactivityTimerRef.current = setTimeout(() => {
       setFloatingAnim("drowsy");
-      setTimeout(() => {
-        setFloatingAnim("sleeping");
-      }, 4000);
+      setTimeout(() => setFloatingAnim("sleeping"), 4000);
     }, 30000);
   }, []);
 
-
-  // Save chat history
-  useEffect(() => {
-    if (typeof window === "undefined" || messages.length === 0) return;
-    try {
-      localStorage.setItem(STORAGE_CHAT_KEY, JSON.stringify(messages));
-    } catch {
-      // ignore
-    }
-  }, [messages]);
-
-  // Scroll to bottom on new messages
-  useEffect(() => {
-    if (isOpen && mode === "chat") {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages, isOpen, mode]);
-
-  // Listen to open events & hotkeys
   useEffect(() => {
     const handleOpenSupport = (e: Event) => {
       const custom = e as CustomEvent<{ question?: string }>;
       setIsOpen(true);
       setMode("chat");
+      setUnreadCount(0);
       setFloatingAnim("happy");
-      if (custom.detail?.question) {
-        setInputText(custom.detail.question);
-      }
+      if (custom.detail?.question) setInputText(custom.detail.question);
     };
 
     const handleOpenGuide = () => {
@@ -289,9 +278,7 @@ export function SupportChat() {
 
     const handleActivity = () => resetInactivity();
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        setIsOpen(false);
-      }
+      if (e.key === "Escape" && isOpen) setIsOpen(false);
     };
 
     window.addEventListener("np:open-support-chat", handleOpenSupport);
@@ -310,223 +297,65 @@ export function SupportChat() {
     };
   }, [isOpen, resetInactivity]);
 
-  // Check ticket status on-demand (Manual Refresh - No Polling)
-  const refreshTicketStatus = useCallback(async () => {
-    const emailToQuery = user?.email || guestEmail;
-    if (!emailToQuery || !emailToQuery.includes("@")) {
-      toast.info("Enter your email below so we can look up your support tickets.");
-      return;
-    }
+  const handleSendMessage = async (rawText: string) => {
+    const cleanText = rawText.trim();
+    if (!cleanText || isSending) return;
 
-    setIsRefreshing(true);
-    try {
-      const reports = await bff<UserSupportMessage[]>(
-        `contact/my?email=${encodeURIComponent(emailToQuery)}`
-      ).catch(() => null);
-
-      let updatedCount = 0;
-      setMessages((prev) => {
-        const next = [...prev];
-
-        if (reports && Array.isArray(reports) && reports.length > 0) {
-          next.forEach((msg, idx) => {
-            if (!msg.ticketId) return;
-            const match = reports.find((r) => r.id === msg.ticketId);
-            if (match && match.status !== msg.ticketStatus) {
-              updatedCount++;
-              next[idx] = {
-                ...msg,
-                ticketStatus: match.status as "open" | "resolved" | "dismissed",
-              };
-            }
-          });
-
-          // If any report has an admin reply, insert it into chat
-          reports.forEach((rep) => {
-            if (rep.details && rep.details.includes("[Admin Reply]:")) {
-              const replyContent = rep.details.split("[Admin Reply]:").slice(1).join("[Admin Reply]:").trim();
-              const replyMsgId = `admin-reply-${rep.id}`;
-              const exists = next.some((m) => m.id === replyMsgId);
-              if (!exists && replyContent) {
-                updatedCount++;
-                next.push({
-                  id: replyMsgId,
-                  sender: "notey",
-                  text: `💬 Admin Response:\n${replyContent}`,
-                  timestamp: Date.now(),
-                });
-              }
-            }
-          });
-
-          // Deduplicated resolved notifications
-          const newlyResolved = reports.filter((r) => r.status === "resolved");
-          newlyResolved.forEach((r) => {
-            const notifId = `resolved-notif-${r.id}`;
-            if (!next.some((m) => m.id === notifId)) {
-              next.push({
-                id: notifId,
-                sender: "notey",
-                text: `🎉 Good news! Your support ticket (#${r.id.slice(0, 8)}) has been marked as resolved by our admin team. Thank you!`,
-                timestamp: Date.now(),
-              });
-            }
-          });
-        }
-
-        // Check if there are locally cached admin replies for this ticket (works in local dev testing)
-        next.forEach((msg) => {
-          if (!msg.ticketId) return;
-          try {
-            const localRaw = typeof window !== "undefined" ? localStorage.getItem(`np_admin_reply_${msg.ticketId}`) : null;
-            if (localRaw) {
-              const list = JSON.parse(localRaw) as Array<{ text: string }>;
-              list.forEach((item, i) => {
-                const localId = `admin-local-reply-${msg.ticketId}-${i}`;
-                if (!next.some((m) => m.id === localId || m.text.includes(item.text)) && item.text) {
-                  updatedCount++;
-                  next.push({
-                    id: localId,
-                    sender: "notey",
-                    text: `💬 Admin Response:\n${item.text}`,
-                    timestamp: Date.now(),
-                  });
-                }
-              });
-            }
-          } catch {}
-        });
-
-        return next;
-      });
-
-      if (updatedCount > 0) {
-        if (!isOpen) {
-          setHasUnreadNotification(true);
-          try {
-            localStorage.setItem("np_has_unread_notif", "true");
-          } catch {}
-        }
-        toast.success(`Updated ${updatedCount} ticket(s) from support!`);
-      } else {
-        toast.info("All support tickets are up to date.");
-      }
-    } catch {
-      toast.info("All support tickets are up to date.");
-    } finally {
-      setIsRefreshing(false);
-    }
-  }, [user?.email, guestEmail, isOpen]);
-
-  // Send message / ticket
-  const handleSendMessage = async (textToSend: string) => {
-    const cleanText = textToSend.trim();
-    if (!cleanText) return;
-
-    const email = (user?.email || guestEmail).trim();
-    if (!email || !email.includes("@")) {
-      toast.error("Please provide a valid email so our support team can reply to you.");
-      return;
-    }
-
-    if (!user?.email && guestEmail) {
+    if (!user?.email && guestContact.trim()) {
       try {
-        localStorage.setItem(STORAGE_EMAIL_KEY, guestEmail.trim());
-      } catch {
-        // ignore
-      }
+        localStorage.setItem(STORAGE_EMAIL_KEY, guestContact.trim());
+      } catch {}
     }
 
-    const userMsgId = `user-${Date.now()}`;
-    const newMsg: ChatMessage = {
-      id: userMsgId,
-      sender: "user",
+    const optimisticId = `temp-${Date.now()}`;
+    const optimisticMsg: ChatMessageItem = {
+      id: optimisticId,
+      sender: "guest",
       text: cleanText,
-      timestamp: Date.now(),
-      ticketStatus: "open",
+      created_at: new Date().toISOString(),
     };
 
-    setMessages((prev) => [...prev, newMsg]);
+    setMessages((prev) => [...prev, optimisticMsg]);
     setInputText("");
     setIsSending(true);
+    setHasStartedChat(true);
+    try {
+      localStorage.setItem(STORAGE_STARTED_KEY, "true");
+    } catch {}
 
     try {
-      const res = await bff<ReportOut>("contact", {
+      const state = await bff<GuestChatState>("chat/messages", {
         method: "POST",
         body: {
-          name: user?.display_name || email.split("@")[0] || "Student",
-          email,
-          message: cleanText,
-          reason: "support_chat",
+          guest_id: guestId || undefined,
+          email: effectiveEmail || undefined,
+          name: effectiveName || undefined,
+          text: cleanText,
         },
       });
-
-      // Update message with ticket ID
-      setMessages((prev) =>
-        prev.map((m) => (m.id === userMsgId ? { ...m, ticketId: res.id, ticketStatus: "open" } : m))
-      );
-
-      // Automated friendly response from Notey
-      const shortId = res.id ? res.id.slice(0, 8) : "LOGGED";
-      setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `notey-${Date.now()}`,
-            sender: "notey",
-            text: `✅ Got it! Your message has been dispatched to our admin inbox (Ticket #${shortId}). We'll review it shortly. You can tap the 🔄 icon above anytime to check status.`,
-            timestamp: Date.now(),
-          },
-        ]);
-      }, 400);
+      if (state && Array.isArray(state.messages)) {
+        setMessages(state.messages);
+        setUnreadCount(0);
+      }
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to send message. Please try again.");
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `err-${Date.now()}`,
-          sender: "notey",
-          text: `⚠️ Could not reach support backend right now. Please check your internet or try again in a moment.`,
-          timestamp: Date.now(),
-        },
-      ]);
+      toast.error(e instanceof Error ? e.message : "Could not send message. Please try again.");
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
+      setInputText(cleanText);
     } finally {
       setIsSending(false);
     }
   };
 
-  const handleChipClick = (chip: QuickChip) => {
+  const handleChipClick = (chip: (typeof QUICK_CHIPS)[number]) => {
     if (chip.isGuide) {
       setMode("guide");
       setCurrentStep(0);
       setModalAnim("happy");
       return;
     }
-
-    if (chip.id === "clean_pdf") {
-      // Instant answer chip without immediately sending ticket unless user wants
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `chip-${Date.now()}`,
-          sender: "user",
-          text: chip.promptText,
-          timestamp: Date.now(),
-        },
-        {
-          id: `notey-${Date.now() + 1}`,
-          sender: "notey",
-          text: `All question papers on Notes & Papers are 100% free with clean watermarks and zero spam! Simply open your paper's page and click the yellow "Download PDF" button. If a paper has formatting issues, pick "Report Broken PDF" or message us below!`,
-          timestamp: Date.now() + 1,
-        },
-      ]);
-      return;
-    }
-
     setInputText(chip.promptText);
   };
 
-  // Tour navigation
   const currentTour = tourSteps[currentStep] ?? tourSteps[0];
   const handleTourNext = () => {
     if (currentStep < tourSteps.length - 1) {
@@ -534,41 +363,8 @@ export function SupportChat() {
       setCurrentStep(next);
       setModalAnim(tourSteps[next]?.animation || "excited");
     } else {
-      setModalAnim("celebrate");
-      setTimeout(() => {
-        setMode("chat");
-        setMessages((prev) => {
-          const alreadyHasTourDone = prev.some((m) => m.text.includes("Tour completed!"));
-          if (alreadyHasTourDone) return prev;
-          return [
-            ...prev,
-            {
-              id: `tour-fin-${Date.now()}`,
-              sender: "notey",
-              text: "🎉 Tour completed! You're ready to find and download any paper. Let me know if you need anything else!",
-              timestamp: Date.now(),
-            },
-          ];
-        });
-      }, 1000);
+      setMode("chat");
     }
-  };
-
-  const handleClearChat = () => {
-    setMessages([
-      {
-        id: `welcome-${Date.now()}`,
-        sender: "notey",
-        text: "Hey Scholar! 👋 How can we help you? Pick an option below or type your message.",
-        timestamp: Date.now(),
-      },
-    ]);
-    try {
-      localStorage.removeItem(STORAGE_CHAT_KEY);
-      localStorage.removeItem("np_has_unread_notif");
-    } catch {}
-    setHasUnreadNotification(false);
-    toast.success("Chat history cleared.");
   };
 
   const handleTourPrev = () => {
@@ -579,15 +375,12 @@ export function SupportChat() {
     }
   };
 
-  // Hide completely on admin routes
   if (!isMounted || pathname.startsWith("/admin")) return null;
-
-  // On /contact page, hide the floating corner mascot to avoid covering page content
   const isContactPage = pathname === "/contact";
 
   return (
     <>
-      {/* Floating Mascot Button (Bottom-Right, hidden on /contact page) */}
+      {/* Floating Mascot Trigger */}
       {!isContactPage && (
         <aside
           aria-label="Notey study companion and support chat"
@@ -597,21 +390,13 @@ export function SupportChat() {
             type="button"
             onClick={() => {
               resetInactivity();
-              setIsOpen((prev) => {
-                const next = !prev;
-                if (next) {
-                  setHasUnreadNotification(false);
-                  try {
-                    localStorage.removeItem("np_has_unread_notif");
-                  } catch {}
-                }
-                return next;
-              });
+              setIsOpen((prev) => !prev);
+              setUnreadCount(0);
               setFloatingAnim("happy");
             }}
             className="group relative flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 cursor-pointer drop-shadow-md focus:outline-none"
-            title="Open Support Chat & Guide"
-            aria-label="Open Support Chat & Guide"
+            title="Chat with Support"
+            aria-label="Chat with Support"
           >
             <NoteyAvatar
               animation={floatingAnim}
@@ -620,50 +405,46 @@ export function SupportChat() {
                 if (endedAnim === "waking") setFloatingAnim("idle");
               }}
             />
-            {/* Show notification dot ONLY when there is an unread admin reply! */}
-            {hasUnreadNotification && (
+            {unreadCount > 0 && (
               <span
-                className="absolute top-0 right-0 size-3.5 rounded-full border-2 border-background bg-destructive shadow-hard-xs animate-pulse"
-                aria-label="New unread message"
-              />
+                className="absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1 rounded-full border-2 border-background bg-destructive text-destructive-foreground text-[10px] font-black grid place-items-center shadow-hard-xs animate-pulse"
+                aria-label={`${unreadCount} unread message`}
+              >
+                {unreadCount}
+              </span>
             )}
           </button>
         </aside>
       )}
 
-      {/* Support Chat & Guide Window (Full screen on mobile devices) */}
+      {/* Clean Chat / Guide Window */}
       {isOpen && (
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="support-chat-title"
-          className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-50 flex w-full h-[100dvh] sm:w-[400px] sm:max-w-[400px] sm:h-[580px] sm:max-h-[calc(100dvh-2.5rem)] flex-col border-0 sm:border-2 border-border bg-card shadow-none sm:shadow-hard-lg overflow-hidden animate-in fade-in duration-150"
+          className="fixed inset-0 sm:inset-auto sm:bottom-6 sm:right-6 z-50 flex w-full h-[100dvh] sm:w-[390px] sm:max-w-[390px] sm:h-[540px] sm:max-h-[calc(100dvh-2.5rem)] flex-col border-0 sm:border-2 border-border bg-card shadow-none sm:shadow-hard-lg overflow-hidden animate-in fade-in duration-150"
         >
-          {/* Header */}
-          <div className="flex items-center justify-between border-b-2 border-border bg-muted/40 px-3.5 py-2.5">
-            <div className="flex items-center gap-2">
+          {/* Minimal Header */}
+          <div className="flex items-center justify-between border-b-2 border-border bg-muted/40 px-3.5 py-2.5 shrink-0">
+            <div className="flex items-center gap-2.5">
               <div className="size-8 rounded-full border-2 border-border bg-primary grid place-items-center shrink-0">
                 <NoteyAvatar size={30} animation={mode === "guide" ? modalAnim : "happy"} />
               </div>
-              <div className="flex items-center gap-1.5">
+              <div>
                 <h2
                   id="support-chat-title"
                   className="font-display text-sm font-black uppercase tracking-wider text-foreground leading-none"
                 >
-                  Support
+                  Support Chat
                 </h2>
-                {hasUnreadNotification && (
-                  <span
-                    className="size-2 rounded-full bg-destructive inline-block animate-pulse"
-                    title="Unread reply"
-                  />
-                )}
+                <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
+                  Direct 1-on-1 help with our team
+                </p>
               </div>
             </div>
 
-            {/* Header Action Controls */}
             <div className="flex items-center gap-1.5">
-              {/* Mode Toggle Button: Guide or Chat */}
               <button
                 type="button"
                 onClick={() => {
@@ -678,61 +459,44 @@ export function SupportChat() {
                 className={`inline-flex items-center gap-1 border-2 border-border px-2 py-1 text-[11px] font-black uppercase tracking-wider shadow-hard-sm transition-all hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 cursor-pointer ${
                   mode === "guide" ? "bg-primary text-primary-foreground" : "bg-card text-foreground"
                 }`}
-                title={mode === "guide" ? "Switch to Support Chat" : "Take Website Tour"}
+                title={mode === "guide" ? "Back to Chat" : "Take Website Tour"}
               >
                 <Sparkles className="size-3" aria-hidden="true" />
                 <span>{mode === "guide" ? "Chat" : "Guide"}</span>
               </button>
 
-              {/* Clear Chat History */}
-              {mode === "chat" && messages.length > 1 && (
-                <button
-                  type="button"
-                  onClick={handleClearChat}
-                  className="grid size-7 place-items-center border-2 border-border bg-card text-foreground shadow-hard-sm transition-all hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
-                  title="Clear chat history"
-                  aria-label="Clear chat history"
-                >
-                  <Trash2 className="size-3.5" aria-hidden="true" />
-                </button>
-              )}
-
-              {/* Manual Refresh Icon (No automatic polling) */}
               {mode === "chat" && (
                 <button
                   type="button"
-                  onClick={refreshTicketStatus}
-                  disabled={isRefreshing}
+                  onClick={() => void handleManualRefresh()}
+                  disabled={isSyncing}
                   className="grid size-7 place-items-center border-2 border-border bg-card text-foreground shadow-hard-sm transition-all hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 cursor-pointer disabled:opacity-50"
-                  title="Check for ticket updates"
-                  aria-label="Refresh ticket status"
+                  title="Refresh messages"
+                  aria-label="Refresh messages"
                 >
                   <RotateCw
-                    className={`size-3.5 ${isRefreshing ? "animate-spin text-primary" : ""}`}
+                    className={`size-3.5 ${isSyncing ? "animate-spin text-primary" : ""}`}
                     aria-hidden="true"
                   />
                 </button>
               )}
 
-              {/* Close Button */}
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
                 className="grid size-7 place-items-center border-2 border-border bg-card text-foreground shadow-hard-sm transition-all hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
-                title="Close Support"
-                aria-label="Close Support dialog"
+                title="Close chat"
+                aria-label="Close Support chat"
               >
                 <X className="size-3.5" aria-hidden="true" />
               </button>
             </div>
           </div>
 
-          {/* Body: Guide Mode or Chat Mode */}
+          {/* Body: Guide Mode OR Clean 1-on-1 Chat */}
           {mode === "guide" ? (
-            /* GUIDE TOUR MODE */
             <div className="flex-1 overflow-y-auto p-4 flex flex-col justify-between space-y-4">
               <div className="space-y-3.5">
-                {/* Progress bar */}
                 <div className="flex items-center justify-between border-b-2 border-border pb-2">
                   <span className="eyebrow inline-flex items-center gap-1 border border-border bg-primary px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm">
                     <Sparkles className="size-2.5" aria-hidden="true" />
@@ -743,7 +507,6 @@ export function SupportChat() {
                   </span>
                 </div>
 
-                {/* Content Row */}
                 <div className="flex items-start gap-3 pt-1">
                   <div className="shrink-0">
                     <NoteyAvatar
@@ -764,17 +527,15 @@ export function SupportChat() {
                   </div>
                 </div>
 
-                {/* Pro Tip Box */}
                 <div className="flex items-start gap-2 border-l-2 border-primary bg-muted/40 px-2.5 py-2 text-[11px] text-muted-foreground">
                   <HelpCircle className="size-3.5 shrink-0 mt-0.5 text-primary" aria-hidden="true" />
                   <span>{currentTour.tip}</span>
                 </div>
               </div>
 
-              {/* Navigation Footer */}
               <div className="border-t-2 border-border pt-3 space-y-3">
                 <div className="flex items-center justify-between gap-2">
-                  {currentTour.action ? (
+                  {currentTour.action && (
                     <Link
                       href={currentTour.action.href}
                       onClick={() => setIsOpen(false)}
@@ -782,17 +543,6 @@ export function SupportChat() {
                     >
                       <span>{currentTour.action.label}</span>
                     </Link>
-                  ) : (
-                    <div className="flex items-center gap-1" aria-hidden="true">
-                      {tourSteps.map((_, idx) => (
-                        <span
-                          key={idx}
-                          className={`h-1.5 transition-all ${
-                            idx === currentStep ? "w-3 bg-primary" : "w-1.5 bg-muted"
-                          }`}
-                        />
-                      ))}
-                    </div>
                   )}
 
                   <div className="flex items-center gap-1.5 ml-auto">
@@ -812,7 +562,7 @@ export function SupportChat() {
                       onClick={handleTourNext}
                       className="inline-flex items-center gap-1 border-2 border-border bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wider shadow-hard-sm text-primary-foreground transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 cursor-pointer"
                     >
-                      <span>{currentStep === tourSteps.length - 1 ? "Finish" : "Next"}</span>
+                      <span>{currentStep === tourSteps.length - 1 ? "Done" : "Next"}</span>
                       {currentStep === tourSteps.length - 1 ? (
                         <CheckCircle2 className="size-3" aria-hidden="true" />
                       ) : (
@@ -827,55 +577,60 @@ export function SupportChat() {
                   onClick={() => setMode("chat")}
                   className="w-full text-center text-[11px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground py-1 cursor-pointer"
                 >
-                  ← Back to Support Chat
+                  ← Back to Chat
                 </button>
               </div>
             </div>
           ) : (
-            /* SUPPORT CHAT MODE */
             <div className="flex flex-1 flex-col overflow-hidden">
-              {/* Message History Thread */}
-              <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex flex-col ${
-                      msg.sender === "user" ? "items-end" : "items-start"
-                    }`}
-                  >
-                    <div
-                      className={`max-w-[86%] rounded-sm p-2.5 text-xs sm:text-sm font-medium shadow-hard-sm border-2 border-border ${
-                        msg.sender === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted/50 text-foreground"
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap leading-relaxed">{msg.text}</p>
-                    </div>
-
-                    {/* Status Badge under ticket message */}
-                    {msg.ticketId && (
-                      <div className="mt-1 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                        <span>Ticket #{msg.ticketId.slice(0, 8)}</span>
-                        <span>•</span>
-                        {msg.ticketStatus === "resolved" ? (
-                          <span className="text-emerald-600 font-extrabold flex items-center gap-0.5">
-                            <CheckCircle2 className="size-3" /> Resolved
-                          </span>
-                        ) : msg.ticketStatus === "dismissed" ? (
-                          <span className="text-muted-foreground">Closed</span>
-                        ) : (
-                          <span className="text-amber-600 font-extrabold">Open</span>
-                        )}
-                      </div>
-                    )}
+              {/* Message Feed */}
+              <div
+                ref={chatContainerRef}
+                className="flex-1 overflow-y-auto p-3.5 space-y-3 bg-muted/10"
+              >
+                {messages.length === 0 ? (
+                  <div className="border-2 border-border bg-card p-3.5 shadow-hard-xs space-y-2">
+                    <p className="text-xs sm:text-sm font-bold text-foreground">
+                      Hey {userName}! 👋 Need a paper or have a question?
+                    </p>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      Send a message below and we&apos;ll reply right here in this chat.
+                    </p>
                   </div>
-                ))}
-                <div ref={messagesEndRef} />
+                ) : (
+                  messages.map((msg) => {
+                    const isGuest = msg.sender === "guest";
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`flex flex-col ${isGuest ? "items-end" : "items-start"}`}
+                      >
+                        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-0.5 px-1">
+                          <span>{isGuest ? "You" : "Admin"}</span>
+                          {msg.created_at && (
+                            <>
+                              <span>·</span>
+                              <span>{fmtMsgTime(msg.created_at)}</span>
+                            </>
+                          )}
+                        </div>
+                        <div
+                          className={`max-w-[85%] rounded-sm px-3 py-2 text-xs sm:text-sm font-medium border-2 border-border shadow-hard-xs ${
+                            isGuest
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-card text-foreground"
+                          }`}
+                        >
+                          <p className="whitespace-pre-wrap leading-relaxed break-words">{msg.text}</p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
 
-              {/* Pre-built Question Chips */}
-              <div className="border-t-2 border-border bg-muted/20 px-3 py-2 flex flex-wrap gap-1.5">
+              {/* Compact Helper Chips */}
+              <div className="border-t-2 border-border bg-muted/20 px-3 py-2 flex flex-wrap gap-1.5 shrink-0">
                 {QUICK_CHIPS.map((chip) => (
                   <button
                     key={chip.id}
@@ -889,39 +644,39 @@ export function SupportChat() {
                 ))}
               </div>
 
-              {/* Guest Email Field (if not signed in) */}
+              {/* Optional Name/Email field for guests (never blocks messaging!) */}
               {!user?.email && (
-                <div className="border-t border-border/60 bg-card px-3 py-1.5 flex items-center gap-2">
+                <div className="border-t border-border/60 bg-card px-3 py-1.5 flex items-center gap-2 shrink-0">
                   <input
-                    type="email"
-                    value={guestEmail}
-                    onChange={(e) => setGuestEmail(e.target.value)}
-                    placeholder="Your email (for reply): student@example.com"
-                    className="w-full bg-transparent text-xs font-medium focus:outline-none placeholder:text-muted-foreground/60 border-b border-border/40 focus:border-primary py-0.5"
+                    type="text"
+                    value={guestContact}
+                    onChange={(e) => setGuestContact(e.target.value)}
+                    placeholder="Your name or email (optional)"
+                    className="w-full bg-transparent text-base sm:text-xs font-medium focus:outline-none placeholder:text-muted-foreground/60 border-b border-border/40 focus:border-primary py-0.5"
                   />
                 </div>
               )}
 
-              {/* Input Area */}
+              {/* Simple Message Input Bar */}
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleSendMessage(inputText);
+                  void handleSendMessage(inputText);
                 }}
-                className="border-t-2 border-border bg-card p-2 sm:p-2.5 flex items-center gap-2"
+                className="border-t-2 border-border bg-card p-2 sm:p-2.5 flex items-center gap-2 shrink-0"
               >
                 <input
                   type="text"
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
-                  placeholder="Type a message or request..."
+                  placeholder="Write a message..."
                   disabled={isSending}
-                  className="flex-1 border-2 border-border bg-background px-3 py-2 text-xs sm:text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary shadow-hard-sm"
+                  className="flex-1 min-w-0 border-2 border-border bg-background px-3 py-2 text-base sm:text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary shadow-hard-sm"
                 />
                 <button
                   type="submit"
-                  disabled={isSending || !inputText.trim()}
-                  className="inline-flex size-9 sm:size-10 items-center justify-center border-2 border-border bg-primary text-primary-foreground shadow-hard-sm transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-40 cursor-pointer shrink-0"
+                  disabled={!inputText.trim() || isSending}
+                  className="grid size-10 shrink-0 place-items-center border-2 border-border bg-primary text-primary-foreground shadow-hard-sm transition-all hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-40 cursor-pointer"
                   title="Send message"
                   aria-label="Send message"
                 >
@@ -936,34 +691,24 @@ export function SupportChat() {
   );
 }
 
-/** Standalone button to trigger Support Chat modal from anywhere on site */
+/** Button trigger exported for use inside /contact or paper pages to open the live chat. */
 export function SupportChatTrigger({
-  label = "Contact Support",
-  className,
   question,
+  label = "Open Support Chat",
+  className = "",
 }: {
+  question?: string;
   label?: string;
   className?: string;
-  question?: string;
 }) {
-  const handleClick = () => {
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(
-        new CustomEvent("np:open-support-chat", { detail: { question } })
-      );
-    }
-  };
-
   return (
     <button
       type="button"
-      onClick={handleClick}
-      className={
-        className ??
-        "inline-flex items-center gap-1.5 border-2 border-border bg-primary px-3 py-1.5 text-xs font-black uppercase tracking-wider text-primary-foreground shadow-hard-sm hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 transition-all cursor-pointer"
-      }
+      onClick={() => {
+        window.dispatchEvent(new CustomEvent("np:open-support-chat", { detail: { question } }));
+      }}
+      className={className}
     >
-      <MessageSquare className="size-3.5" aria-hidden="true" />
       <span>{label}</span>
     </button>
   );

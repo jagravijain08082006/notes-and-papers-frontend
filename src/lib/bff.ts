@@ -1,7 +1,7 @@
 /** Pure helpers for the BFF route handler (kept out of the route file so they can be unit tested). */
 
 /** First path segments the browser may reach. `internal` and `dev` are deliberately absent. */
-const ALLOWED = new Set(["me", "uploads", "admin", "reports", "contact", "bookmarks", "events"]);
+const ALLOWED = new Set(["me", "uploads", "admin", "reports", "contact", "chat", "bookmarks", "events"]);
 
 export function isAllowedPath(segments: string[]) {
   return (

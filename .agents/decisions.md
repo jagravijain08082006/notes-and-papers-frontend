@@ -82,6 +82,12 @@
   4. **Other Exams** (Competitive exams: SSC, SBI Clerk, UPSC, GATE, NEET)
   Differentiated card icons by using `<School />` for school boards and `<Award />` for competitive examinations.
 - **ADR-043 Next.js BFF Proxy Enforcement for Browser Support APIs.** Browser-side client code must never invoke cross-origin Render backend endpoints directly using `apiFetch`, as Render blocks `localhost:3010` under strict production CORS. All client support calls route through same-origin BFF proxy (`bff("contact", ...)` -> `/api/backend/contact`), which forwards server-to-server. Also removed `status=all` from queries to ensure 100% compliance with FastAPI's strict literal enum validation.
+- **ADR-044 Pure 1-on-1 Live Chat (Removal of Ticket UI & Robot Auto-Replies).**
+  Replaced the ticket-based support chat model (`Ticket #...`, `open`/`resolved` states, automated robot confirmations, localStorage reply caching) with a dedicated two-way 1-on-1 conversation backed by `chat_conversations` / `chat_messages`:
+  1. **Zero Duplicate Conversations:** Browser guests receive a stable `guest_id` (`np_chat_guest_id_v1`) sent alongside optional name/email or logged-in account details so repeated messages always append to the same thread.
+  2. **Zero Ticket Clutter:** Eliminated ticket IDs, Resolve buttons, and automated "Got it! / Tour completed!" message spam from both `SupportChat` and `SupportChatConsole`.
+  3. **Live Two-Way Polling & Accurate Unread Counters:** Added `"chat"` to BFF `ALLOWED` segments (`src/lib/bff.ts`). Admin console polls `/admin/chats` (8s) and open thread (4s); `AdminNav` polls `/admin/chats/unread` (15s) and listens to `np:admin-chat-updated`; guest chat polls `/chat` (5s when open, 25s if started when closed).
+  4. **Separated Paper Reports:** `reports` remains solely for broken PDF reports & DMCA claims under the `"Paper Reports"` view (`?view=table`).
 
 
 

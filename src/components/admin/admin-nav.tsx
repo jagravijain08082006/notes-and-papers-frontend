@@ -22,7 +22,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { bff } from "@/services/api-client";
-import type { AdminReport, Paginated, Role } from "@/lib/api/types";
+import type { AdminChatUnreadCount, Role } from "@/lib/api/types";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
@@ -30,7 +30,7 @@ const ITEMS = [
   { href: "/admin/review", label: "Review queue", icon: ClipboardCheck },
   { href: "/admin/papers", label: "Papers", icon: FileText },
   { href: "/admin/notes", label: "Notes", icon: Inbox },
-  { href: "/admin/reports", label: "Support & Queries", icon: MessageSquare },
+  { href: "/admin/reports", label: "Support Chat", icon: MessageSquare },
   { href: "/admin/imports", label: "Crawler", icon: Upload, admin: true },
   { href: "/admin/sources", label: "Sources", icon: Globe, admin: true },
   { href: "/admin/runs", label: "Crawl runs", icon: History, admin: true },
@@ -48,28 +48,30 @@ const ITEMS = [
 export function AdminNav({ role }: { role: Role }) {
   const path = usePathname();
   const items = ITEMS.filter((i) => !i.admin || role === "admin");
-  const [openQueriesCount, setOpenQueriesCount] = useState<number | null>(null);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
-  // Poll on navigation and every 30s for any new open student support queries
+  // Poll on navigation, custom update events, and every 15s for unread student/guest chats
   useEffect(() => {
     let cancelled = false;
 
-    const checkOpenQueries = () => {
-      bff<Paginated<AdminReport>>("admin/reports?status=open&size=1")
+    const checkUnreadChats = () => {
+      bff<AdminChatUnreadCount>("admin/chats/unread")
         .then((res) => {
-          if (!cancelled && typeof res?.total === "number") {
-            setOpenQueriesCount(res.total);
+          if (!cancelled && typeof res?.unread_conversations === "number") {
+            setUnreadCount(res.unread_conversations);
           }
         })
         .catch(() => {});
     };
 
-    checkOpenQueries();
-    const interval = setInterval(checkOpenQueries, 30000);
+    checkUnreadChats();
+    const interval = setInterval(checkUnreadChats, 15000);
+    window.addEventListener("np:admin-chat-updated", checkUnreadChats);
 
     return () => {
       cancelled = true;
       clearInterval(interval);
+      window.removeEventListener("np:admin-chat-updated", checkUnreadChats);
     };
   }, [path]);
 
@@ -82,7 +84,7 @@ export function AdminNav({ role }: { role: Role }) {
         {items.map(({ href, label, icon: Icon }) => {
           const active = href === "/admin" ? path === href : path.startsWith(href);
           const isSupport = href === "/admin/reports";
-          const hasUnseen = isSupport && openQueriesCount && openQueriesCount > 0;
+          const hasUnseen = isSupport && unreadCount > 0;
 
           return (
             <Link
@@ -98,10 +100,10 @@ export function AdminNav({ role }: { role: Role }) {
               <Icon className="size-4 shrink-0" aria-hidden="true" />
               <span className="whitespace-nowrap">{label}</span>
 
-              {/* Real-time unread/open indicator badge */}
+              {/* Real-time unread chats badge */}
               {hasUnseen ? (
                 <span className="ml-auto inline-flex items-center px-1.5 py-0.2 text-[10px] font-black border border-border bg-destructive text-destructive-foreground shadow-hard-xs animate-pulse">
-                  {openQueriesCount}
+                  {unreadCount}
                 </span>
               ) : null}
             </Link>

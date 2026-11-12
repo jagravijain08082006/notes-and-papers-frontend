@@ -395,3 +395,39 @@ export interface ReportOut {
   id: string;
   status: string;
 }
+
+export interface ChatMessageItem {
+  id: string;
+  sender: "guest" | "admin";
+  text: string;
+  created_at: string;
+}
+
+export interface GuestChatState {
+  conversation_id: string | null;
+  guest_name: string | null;
+  guest_email: string | null;
+  unread_by_guest: number;
+  messages: ChatMessageItem[];
+}
+
+export interface AdminChatSummary {
+  id: string;
+  guest_key: string;
+  guest_name: string | null;
+  guest_email: string | null;
+  unread_by_admin: number;
+  last_message_text: string | null;
+  last_message_sender: string | null;
+  last_message_at: string;
+  created_at: string;
+}
+
+export interface AdminChatDetail extends AdminChatSummary {
+  messages: ChatMessageItem[];
+}
+
+export interface AdminChatUnreadCount {
+  unread_conversations: number;
+  unread_messages: number;
+}

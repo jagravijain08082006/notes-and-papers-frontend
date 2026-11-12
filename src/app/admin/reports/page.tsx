@@ -5,7 +5,7 @@ import { ReportReplyDialog } from "@/components/admin/report-reply-dialog";
 import { SupportChatConsole } from "@/components/admin/support-chat-console";
 import { PageHeader, SearchForm, Select, StatusBadge, fmtDate } from "@/components/admin/ui";
 import { authedFetch } from "@/lib/api/server";
-import type { AdminReport, Paginated } from "@/lib/api/types";
+import type { AdminChatSummary, AdminReport, Paginated } from "@/lib/api/types";
 import { enumParam, first, intParam } from "@/lib/search-params";
 import { MessageSquare, Table } from "lucide-react";
 
@@ -15,21 +15,23 @@ export default async function ReportsPage(props: PageProps<"/admin/reports">) {
   const sp = await props.searchParams;
   const status = enumParam(sp.status, STATUSES, "open");
   const q = first(sp.q)?.trim().slice(0, 120);
-  const view = first(sp.view) === "table" ? "table" : "chat"; // Default to "chat" view!
+  const view = first(sp.view) === "table" ? "table" : "chat";
 
-  // Fetch paginated data for table view and console
-  const [tableData, chatData] = await Promise.all([
-    authedFetch<Paginated<AdminReport>>(
-      "/admin/reports",
-      { query: { status, q, page: intParam(sp.page), size: 20 } },
-      "/admin/reports",
-    ),
-    // For chat view, fetch all recent reports so conversations are ready to browse
-    authedFetch<Paginated<AdminReport>>(
-      "/admin/reports",
-      { query: { size: 100 } },
-      "/admin/reports",
-    ).catch(() => ({ items: [], total: 0, page: 1, size: 100 })),
+  const [chats, tableData] = await Promise.all([
+    view === "chat"
+      ? authedFetch<AdminChatSummary[]>(
+          "/admin/chats",
+          { query: { limit: 150 } },
+          "/admin/reports",
+        ).catch(() => [] as AdminChatSummary[])
+      : Promise.resolve([] as AdminChatSummary[]),
+    view === "table"
+      ? authedFetch<Paginated<AdminReport>>(
+          "/admin/reports",
+          { query: { status, q, page: intParam(sp.page), size: 20 } },
+          "/admin/reports",
+        )
+      : Promise.resolve({ items: [], total: 0, page: 1, size: 20 } as Paginated<AdminReport>),
   ]);
 
   const columns: Column<AdminReport>[] = [
@@ -139,8 +141,12 @@ export default async function ReportsPage(props: PageProps<"/admin/reports">) {
     <>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
         <PageHeader
-          title="Support & Queries"
-          description="Direct student support inquiries, missing paper requests, and error reports."
+          title={view === "chat" ? "Support Chat" : "Paper Reports"}
+          description={
+            view === "chat"
+              ? "1-on-1 live chat conversations with website guests and students."
+              : "Broken file reports and copyright takedown requests on specific papers."
+          }
         />
 
         {/* View Mode Switcher */}
@@ -154,7 +160,7 @@ export default async function ReportsPage(props: PageProps<"/admin/reports">) {
             }`}
           >
             <MessageSquare className="size-3.5" />
-            <span>Chat View</span>
+            <span>Support Chat</span>
           </Link>
           <Link
             href="/admin/reports?view=table"
@@ -165,16 +171,16 @@ export default async function ReportsPage(props: PageProps<"/admin/reports">) {
             }`}
           >
             <Table className="size-3.5" />
-            <span>Table View</span>
+            <span>Paper Reports</span>
           </Link>
         </div>
       </div>
 
       {view === "chat" ? (
-        /* Dedicated Chat Console View (Default) */
         <SupportChatConsole
-          key={chatData.total + (chatData.items[0]?.id ?? "")}
-          initialReports={chatData.items}
+          key={chats.length + (chats[0]?.id ?? "")}
+          initialChats={chats}
+          initialQuery={q ?? ""}
         />
       ) : (
         /* Legacy Table View */

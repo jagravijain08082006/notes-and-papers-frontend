@@ -8,7 +8,7 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { apiFetch } from "@/lib/api/client";
+import { bff } from "@/services/api-client";
 import { contactSchema, type ContactValues } from "@/lib/validation";
 import { useOnline } from "./offline-banner";
 
@@ -28,7 +28,7 @@ export function ContactForm() {
 
   async function onSubmit(values: ContactValues) {
     try {
-      await apiFetch("/contact", { method: "POST", revalidate: false, body: values });
+      await bff("contact", { method: "POST", body: values });
       toast.success("Message sent. Thank you!");
       reset(undefined, { keepIsSubmitSuccessful: true });
     } catch (e) {
