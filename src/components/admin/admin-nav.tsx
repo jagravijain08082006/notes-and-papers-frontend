@@ -50,7 +50,7 @@ export function AdminNav({ role }: { role: Role }) {
   const items = ITEMS.filter((i) => !i.admin || role === "admin");
   const [unreadCount, setUnreadCount] = useState<number>(0);
 
-  // Poll on navigation, custom update events, and every 15s for unread student/guest chats
+  // Poll on navigation, focus/visibility resume, custom update events, and every 6s for unread chats
   useEffect(() => {
     let cancelled = false;
 
@@ -64,14 +64,28 @@ export function AdminNav({ role }: { role: Role }) {
         .catch(() => {});
     };
 
+    const handleResume = () => {
+      if (typeof document === "undefined" || document.visibilityState === "visible") {
+        checkUnreadChats();
+      }
+    };
+
     checkUnreadChats();
-    const interval = setInterval(checkUnreadChats, 15000);
+    const interval = setInterval(() => {
+      if (typeof document === "undefined" || document.visibilityState === "visible") {
+        checkUnreadChats();
+      }
+    }, 6000);
     window.addEventListener("np:admin-chat-updated", checkUnreadChats);
+    window.addEventListener("focus", handleResume);
+    document.addEventListener("visibilitychange", handleResume);
 
     return () => {
       cancelled = true;
       clearInterval(interval);
       window.removeEventListener("np:admin-chat-updated", checkUnreadChats);
+      window.removeEventListener("focus", handleResume);
+      document.removeEventListener("visibilitychange", handleResume);
     };
   }, [path]);
 

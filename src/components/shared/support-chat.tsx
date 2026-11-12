@@ -202,7 +202,7 @@ export function SupportChat() {
     }
   }, [messages, isOpen, mode]);
 
-  // Real-time polling: 5s when chat window is open; 25s when closed ONLY if user has previously chatted
+  // Real-time polling: 4s when open; 5s when closed (if user has chatted or has email) + instant sync on tab focus
   useEffect(() => {
     if (!isMounted || pathname.startsWith("/admin")) return;
     if (!guestId && !effectiveEmail) return;
@@ -224,31 +224,35 @@ export function SupportChat() {
         .catch(() => {});
     };
 
-    if (isOpen) {
-      poll(true);
-      const timer = setInterval(() => {
-        if (typeof document !== "undefined" && document.visibilityState === "visible") {
-          poll(true);
-        }
-      }, 5000);
-      return () => {
-        cancelled = true;
-        clearInterval(timer);
-      };
-    }
+    const shouldPoll = isOpen || hasStartedChat || Boolean(effectiveEmail);
+    if (!shouldPoll) return;
 
-    if (!hasStartedChat && !effectiveEmail) return;
-    poll(false);
-    const bgTimer = setInterval(() => {
+    const markOnPoll = isOpen && mode === "chat";
+    poll(markOnPoll);
+
+    const intervalMs = isOpen ? 4000 : 5000;
+    const timer = setInterval(() => {
       if (typeof document !== "undefined" && document.visibilityState === "visible") {
-        poll(false);
+        poll(markOnPoll);
       }
-    }, 25000);
+    }, intervalMs);
+
+    const handleResume = () => {
+      if (typeof document === "undefined" || document.visibilityState === "visible") {
+        poll(markOnPoll);
+      }
+    };
+
+    window.addEventListener("focus", handleResume);
+    document.addEventListener("visibilitychange", handleResume);
+
     return () => {
       cancelled = true;
-      clearInterval(bgTimer);
+      clearInterval(timer);
+      window.removeEventListener("focus", handleResume);
+      document.removeEventListener("visibilitychange", handleResume);
     };
-  }, [isMounted, pathname, isOpen, guestId, effectiveEmail, hasStartedChat, buildChatQuery]);
+  }, [isMounted, pathname, isOpen, mode, guestId, effectiveEmail, hasStartedChat, buildChatQuery]);
 
   // Mascot inactivity & custom events
   const resetInactivity = useCallback(() => {
@@ -407,7 +411,7 @@ export function SupportChat() {
             />
             {unreadCount > 0 && (
               <span
-                className="absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1 rounded-full border-2 border-background bg-destructive text-destructive-foreground text-[10px] font-black grid place-items-center shadow-hard-xs animate-pulse"
+                className="absolute -top-0.5 -right-0.5 z-10 min-w-5 h-5 px-1 rounded-full border-2 border-background bg-foreground text-background text-[10px] font-black grid place-items-center shadow-hard-xs animate-bounce"
                 aria-label={`${unreadCount} unread message`}
               >
                 {unreadCount}

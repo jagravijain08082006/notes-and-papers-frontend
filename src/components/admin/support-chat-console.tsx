@@ -124,18 +124,38 @@ export function SupportChatConsole({
     }
   };
 
-  // Load selected conversation thread on selection change
+  const markConversationRead = useCallback((id: string) => {
+    setChats((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, unread_by_admin: 0 } : c)),
+    );
+    bff(`admin/chats/${id}/read`, { method: "POST" })
+      .then(() => {
+        window.dispatchEvent(new Event("np:admin-chat-updated"));
+      })
+      .catch(() => {});
+  }, []);
+
+  // Load selected conversation thread on selection change WITHOUT silently wiping unread status
   useEffect(() => {
     if (!selectedId) return;
     let cancelled = false;
-    bff<AdminChatDetail>(`admin/chats/${selectedId}?mark_read=true`)
+    bff<AdminChatDetail>(`admin/chats/${selectedId}?mark_read=false`)
       .then((detail) => {
         if (cancelled || !detail) return;
         setMessagesMap((prev) => ({ ...prev, [selectedId]: detail.messages }));
         setChats((prev) =>
-          prev.map((c) => (c.id === selectedId ? { ...c, unread_by_admin: 0 } : c)),
+          prev.map((c) =>
+            c.id === selectedId
+              ? {
+                  ...c,
+                  unread_by_admin: detail.unread_by_admin,
+                  last_message_text: detail.last_message_text,
+                  last_message_sender: detail.last_message_sender,
+                  last_message_at: detail.last_message_at,
+                }
+              : c,
+          ),
         );
-        window.dispatchEvent(new Event("np:admin-chat-updated"));
       })
       .catch(() => {
         if (!cancelled) {
@@ -148,36 +168,45 @@ export function SupportChatConsole({
     };
   }, [selectedId]);
 
-  // Real-time background polling: refresh chat list every 8s, open thread every 4s
+  // Real-time background polling: refresh chat list (5s) + active thread (4s) WITHOUT auto-marking read
   useEffect(() => {
-    const listTimer = setInterval(() => {
-      if (typeof document !== "undefined" && document.visibilityState === "visible") {
-        void fetchChatList();
-      }
-    }, 8000);
-
-    const threadTimer = setInterval(() => {
-      if (
-        selectedId &&
-        typeof document !== "undefined" &&
-        document.visibilityState === "visible"
-      ) {
-        bff<AdminChatDetail>(`admin/chats/${selectedId}?mark_read=true`)
+    const syncNow = () => {
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      void fetchChatList().then(() => {
+        window.dispatchEvent(new Event("np:admin-chat-updated"));
+      });
+      if (selectedId) {
+        bff<AdminChatDetail>(`admin/chats/${selectedId}?mark_read=false`)
           .then((detail) => {
             if (!detail) return;
             setMessagesMap((prev) => ({ ...prev, [selectedId]: detail.messages }));
             setChats((prev) =>
-              prev.map((c) => (c.id === selectedId ? { ...c, unread_by_admin: 0 } : c)),
+              prev.map((c) =>
+                c.id === selectedId
+                  ? {
+                      ...c,
+                      unread_by_admin: detail.unread_by_admin,
+                      last_message_text: detail.last_message_text,
+                      last_message_sender: detail.last_message_sender,
+                      last_message_at: detail.last_message_at,
+                    }
+                  : c,
+              ),
             );
             window.dispatchEvent(new Event("np:admin-chat-updated"));
           })
           .catch(() => {});
       }
-    }, 4000);
+    };
+
+    const listTimer = setInterval(syncNow, 4000);
+    window.addEventListener("focus", syncNow);
+    document.addEventListener("visibilitychange", syncNow);
 
     return () => {
       clearInterval(listTimer);
-      clearInterval(threadTimer);
+      window.removeEventListener("focus", syncNow);
+      document.removeEventListener("visibilitychange", syncNow);
     };
   }, [selectedId, fetchChatList]);
 
@@ -191,6 +220,9 @@ export function SupportChatConsole({
   const handleSelectChat = (chat: AdminChatSummary) => {
     setSelectedId(chat.id);
     setShowMobileChat(true);
+    if (chat.unread_by_admin > 0) {
+      markConversationRead(chat.id);
+    }
   };
 
   const handleSendReply = async () => {
@@ -446,9 +478,16 @@ export function SupportChatConsole({
                   </div>
 
                   <div className="min-w-0">
-                    <h3 className="text-sm font-black uppercase tracking-wider text-foreground truncate">
-                      {displayName}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-black uppercase tracking-wider text-foreground truncate">
+                        {displayName}
+                      </h3>
+                      {selectedChat.unread_by_admin > 0 && (
+                        <span className="inline-flex items-center border border-border bg-destructive px-1.5 py-0.5 text-[10px] font-black uppercase text-destructive-foreground shadow-hard-xs animate-pulse">
+                          {selectedChat.unread_by_admin} New
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono mt-0.5">
                       <span className="truncate max-w-[200px] sm:max-w-none">
                         {selectedChat.guest_email || "Anonymous website visitor"}
@@ -498,6 +537,11 @@ export function SupportChatConsole({
               {/* Chronological Chat Messages */}
               <div
                 ref={chatContainerRef}
+                onClick={() => {
+                  if (selectedChat.unread_by_admin > 0) {
+                    markConversationRead(selectedChat.id);
+                  }
+                }}
                 className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/10"
               >
                 {isLoadingSelected && activeMessages.length === 0 ? (
@@ -549,6 +593,11 @@ export function SupportChatConsole({
                     rows={2}
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
+                    onFocus={() => {
+                      if (selectedChat.unread_by_admin > 0) {
+                        markConversationRead(selectedChat.id);
+                      }
+                    }}
                     placeholder={`Reply to ${displayName}... (Enter to send, Shift+Enter for new line)`}
                     className="flex-1 min-w-0 border-2 border-border bg-background p-2.5 text-base sm:text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary shadow-hard-xs resize-none"
                     onKeyDown={(e) => {
