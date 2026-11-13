@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Select as UiSelect } from "@/components/ui/select";
 import { Search } from "lucide-react";
+import Link from "next/link";
 
 export { InstantSyncButton } from "@/components/admin/instant-sync-button";
 
@@ -35,27 +36,44 @@ export function StatCard({
   value,
   hint,
   tone,
+  href,
 }: {
   label: string;
   value: number | string;
   hint?: string;
-  tone?: "warn" | "bad";
+  tone?: "warn" | "bad" | "good";
+  href?: string;
 }) {
-  return (
-    <Card className="p-4 transition-all hover:shadow-hard min-w-0 overflow-hidden">
-      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground line-clamp-1">{label}</p>
-      <p
-        className={cn(
-          "mt-2 text-2xl sm:text-3xl font-extrabold tabular-nums tracking-normal break-words leading-tight",
-          tone === "warn" && "text-amber-600 dark:text-amber-400",
-          tone === "bad" && "text-destructive",
-        )}
-      >
-        {typeof value === "number" ? value.toLocaleString("en-IN") : value}
-      </p>
-      {hint && <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">{hint}</p>}
+  const content = (
+    <Card className={cn("p-4 transition-all hover:shadow-hard min-w-0 overflow-hidden h-full flex flex-col justify-between", href && "group hover:border-foreground/80")}>
+      <div>
+        <div className="flex items-center justify-between gap-1">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground line-clamp-1">{label}</p>
+          {href && <span className="text-xs font-black text-muted-foreground opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">→</span>}
+        </div>
+        <p
+          className={cn(
+            "mt-2 text-2xl sm:text-3xl font-extrabold tabular-nums tracking-normal break-words leading-tight",
+            tone === "good" && "text-emerald-600 dark:text-emerald-400",
+            tone === "warn" && "text-amber-600 dark:text-amber-400",
+            tone === "bad" && "text-destructive",
+          )}
+        >
+          {typeof value === "number" ? value.toLocaleString("en-IN") : value}
+        </p>
+      </div>
+      {hint && <p className="mt-2 text-xs text-muted-foreground line-clamp-2">{hint}</p>}
     </Card>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className="focus:outline-none block h-full">
+        {content}
+      </Link>
+    );
+  }
+  return content;
 }
 
 /** Tiny dependency-free bar chart with a text summary for screen readers. */
