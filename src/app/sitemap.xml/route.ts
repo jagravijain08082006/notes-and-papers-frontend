@@ -2,7 +2,7 @@ import { getSitemapPage } from "@/lib/api/public";
 import { SITE_URL } from "@/lib/env";
 import { API_SITEMAP_TYPES, sitemapIndexXml, xmlResponse } from "@/lib/sitemap";
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export async function GET(req: Request) {
   const origin = new URL(req.url).origin;

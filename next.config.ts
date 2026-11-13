@@ -93,6 +93,55 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        source: "/papers/:path*",
+        headers: [
+          { key: "CDN-Cache-Control", value: "public, s-maxage=2592000, stale-while-revalidate=86400" },
+          { key: "Cloudflare-CDN-Cache-Control", value: "public, s-maxage=2592000, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/exams/:path*",
+        headers: [
+          { key: "CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+          { key: "Cloudflare-CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/universities/:path*",
+        headers: [
+          { key: "CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+          { key: "Cloudflare-CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/rajasthanboard/:path*",
+        headers: [
+          { key: "CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+          { key: "Cloudflare-CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/categories/:path*",
+        headers: [
+          { key: "CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+          { key: "Cloudflare-CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/boards",
+        headers: [
+          { key: "CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+          { key: "Cloudflare-CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+        ],
+      },
+      {
+        source: "/notes/:path*",
+        headers: [
+          { key: "CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+          { key: "Cloudflare-CDN-Cache-Control", value: "public, s-maxage=604800, stale-while-revalidate=86400" },
+        ],
+      },
     ];
   },
 };

@@ -3,7 +3,7 @@ import {
   generateRbseChannelMetadata,
 } from "@/components/shared/rbse-channel-page";
 
-export const revalidate = 3600;
+export const revalidate = 604800;
 
 export async function generateMetadata() {
   return generateRbseChannelMetadata("class-9");

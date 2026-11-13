@@ -66,7 +66,7 @@ export async function apiFetch<T>(path: string, opts: ApiOptions = {}): Promise<
       body: body !== undefined ? JSON.stringify(body) : undefined,
       ...(revalidate === false || process.env.NODE_ENV !== "production"
         ? { cache: "no-store" as const }
-        : { next: { revalidate, tags: [...(tags ?? []), "catalog"] } }),
+        : { next: { revalidate, ...(tags && tags.length > 0 ? { tags } : {}) } }),
     },
     method === "GET",
   );

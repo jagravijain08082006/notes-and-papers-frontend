@@ -7,7 +7,7 @@ import { cleanExamTitle, EXAM_DOMAINS, getExamDomain } from "@/lib/exam-categori
 import { buildMetadata } from "@/lib/seo";
 import { plural } from "@/lib/utils";
 
-export const revalidate = 3600;
+export const revalidate = 604800;
 
 export const metadata = buildMetadata({
   title: "Exam & Board Categories: Engineering, Medical, Civil Services, School Boards",

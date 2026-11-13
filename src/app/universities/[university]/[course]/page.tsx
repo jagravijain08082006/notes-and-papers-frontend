@@ -10,7 +10,7 @@ import { routes, termLabel } from "@/lib/routes";
 import { buildMetadata, collectionPageLd, courseMeta } from "@/lib/seo";
 import { plural } from "@/lib/utils";
 
-export const revalidate = 86400;
+export const revalidate = 2592000;
 export const dynamicParams = true;
 
 // Built at deploy time on Vercel (see src/lib/static-params.ts); anything else is built on first visit and then cached.

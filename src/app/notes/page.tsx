@@ -9,7 +9,7 @@ import type { Paginated, NoteSummary } from "@/lib/api/types";
 import { parsePositiveInt } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
 
-export const revalidate = 3600;
+export const revalidate = 604800;
 const SIZE = 20;
 
 export async function generateMetadata(props: PageProps<"/notes">) {

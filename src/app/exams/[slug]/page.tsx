@@ -19,7 +19,7 @@ import { plural } from "@/lib/utils";
 import type { ExamSection } from "@/lib/api/types";
 import { prebuiltPaths } from "@/lib/static-params";
 
-export const revalidate = 3600;
+export const revalidate = 604800;
 
 // Built at deploy time on Vercel (see src/lib/static-params.ts); other exams are built on first visit.
 export async function generateStaticParams() {

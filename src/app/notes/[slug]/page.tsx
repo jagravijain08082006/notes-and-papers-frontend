@@ -9,7 +9,7 @@ import { noteDownloadUrl } from "@/lib/api/urls";
 import { buildMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
-export const revalidate = 3600;
+export const revalidate = 604800;
 export const dynamicParams = true;
 
 // Built on its first visit and cached from then on (an empty list is what turns on that caching for a dynamic page).

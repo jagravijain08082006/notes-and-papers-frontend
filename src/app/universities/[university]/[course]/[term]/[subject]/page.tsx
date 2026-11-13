@@ -10,7 +10,7 @@ import { paperHref, routes, yearRange } from "@/lib/routes";
 import { buildMetadata, collectionPageLd, faqLd, itemListLd, subjectMeta } from "@/lib/seo";
 import { prebuiltPaths } from "@/lib/static-params";
 
-export const revalidate = 86400;
+export const revalidate = 2592000;
 export const dynamicParams = true;
 
 // Subject pages with a single paper are noindex and not in the sitemap, so they are built on first visit only.

@@ -12,7 +12,7 @@ import { plural } from "@/lib/utils";
 import { prebuiltPaths } from "@/lib/static-params";
 
 // Shorter than other pages: if the API was down during a build, the degraded page heals within the hour.
-export const revalidate = 3600;
+export const revalidate = 604800;
 export const dynamicParams = true;
 
 // Built at deploy time on Vercel (see src/lib/static-params.ts); anything else is built on first visit and then cached.

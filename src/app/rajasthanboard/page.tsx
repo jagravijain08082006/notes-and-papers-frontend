@@ -7,7 +7,7 @@ import { getExam } from "@/lib/api/public";
 import { getRbseOverviewCards } from "@/lib/rbse-channels";
 import { buildMetadata, collectionPageLd, faqLd } from "@/lib/seo";
 
-export const revalidate = 3600;
+export const revalidate = 604800;
 
 export const metadata = buildMetadata({
   title: "RBSE Rajasthan Board Question Papers PDF (Class 9, 10, 11, 12)",

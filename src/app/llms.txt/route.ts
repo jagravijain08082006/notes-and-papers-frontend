@@ -3,7 +3,7 @@ import { SITE_URL } from "@/lib/env";
 import { routes } from "@/lib/routes";
 
 /** /llms.txt: a plain-markdown map of the site for AI assistants and answer engines. */
-export const revalidate = 3600;
+export const revalidate = 604800;
 
 export async function GET() {
   const [unis, exams] = await Promise.all([

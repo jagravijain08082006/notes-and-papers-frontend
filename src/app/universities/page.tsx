@@ -10,7 +10,7 @@ import { routes } from "@/lib/routes";
 import { buildMetadata, collectionPageLd, faqLd, itemListLd } from "@/lib/seo";
 import { plural } from "@/lib/utils";
 
-export const revalidate = 3600;
+export const revalidate = 604800;
 
 export const metadata = buildMetadata({
   title: "University Previous Year Question Papers PDF (UNIRAJ, RTU)",

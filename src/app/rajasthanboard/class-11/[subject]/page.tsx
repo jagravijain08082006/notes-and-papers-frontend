@@ -3,7 +3,7 @@ import {
   generateRbseSubjectMetadata,
 } from "@/components/shared/rbse-subject-page";
 
-export const revalidate = 3600;
+export const revalidate = 604800;
 
 // Built on its first visit and cached from then on (an empty list is what turns on that caching for a dynamic page).
 export function generateStaticParams() {

@@ -7,7 +7,7 @@ import { EXAM_DOMAINS, getExamDomain } from "@/lib/exam-categories";
 import { buildMetadata } from "@/lib/seo";
 import { plural } from "@/lib/utils";
 
-export const revalidate = 3600;
+export const revalidate = 604800;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {

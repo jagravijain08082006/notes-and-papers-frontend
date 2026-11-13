@@ -25,7 +25,7 @@ export const tags = {
 };
 
 export const getUniversities = () =>
-  apiFetch<UniversityListItem[]>("/universities", { tags: [tags.home], revalidate: 3600 });
+  apiFetch<UniversityListItem[]>("/universities", { tags: [tags.home], revalidate: 604800 });
 
 export const getUniversity = (u: string) =>
   apiFetchOrNull<UniversityDetail>(`/universities/${u}`, { tags: [tags.home] });
@@ -66,14 +66,14 @@ export const listPapers = (params: ListParams) =>
   apiFetch<Paginated<PaperSummary>>("/papers", {
     query: { ...params },
     tags: [tags.home],
-    revalidate: 1800,
+    revalidate: 86400,
   });
 
 export const getLatestPapers = (size = 8) =>
   apiFetch<Paginated<PaperSummary>>("/papers", {
     query: { page: 1, size, sort: "latest" },
     tags: [tags.home],
-    revalidate: 3600,
+    revalidate: 86400,
   });
 
 export interface SearchParams {
@@ -91,19 +91,19 @@ export const searchPapers = (params: SearchParams) =>
   apiFetch<SearchResponse>("/search", { query: { ...params }, revalidate: false });
 
 export const getSitemapPage = (type: string, page: number) =>
-  apiFetch<SitemapPage>(`/seo/sitemap/${type}`, { query: { page }, revalidate: 3600 });
+  apiFetch<SitemapPage>(`/seo/sitemap/${type}`, { query: { page }, revalidate: 86400 });
 
 export { downloadUrl } from "./urls";
 
-export const getCatalog = () => apiFetch<CatalogCourse[]>("/catalog", { revalidate: 3600 });
+export const getCatalog = () => apiFetch<CatalogCourse[]>("/catalog", { revalidate: 604800 });
 
 export const listNotes = (params: { q?: string; page?: number; size?: number }) =>
-  apiFetch<Paginated<NoteSummary>>("/notes", { query: params, tags: ["notes"], revalidate: 3600 });
+  apiFetch<Paginated<NoteSummary>>("/notes", { query: params, tags: ["notes"], revalidate: 604800 });
 
 export const getNote = (slug: string) =>
   apiFetchOrNull<NoteSummary>(`/notes/${slug}`, {
     tags: ["notes", `note:${slug}`],
-    revalidate: 3600,
+    revalidate: 604800,
   });
 
 export interface Features {
@@ -114,23 +114,23 @@ export interface Features {
 
 /**
  * What the deployment supports. Falls back to "paused" so a broken API never advertises a feature that fails.
- * Cached for an hour: it is read by the shared header, and the shortest cache time found in a page becomes the page's own,
- * so a short one here would make every page on the site expire after that time.
+ * Cached for 7 days: it is read by the shared header, and the shortest cache time found in a page becomes the page's own,
+ * so keeping it high prevents every page on the site from expiring too quickly.
  */
 export const getFeatures = (): Promise<Features> =>
-  apiFetch<Features>("/features", { revalidate: 3600, tags: ["features"] }).catch(() => ({
+  apiFetch<Features>("/features", { revalidate: 604800, tags: ["features"] }).catch(() => ({
     uploads: false,
     stored_files: false,
     link_only_mode: true,
   }));
 
 export const getExams = (kind?: "exam" | "board" | "university_site") =>
-  apiFetch<ExamSummary[]>("/exams", { query: { kind }, tags: [tags.home], revalidate: 3600 });
+  apiFetch<ExamSummary[]>("/exams", { query: { kind }, tags: [tags.home], revalidate: 604800 });
 
 export const getExam = (slug: string) =>
   apiFetchOrNull<ExamDetail>(`/exams/${slug}`, {
     tags: [tags.home, `exam:${slug}`],
-    revalidate: 3600,
+    revalidate: 604800,
   });
 
 export interface SiteStats {
@@ -142,4 +142,4 @@ export interface SiteStats {
   exams: number;
 }
 
-export const getStats = () => apiFetch<SiteStats>("/stats", { tags: [tags.home], revalidate: 3600 });
+export const getStats = () => apiFetch<SiteStats>("/stats", { tags: [tags.home], revalidate: 86400 });

@@ -6,7 +6,7 @@ import { routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
 import { plural } from "@/lib/utils";
 
-export const revalidate = 3600;
+export const revalidate = 604800;
 
 export const metadata = buildMetadata({
   title: "Exam & Board Question Papers: UPSC, SSC, NEET, GATE, UGC NET, CBSE",

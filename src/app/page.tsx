@@ -21,7 +21,7 @@ import { routes } from "@/lib/routes";
 import { buildMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
-export const revalidate = 86400;
+export const revalidate = 604800;
 
 export const metadata = buildMetadata({
   title: "UNIRAJ, RTU & Rajasthan Board Question Papers PDF | Notes & Papers",
