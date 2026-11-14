@@ -1,6 +1,12 @@
 # Deployment (frontend)
 
-Last updated: 2026-10-25.
+Last updated: 2026-11-14.
+
+## Current production target (supersedes Cloudflare instructions below)
+
+Production `notesandpapers.dpdns.org` is on **Vercel**, linked by `.vercel/project.json` to project `notes-and-papers-frontend`. Deploy committed code with `npm.cmd run vercel:deploy`. That script exports HEAD without Git history into a verified temporary directory, preserving the Vercel account's existing production environment and avoiding Hobby-plan commit-author restrictions. Push alone does not guarantee a production deploy. Do not replace production DNS or attach the domain to the old Cloudflare Workers.
+
+The older Cloudflare setup below is historical. On 2026-11-14 the app/front Workers accepted uploads, but their custom-domain registration failed because externally managed records exist. Reading Cloudflare confirmed zero Worker domains and zero zone Worker routes. Existing production DNS was preserved. Verify production through authenticated admin HTML containing the new rankings and Search Console setup/index-check controls.
 
 ## Status
 

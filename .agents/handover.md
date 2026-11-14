@@ -1,5 +1,11 @@
 # Handover (2026-11-12, ninth pass)
 
+## Deployment target correction (2026-11-14)
+
+- Backend fixes pushed as `1f28bdf` and verified live: health ready 200, admin overview 200 with rankings, SEO nine warnings, anonymous chat 401.
+- Frontend fixes pushed as `3df47c8`. Production is Vercel, not the historical Cloudflare deployment. Use `npm.cmd run vercel:deploy`; `.vercel/project.json` is linked and the script exports committed source without Git history to avoid Hobby-plan author restrictions. The temporary export cleanup now verifies its absolute path.
+- Cloudflare production build passed and Workers uploaded, but custom-domain trigger update failed with 100117. Cloudflare has no domain/zone routes for this site. No production DNS records were changed. Continuing deployment via Vercel; verify live admin HTML before claiming success. See `.agents/deployment.md`.
+
 ## SEO warnings and unavailable Search Console data (2026-11-14)
 - Applied 73 verified live metadata corrections: 70 missing years and 3 explicit sample-paper reclassifications. Live audit warnings fell from 91 to 18; all changes have `paper.metadata_repair` audit records. Applied/verified reports are in backend `data/reports/metadata-repair-applied-20261114T163748Z.json` and `seo-repair-verification-20261114.json`.
 - Remaining 18 records are genuinely undated in the checked evidence (8 Army, 6 JEE LMN/RST, 3 Drug Inspector, 1 RTU). They remain visible for review; no years were fabricated. Evidence/procedure: backend `docs/SEO-REPAIR.md`.

@@ -8,7 +8,7 @@
 import { execSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 
 const dry = process.argv.includes("--dry");
 const root = process.cwd();
@@ -19,7 +19,11 @@ if (!existsSync(join(root, ".vercel", "project.json"))) {
 const dirty = execSync("git status --porcelain", { encoding: "utf8" }).trim();
 if (dirty) console.warn("Note: uncommitted changes are NOT deployed (only the last commit is):\n" + dirty + "\n");
 
-const tmp = mkdtempSync(join(tmpdir(), "np-vercel-"));
+const deployTempRoot = resolve(tmpdir());
+const tmp = resolve(mkdtempSync(join(deployTempRoot, "np-vercel-")));
+if (dirname(tmp) !== deployTempRoot || !basename(tmp).startsWith("np-vercel-")) {
+  throw new Error("Unexpected deployment temporary directory; refusing cleanup.");
+}
 try {
   // git writes the archive to an absolute path; tar then runs inside the folder with a relative name (GNU tar mistakes the
   // "C:" of a Windows path for a remote host).
