@@ -1,6 +1,7 @@
 "use client";
 
 import { Controller, useForm } from "react-hook-form";
+import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,8 +12,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { bff } from "@/services/api-client";
 import { contactSchema, type ContactValues } from "@/lib/validation";
 import { useOnline } from "./offline-banner";
+import { useMe } from "@/hooks/use-me";
+import type { Me } from "@/lib/api/types";
 
 export function ContactForm() {
+  const { data: user, isPending } = useMe();
+  if (isPending) return <p role="status">Checking your account...</p>;
+  if (!user) return <Link href="/login?next=%2Fcontact%3Fsupport%3Dchat" className="text-link underline">Log in to contact support</Link>;
+  return <AccountContactForm key={user.id} user={user} />;
+}
+
+function AccountContactForm({ user }: { user: Me }) {
   const online = useOnline();
   const {
     register,
@@ -23,7 +33,7 @@ export function ContactForm() {
   } = useForm<ContactValues>({
     resolver: zodResolver(contactSchema),
     mode: "onChange",
-    defaultValues: { name: "", email: "", message: "" },
+    defaultValues: { name: user.display_name || user.email?.split("@")[0] || "Student", email: user.email || "", message: "" },
   });
 
   async function onSubmit(values: ContactValues) {
@@ -49,6 +59,7 @@ export function ContactForm() {
           id="name"
           placeholder="Your full name"
           autoComplete="name"
+          readOnly
           aria-required="true"
           invalid={!!(touchedFields.name && errors.name)}
           {...register("name")}
@@ -65,6 +76,7 @@ export function ContactForm() {
           placeholder="you@example.com"
           type="email"
           autoComplete="email"
+          readOnly
           aria-required="true"
           invalid={!!(touchedFields.email && errors.email)}
           {...register("email")}

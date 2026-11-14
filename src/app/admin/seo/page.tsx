@@ -4,26 +4,9 @@ import { PageHeader, SearchForm, Select, StatCard, fmtDate } from "@/components/
 import { authedFetch, getMe } from "@/lib/api/server";
 import { enumParam, first, intParam } from "@/lib/search-params";
 import { cn } from "@/lib/utils";
-
-interface SeoOverview {
-  pages: number;
-  indexed: number;
-  not_indexed: number;
-  clicks: number;
-  impressions: number;
-  pages_with_issues: number;
-  last_synced: string | null;
-}
-interface SeoPageRow {
-  url: string;
-  page_type: string | null;
-  indexed: boolean | null;
-  clicks: number | null;
-  impressions: number | null;
-  ctr: number | null;
-  position: number | null;
-  issues: string[];
-}
+import Link from "next/link";
+import { AdminAction } from "@/components/admin/admin-action";
+import type { AdminSeoOverview, AdminSeoPage as SeoPageRow } from "@/lib/api/types";
 interface Pages {
   items: SeoPageRow[];
   total: number;
@@ -37,23 +20,28 @@ interface IssueGroup {
 }
 
 const SORTS = ["clicks", "impressions", "position", "ctr"] as const;
+const PAGE_TYPES = ["paper", "subject", "course", "term", "home", "exam", "exams", "university", "universities", "board"] as const;
 
 export default async function SeoPage(props: PageProps<"/admin/seo">) {
   if ((await getMe())?.role !== "admin") return <NoPermission />;
   const sp = await props.searchParams;
   const sort = enumParam(sp.sort, SORTS, "clicks")!;
   const order = enumParam(sp.order, ["asc", "desc"] as const, "desc")!;
-  const pageType = enumParam(sp.page_type, ["paper", "subject", "course", "term", "home"] as const);
+  const pageType = enumParam(sp.page_type, PAGE_TYPES);
+  const q = first(sp.q)?.trim().slice(0, 300);
+  const issue = first(sp.issue)?.slice(0, 80);
+  const indexStatus = enumParam(sp.index_status, ["indexed", "not_indexed", "unknown"] as const);
   const [ov, pages, issues] = await Promise.all([
-    authedFetch<SeoOverview>("/admin/seo/overview", {}, "/admin/seo"),
+    authedFetch<AdminSeoOverview>("/admin/seo/overview", {}, "/admin/seo"),
     authedFetch<Pages>(
       "/admin/seo/pages",
-      { query: { sort, order, page_type: pageType, page: intParam(sp.page), size: 50 } },
+      { query: { sort, order, page_type: pageType, q, issue, index_status: indexStatus, page: intParam(sp.page), size: 50 } },
       "/admin/seo",
     ),
     authedFetch<IssueGroup[]>("/admin/seo/issues", {}, "/admin/seo"),
   ]);
-  void first;
+  const unknown = ov.unknown ?? Math.max(0, ov.pages - ov.indexed - ov.not_indexed);
+  const hasPerformance = (ov.pages_with_metrics ?? 0) > 0 || ov.search_console?.status === "ok";
 
   const cols: Column<SeoPageRow>[] = [
     {
@@ -83,7 +71,7 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
     },
     {
       key: "idx",
-      header: "Indexed",
+      header: "Index evidence",
       className: "whitespace-nowrap",
       cell: (p) => (
         <span
@@ -96,9 +84,16 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
                 : "bg-muted text-muted-foreground border-border",
           )}
         >
-          {p.indexed === null ? "unknown" : p.indexed ? "yes" : "no"}
+          {p.indexed === null ? "Not checked" : p.indexed ? "Seen on Google" : "Not indexed"}
         </span>
       ),
+    },
+    {
+      key: "inspect",
+      header: "Google check",
+      className: "whitespace-nowrap",
+      cell: (p) => <AdminAction label="Check index" path="admin/seo/inspect" body={{ url: p.url }}
+        disabled={!ov.search_console?.configured} success="Google indexing status checked." />,
     },
     {
       key: "clicks",
@@ -136,6 +131,7 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
                 {iss.replace(/_/g, " ")}
               </span>
             ))}
+            {p.paper_id && <Link href={`/admin/review/${p.paper_id}`} className="text-xs font-semibold text-link underline">Edit metadata</Link>}
           </div>
         ) : (
           <span className="text-xs text-muted-foreground">none</span>
@@ -147,14 +143,33 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
     <>
       <PageHeader
         title="SEO"
-        description={`Search Console data (28 days) plus problems found in our own pages. Last synced ${fmtDate(ov.last_synced)}.`}
+        description={`Page metadata audit: ${fmtDate(ov.last_audited)}. Search Console sync: ${ov.last_synced ? fmtDate(ov.last_synced) : "not run yet"}.`}
+        actions={<div className="flex flex-wrap gap-2">
+          <AdminAction label="Refresh page audit" path="admin/seo/refresh" success="Page metadata audit refreshed." />
+          <AdminAction label="Sync Search Console" path="admin/seo/sync" disabled={!ov.search_console?.configured} success="Search Console metrics synced." />
+        </div>}
       />
+      <div className="mb-5 space-y-2 border-2 border-border bg-card p-4 text-sm">
+        {!ov.search_console?.configured ? (
+          <>
+            <p className="font-bold">Search Console data is not connected</p>
+            <p className="text-muted-foreground">Set GOOGLE_SC_CREDENTIALS_JSON and GOOGLE_SC_SITE_URL on the backend and scheduled job, enable the Search Console API, and grant the service account access to the property. Then run Sync Search Console.</p>
+          </>
+        ) : ov.search_console.status === "error" ? (
+          <p className="text-destructive">{ov.search_console.error || "Search Console sync failed. Check the property and service-account access."}</p>
+        ) : ov.search_console.status !== "ok" ? (
+          <p className="text-muted-foreground">Search Console is configured. Run a sync to import search performance.</p>
+        ) : (
+          <p className="text-muted-foreground">Search performance period: {ov.search_console.period_start} to {ov.search_console.period_end}.</p>
+        )}
+        <p className="text-xs text-muted-foreground">“Not checked” means indexing has not been verified. No impressions does not mean a page is not indexed; use Google Search Console URL Inspection to confirm it. A missing year is a metadata warning, not proof that Google cannot index a page.</p>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Tracked pages" value={ov.pages} />
-        <StatCard label="Indexed" value={ov.indexed} hint={`${ov.not_indexed} not indexed`} />
+        <StatCard label="Seen on Google" value={unknown === ov.pages ? "Not checked" : ov.indexed} hint={`${unknown.toLocaleString("en-IN")} not checked · ${ov.not_indexed} confirmed not indexed`} />
         <StatCard
           label="Clicks / impressions"
-          value={`${ov.clicks.toLocaleString("en-IN")} / ${ov.impressions.toLocaleString("en-IN")}`}
+          value={hasPerformance ? `${(ov.clicks ?? 0).toLocaleString("en-IN")} / ${(ov.impressions ?? 0).toLocaleString("en-IN")}` : "Not available"}
         />
         <StatCard
           label="Pages with issues"
@@ -175,14 +190,14 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
                 className="border-2 border-border bg-card p-4 shadow-hard-sm transition-all hover:shadow-hard"
               >
                 <div className="flex items-center justify-between gap-2">
-                  <p className="font-bold text-sm text-foreground">
+                  <Link href={`/admin/seo?issue=${encodeURIComponent(g.issue)}`} className="font-bold text-sm text-link hover:underline">
                     {g.issue.replace(/_/g, " ")}
-                  </p>
+                  </Link>
                   <span className="inline-flex items-center px-2 py-0.5 text-xs font-bold bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 tabular-nums">
                     {g.count.toLocaleString("en-IN")}
                   </span>
                 </div>
-                <p className="mt-2 truncate font-mono text-xs text-muted-foreground bg-muted/40 px-2.5 py-1 border border-border/40">
+                <p className="mt-2 break-all font-mono text-xs text-muted-foreground bg-muted/40 px-2.5 py-1 border border-border/40">
                   e.g. {g.sample[0]?.replace(/^https?:\/\/[^/]+/, "")}
                 </p>
               </li>
@@ -200,19 +215,24 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
             {pages.total.toLocaleString("en-IN")} pages tracked
           </span>
         </div>
-        <SearchForm action="/admin/seo" placeholder="Filter pages by URL or path...">
+        {issue && <p className="mb-3 text-sm">Showing: {issue.replace(/_/g, " ")} · <Link href="/admin/seo" className="text-link underline">Clear filters</Link></p>}
+        <SearchForm action="/admin/seo" q={q} placeholder="Filter pages by URL or path..." hidden={{ issue, sort, order }}>
           <Select
             name="page_type"
             label="Page type"
             value={pageType}
             options={[
               { value: "", label: "All types" },
-              ...["paper", "subject", "course", "term", "home"].map((t) => ({
+              ...PAGE_TYPES.map((t) => ({
                 value: t,
                 label: t,
               })),
             ]}
           />
+          <Select name="index_status" label="Index evidence" value={indexStatus} options={[
+            { value: "", label: "All index states" }, { value: "unknown", label: "Not checked" },
+            { value: "indexed", label: "Seen on Google" }, { value: "not_indexed", label: "Not indexed" },
+          ]} />
         </SearchForm>
         <DataTable
           caption="Pages by search performance"
@@ -220,7 +240,7 @@ export default async function SeoPage(props: PageProps<"/admin/seo">) {
           rows={pages.items}
           rowKey={(p) => p.url}
           basePath="/admin/seo"
-          params={{ page_type: pageType }}
+          params={{ page_type: pageType, q, issue, index_status: indexStatus }}
           sort={sort}
           order={order}
           total={pages.total}

@@ -14,10 +14,11 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { NoteyAvatar } from "@/components/account/notey-avatar";
 import { useMe } from "@/hooks/use-me";
-import type { ChatMessageItem, GuestChatState } from "@/lib/api/types";
-import { bff } from "@/services/api-client";
+import type { ChatMessageItem, GuestChatState, Me } from "@/lib/api/types";
+import { BffError, bff } from "@/services/api-client";
 
 interface TourStep {
   animation: string;
@@ -30,10 +31,6 @@ interface TourStep {
     label: string;
   };
 }
-
-const STORAGE_GUEST_ID_KEY = "np_chat_guest_id_v1";
-const STORAGE_EMAIL_KEY = "np_support_chat_guest_email_v1";
-const STORAGE_STARTED_KEY = "np_chat_started_v1";
 
 const QUICK_CHIPS = [
   {
@@ -61,23 +58,6 @@ const emptySubscribe = () => () => {};
 const getClientSnapshot = () => true;
 const getServerSnapshot = () => false;
 
-function getOrCreateGuestId(): string {
-  if (typeof window === "undefined") return "";
-  try {
-    let existing = localStorage.getItem(STORAGE_GUEST_ID_KEY);
-    if (!existing) {
-      existing =
-        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-          ? crypto.randomUUID()
-          : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
-      localStorage.setItem(STORAGE_GUEST_ID_KEY, existing);
-    }
-    return existing;
-  } catch {
-    return "";
-  }
-}
-
 function fmtMsgTime(iso: string): string {
   try {
     const d = new Date(iso);
@@ -89,33 +69,24 @@ function fmtMsgTime(iso: string): string {
 }
 
 export function SupportChat() {
+  const { data: user, isPending } = useMe();
   const pathname = usePathname();
-  const { data: user } = useMe();
+  // Reset private state on account changes and reopen chat on the return route after login.
+  return <SupportChatWidget key={`${user?.id ?? "signed-out"}:${pathname}`} user={user ?? null} isPending={isPending} />;
+}
+
+function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: boolean }) {
+  const pathname = usePathname();
+  const queryClient = useQueryClient();
   const isMounted = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() =>
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("support") === "chat",
+  );
   const [mode, setMode] = useState<"chat" | "guide">("chat");
   const [floatingAnim, setFloatingAnim] = useState("idle");
   const [modalAnim, setModalAnim] = useState("happy");
   const [currentStep, setCurrentStep] = useState(0);
-
-  const [guestId] = useState<string>(() => getOrCreateGuestId());
-  const [guestContact, setGuestContact] = useState<string>(() => {
-    if (typeof window === "undefined") return "";
-    try {
-      return localStorage.getItem(STORAGE_EMAIL_KEY) || "";
-    } catch {
-      return "";
-    }
-  });
-  const [hasStartedChat, setHasStartedChat] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    try {
-      return localStorage.getItem(STORAGE_STARTED_KEY) === "true";
-    } catch {
-      return false;
-    }
-  });
 
   const [messages, setMessages] = useState<ChatMessageItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -125,10 +96,15 @@ export function SupportChat() {
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sendingRef = useRef(false);
+  const revisionRef = useRef(0);
 
   const userName = user?.display_name?.split(" ")[0] || "Scholar";
-  const effectiveEmail = user?.email || (guestContact.includes("@") ? guestContact.trim() : "");
-  const effectiveName = user?.display_name || (!guestContact.includes("@") ? guestContact.trim() : "");
+  const handleSessionError = useCallback((error: unknown) => {
+    if (error instanceof BffError && (error.status === 401 || error.status === 403)) {
+      queryClient.setQueryData(["me"], null);
+    }
+  }, [queryClient]);
 
   const tourSteps: TourStep[] = [
     {
@@ -166,30 +142,20 @@ export function SupportChat() {
     },
   ];
 
-  // Build URL for chat sync
-  const buildChatQuery = useCallback(
-    (markRead: boolean) => {
-      const params = new URLSearchParams();
-      if (guestId) params.set("guest_id", guestId);
-      if (effectiveEmail) params.set("email", effectiveEmail);
-      if (markRead) params.set("mark_read", "true");
-      return `chat?${params.toString()}`;
-    },
-    [guestId, effectiveEmail],
-  );
-
   // Manual refresh button handler
   const handleManualRefresh = async () => {
-    if (!guestId && !effectiveEmail) return;
+    if (!user || sendingRef.current) return;
+    const revision = ++revisionRef.current;
     setIsSyncing(true);
     try {
-      const state = await bff<GuestChatState>(buildChatQuery(true));
-      if (state && Array.isArray(state.messages)) {
+      const state = await bff<GuestChatState>("chat?mark_read=true");
+      if (revision === revisionRef.current && state && Array.isArray(state.messages)) {
         setMessages(state.messages);
         setUnreadCount(0);
       }
-    } catch {
-      // Ignore silent failure
+    } catch (error) {
+      handleSessionError(error);
+      toast.error("Could not refresh messages. Please try again.");
     } finally {
       setIsSyncing(false);
     }
@@ -202,46 +168,32 @@ export function SupportChat() {
     }
   }, [messages, isOpen, mode]);
 
-  // Real-time polling: 4s when open; 5s when closed (if user has chatted or has email) + instant sync on tab focus
+  // Poll only for signed-in accounts; never acknowledge replies in a hidden tab.
   useEffect(() => {
-    if (!isMounted || pathname.startsWith("/admin")) return;
-    if (!guestId && !effectiveEmail) return;
+    if (!isMounted || !user || pathname.startsWith("/admin")) return;
 
     let cancelled = false;
-    const poll = (markRead: boolean) => {
-      bff<GuestChatState>(buildChatQuery(markRead))
+    let inFlight = false;
+    const poll = () => {
+      if (inFlight || sendingRef.current || document.visibilityState !== "visible") return;
+      const markRead = isOpen && mode === "chat";
+      const revision = ++revisionRef.current;
+      inFlight = true;
+      bff<GuestChatState>(markRead ? "chat?mark_read=true" : "chat")
         .then((state) => {
-          if (cancelled || !state || !Array.isArray(state.messages)) return;
+          if (cancelled || revision !== revisionRef.current || sendingRef.current || !state || !Array.isArray(state.messages)) return;
           setMessages(state.messages);
           setUnreadCount(markRead ? 0 : state.unread_by_guest || 0);
-          if (state.messages.length > 0) {
-            setHasStartedChat(true);
-            try {
-              localStorage.setItem(STORAGE_STARTED_KEY, "true");
-            } catch {}
-          }
         })
-        .catch(() => {});
+        .catch((error) => { if (!cancelled) handleSessionError(error); })
+        .finally(() => { inFlight = false; });
     };
 
-    const shouldPoll = isOpen || hasStartedChat || Boolean(effectiveEmail);
-    if (!shouldPoll) return;
+    poll();
 
-    const markOnPoll = isOpen && mode === "chat";
-    poll(markOnPoll);
+    const timer = setInterval(poll, isOpen ? 4000 : 25000);
 
-    const intervalMs = isOpen ? 4000 : 5000;
-    const timer = setInterval(() => {
-      if (typeof document !== "undefined" && document.visibilityState === "visible") {
-        poll(markOnPoll);
-      }
-    }, intervalMs);
-
-    const handleResume = () => {
-      if (typeof document === "undefined" || document.visibilityState === "visible") {
-        poll(markOnPoll);
-      }
-    };
+    const handleResume = () => poll();
 
     window.addEventListener("focus", handleResume);
     document.addEventListener("visibilitychange", handleResume);
@@ -252,7 +204,7 @@ export function SupportChat() {
       window.removeEventListener("focus", handleResume);
       document.removeEventListener("visibilitychange", handleResume);
     };
-  }, [isMounted, pathname, isOpen, mode, guestId, effectiveEmail, hasStartedChat, buildChatQuery]);
+  }, [isMounted, pathname, isOpen, mode, user, handleSessionError]);
 
   // Mascot inactivity & custom events
   const resetInactivity = useCallback(() => {
@@ -303,13 +255,9 @@ export function SupportChat() {
 
   const handleSendMessage = async (rawText: string) => {
     const cleanText = rawText.trim();
-    if (!cleanText || isSending) return;
-
-    if (!user?.email && guestContact.trim()) {
-      try {
-        localStorage.setItem(STORAGE_EMAIL_KEY, guestContact.trim());
-      } catch {}
-    }
+    if (!user || !cleanText || cleanText.length > 2000 || sendingRef.current) return;
+    sendingRef.current = true;
+    revisionRef.current++;
 
     const optimisticId = `temp-${Date.now()}`;
     const optimisticMsg: ChatMessageItem = {
@@ -322,18 +270,11 @@ export function SupportChat() {
     setMessages((prev) => [...prev, optimisticMsg]);
     setInputText("");
     setIsSending(true);
-    setHasStartedChat(true);
-    try {
-      localStorage.setItem(STORAGE_STARTED_KEY, "true");
-    } catch {}
 
     try {
       const state = await bff<GuestChatState>("chat/messages", {
         method: "POST",
         body: {
-          guest_id: guestId || undefined,
-          email: effectiveEmail || undefined,
-          name: effectiveName || undefined,
           text: cleanText,
         },
       });
@@ -342,10 +283,12 @@ export function SupportChat() {
         setUnreadCount(0);
       }
     } catch (e) {
+      handleSessionError(e);
       toast.error(e instanceof Error ? e.message : "Could not send message. Please try again.");
       setMessages((prev) => prev.filter((m) => m.id !== optimisticId));
       setInputText(cleanText);
     } finally {
+      sendingRef.current = false;
       setIsSending(false);
     }
   };
@@ -381,6 +324,9 @@ export function SupportChat() {
 
   if (!isMounted || pathname.startsWith("/admin")) return null;
   const isContactPage = pathname === "/contact";
+  const returnUrl = new URL(window.location.href);
+  returnUrl.searchParams.set("support", "chat");
+  const loginHref = `/login?next=${encodeURIComponent(returnUrl.pathname + returnUrl.search)}`;
 
   return (
     <>
@@ -409,7 +355,7 @@ export function SupportChat() {
                 if (endedAnim === "waking") setFloatingAnim("idle");
               }}
             />
-            {unreadCount > 0 && (
+            {user && unreadCount > 0 && (
               <span
                 className="absolute -top-0.5 -right-0.5 z-10 min-w-5 h-5 px-1 rounded-full border-2 border-background bg-foreground text-background text-[10px] font-black grid place-items-center shadow-hard-xs animate-bounce"
                 aria-label={`${unreadCount} unread message`}
@@ -469,7 +415,7 @@ export function SupportChat() {
                 <span>{mode === "guide" ? "Chat" : "Guide"}</span>
               </button>
 
-              {mode === "chat" && (
+              {mode === "chat" && user && (
                 <button
                   type="button"
                   onClick={() => void handleManualRefresh()}
@@ -585,6 +531,20 @@ export function SupportChat() {
                 </button>
               </div>
             </div>
+          ) : isPending ? (
+            <div role="status" className="flex-1 grid place-items-center p-5 text-sm text-muted-foreground">
+              Checking your account...
+            </div>
+          ) : !user ? (
+            <div className="flex flex-1 flex-col justify-center gap-4 p-5">
+              <h3 className="text-lg font-black uppercase">Log in to chat</h3>
+              <p className="text-sm text-muted-foreground">
+                Chat with our support team using your account. Your name, email and conversation stay together so we can help you.
+              </p>
+              <Link href={loginHref} onClick={() => setIsOpen(false)} className="inline-flex min-h-11 items-center justify-center border-2 border-border bg-primary px-4 py-2 text-sm font-bold uppercase text-primary-foreground shadow-hard-sm">
+                Log in to continue
+              </Link>
+            </div>
           ) : (
             <div className="flex flex-1 flex-col overflow-hidden">
               {/* Message Feed */}
@@ -648,18 +608,9 @@ export function SupportChat() {
                 ))}
               </div>
 
-              {/* Optional Name/Email field for guests (never blocks messaging!) */}
-              {!user?.email && (
-                <div className="border-t border-border/60 bg-card px-3 py-1.5 flex items-center gap-2 shrink-0">
-                  <input
-                    type="text"
-                    value={guestContact}
-                    onChange={(e) => setGuestContact(e.target.value)}
-                    placeholder="Your name or email (optional)"
-                    className="w-full bg-transparent text-base sm:text-xs font-medium focus:outline-none placeholder:text-muted-foreground/60 border-b border-border/40 focus:border-primary py-0.5"
-                  />
-                </div>
-              )}
+              <p className="border-t border-border/60 px-3 py-1.5 text-xs text-muted-foreground truncate">
+                Chatting as {user.display_name || user.email || "Student"}
+              </p>
 
               {/* Simple Message Input Bar */}
               <form
@@ -674,6 +625,8 @@ export function SupportChat() {
                   value={inputText}
                   onChange={(e) => setInputText(e.target.value)}
                   placeholder="Write a message..."
+                  aria-label="Your message"
+                  maxLength={2000}
                   disabled={isSending}
                   className="flex-1 min-w-0 border-2 border-border bg-background px-3 py-2 text-base sm:text-sm font-medium focus:outline-none focus:ring-1 focus:ring-primary shadow-hard-sm"
                 />

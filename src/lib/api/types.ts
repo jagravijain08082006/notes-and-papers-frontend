@@ -341,6 +341,69 @@ export interface AdminOverview {
   kpis: Record<string, number>;
   last_run: AdminRun | null;
   charts: Record<"new_papers" | "searches" | "downloads", { date: string; count: number }[]>;
+  top_downloads?: AdminTopDownload[];
+  top_searches?: AdminTopSearch[];
+}
+
+export interface AdminTopDownload {
+  slug: string;
+  title: string;
+  path: string;
+  downloads: number;
+  views: number;
+  attempts: number;
+}
+
+export interface AdminTopSearch {
+  query: string;
+  count: number;
+  avg_results: number;
+  no_results: number;
+  last_seen: string;
+}
+
+export interface AdminSeoOverview {
+  pages: number;
+  indexed: number;
+  not_indexed: number;
+  unknown: number;
+  pages_with_metrics: number;
+  clicks: number | null;
+  impressions: number | null;
+  pages_with_issues: number;
+  last_synced: string | null;
+  last_audited: string | null;
+  search_console: {
+    configured: boolean;
+    credentials_configured: boolean;
+    property_configured: boolean;
+    status: "not_configured" | "not_synced" | "ok" | "error";
+    last_success?: string;
+    period_start?: string;
+    period_end?: string;
+    error?: string | null;
+  };
+}
+
+export interface AdminSeoPage {
+  url: string;
+  page_type: string | null;
+  indexed: boolean | null;
+  clicks: number | null;
+  impressions: number | null;
+  ctr: number | null;
+  position: number | null;
+  issues: string[];
+  paper_id?: string | null;
+}
+
+export interface AdminSeoInspectResult {
+  checked: boolean;
+  url: string;
+  indexed: boolean;
+  verdict: "PASS" | "FAIL" | "NEUTRAL";
+  coverage: string | null;
+  last_crawl: string | null;
 }
 
 export interface AuditEntry {
@@ -403,6 +466,7 @@ export interface ChatMessageItem {
   created_at: string;
 }
 
+/** Authenticated account chat. Legacy guest_* field names are retained in the API contract. */
 export interface GuestChatState {
   conversation_id: string | null;
   guest_name: string | null;

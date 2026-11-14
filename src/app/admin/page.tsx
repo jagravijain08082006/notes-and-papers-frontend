@@ -4,12 +4,15 @@ import { NoPermission } from "@/components/admin/no-permission";
 import { authedFetch, getMe } from "@/lib/api/server";
 import type { AdminOverview } from "@/lib/api/types";
 import Link from "next/link";
+import { ActivityRankings } from "@/components/admin/activity-rankings";
+import { enumParam } from "@/lib/search-params";
 
-export default async function AdminOverviewPage() {
+export default async function AdminOverviewPage(props: PageProps<"/admin">) {
   const me = await getMe();
   if (me?.role === "moderator") redirect("/admin/review");
   if (me?.role !== "admin") return <NoPermission />;
-  const o = await authedFetch<AdminOverview>("/admin/overview", { query: { days: 30 } }, "/admin");
+  const days = Number(enumParam((await props.searchParams).days, ["7", "30", "90"] as const, "30"));
+  const o = await authedFetch<AdminOverview>("/admin/overview", { query: { days } }, "/admin");
   const k = o.kpis;
 
   const totalDownloads = k.downloads_total ?? k.downloads_7d ?? 0;
@@ -75,11 +78,27 @@ export default async function AdminOverviewPage() {
           <StatCard
             label="Support Queries"
             value={unreadChats > 0 ? `${unreadChats} Unread` : "All read"}
-            hint={`${(k.chats_open ?? 0).toLocaleString("en-IN")} active conversations`}
+            hint={`${(k.chats_open ?? 0).toLocaleString("en-IN")} conversations`}
             tone={unreadChats > 0 ? "warn" : undefined}
             href="/admin/reports"
           />
         </div>
+      </section>
+
+      <section className="mt-5 space-y-3" aria-labelledby="popular-activity">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 id="popular-activity" className="text-xs font-black uppercase tracking-wider text-muted-foreground">Popular activity</h2>
+          <nav aria-label="Activity period" className="flex gap-1 text-sm">
+            {[7, 30, 90].map((period) => (
+              <Link key={period} href={`/admin?days=${period}`} aria-current={period === days ? "page" : undefined}
+                className={`inline-flex min-h-10 items-center border-2 border-border px-3 font-bold ${period === days ? "bg-primary text-primary-foreground" : "bg-card hover:bg-muted"}`}>
+                {period} days
+              </Link>
+            ))}
+          </nav>
+        </div>
+        <ActivityRankings downloads={o.top_downloads ?? []} searches={o.top_searches ?? []} days={days} />
+        <Link href={`/admin/insights?days=${days}`} className="inline-block text-xs font-bold text-link hover:underline">View search gaps and more rankings →</Link>
       </section>
 
       {/* Content Repository & Operations KPIs */}

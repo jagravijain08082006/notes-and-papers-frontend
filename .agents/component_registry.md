@@ -31,7 +31,7 @@
 - **BookmarkButton / ReportDialog (supports variant, size) / PdfPreview:** src/components/shared/{bookmark-button,report-dialog,pdf-preview}.tsx
 - **PaperPage (high-impact hero download card + trust badges):** src/components/shared/paper-page.tsx
 - **UploadForm / ContactForm (min 16px font inputs):** src/components/shared/{upload-form,contact-form}.tsx
-- **SupportChat / SupportChatTrigger (1-on-1 DB-synced guest chat, persistent guest_id, live polling, interactive tour):** src/components/shared/support-chat.tsx
+- **SupportChat / SupportChatTrigger (login-required account chat, session identity, live polling, interactive tour):** src/components/shared/support-chat.tsx
 - **NoteyAvatar (animated mascot avatar with conditional semantic div/button rendering):** src/components/account/notey-avatar.tsx
 
 ## hooks & lib utilities
@@ -51,3 +51,5 @@
 
 ## Not built yet
 YearTabs, AdSlot.
+
+- **ActivityRankings (admin top downloaded papers and search terms, counts, links, no-result hints, period/empty states):** src/components/admin/activity-rankings.tsx; shared by overview, Insights and Analytics.

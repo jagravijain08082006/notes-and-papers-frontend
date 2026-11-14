@@ -4,6 +4,8 @@ import { BarChart, PageHeader, StatCard } from "@/components/admin/ui";
 import { EmptyState } from "@/components/shared/empty-state";
 import { authedFetch, getMe } from "@/lib/api/server";
 import { enumParam } from "@/lib/search-params";
+import { ActivityRankings } from "@/components/admin/activity-rankings";
+import type { AdminTopDownload, AdminTopSearch } from "@/lib/api/types";
 
 interface Analytics {
   days: number;
@@ -11,8 +13,8 @@ interface Analytics {
   sessions: number;
   daily: { day: string; type: string; n: number }[];
   top_pages: { path: string; n: number }[];
-  top_searches: { query: string; n: number }[];
-  top_papers: { slug: string; title: string; views: number; attempts: number; downloads: number }[];
+  top_searches: AdminTopSearch[];
+  top_papers: AdminTopDownload[];
   funnel: { step: string; n: number }[];
 }
 
@@ -123,29 +125,14 @@ export default async function AnalyticsPage(props: PageProps<"/admin/analytics">
         </ul>
       </section>
 
-      <div className="mt-4 grid gap-4 xl:grid-cols-3">
+      <div className="mt-4">
+        <ActivityRankings downloads={a.top_papers} searches={a.top_searches} days={days} />
+      </div>
+      <div className="mt-4">
         <List
           title="Top pages"
           rows={a.top_pages.map((p) => ({ key: p.path, label: p.path, value: String(p.n) }))}
           empty="Browse the site and pages show up here."
-        />
-        <List
-          title="Top searches"
-          rows={a.top_searches.map((s) => ({ key: s.query, label: s.query, value: `${s.n}x` }))}
-          empty="Searches appear as people use the site."
-        />
-        <List
-          title="Top resources"
-          rows={a.top_papers.map((p) => ({
-            key: p.slug,
-            label: (
-              <Link className="text-link hover:underline" href={`/papers/${p.slug}`}>
-                {p.title}
-              </Link>
-            ),
-            value: `${p.views} views · ${p.downloads} dl`,
-          }))}
-          empty="Open a paper page to record a view."
         />
       </div>
     </>

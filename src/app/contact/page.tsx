@@ -31,7 +31,7 @@ export default function ContactPage() {
               Instant Support Chat
             </h2>
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-lg">
-              Talk directly with our support team. Request missing exam papers, report broken links, or ask any question—replies appear right inside your chat.
+              Log in to talk directly with our support team. Request missing exam papers, report broken links, or ask any question—replies appear right inside your chat.
             </p>
           </div>
 

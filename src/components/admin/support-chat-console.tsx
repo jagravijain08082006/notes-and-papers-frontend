@@ -68,6 +68,8 @@ export function SupportChatConsole({
   const [showMobileChat, setShowMobileChat] = useState(false);
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const sendingRef = useRef(false);
+  const revisionRef = useRef(0);
 
   const selectedChat = useMemo(
     () => chats.find((c) => c.id === selectedId) ?? null,
@@ -99,9 +101,10 @@ export function SupportChatConsole({
 
   // Fetch conversation list cleanly (no synchronous setState inside effect paths)
   const fetchChatList = useCallback(async () => {
+    const revision = revisionRef.current;
     try {
       const list = await bff<AdminChatSummary[]>("admin/chats?limit=150");
-      if (Array.isArray(list)) {
+      if (revision === revisionRef.current && !sendingRef.current && Array.isArray(list)) {
         setChats(list);
       }
     } catch {
@@ -110,10 +113,12 @@ export function SupportChatConsole({
   }, []);
 
   const handleManualRefresh = async () => {
+    if (sendingRef.current) return;
+    const revision = revisionRef.current;
     setIsRefreshing(true);
     try {
       const list = await bff<AdminChatSummary[]>("admin/chats?limit=150");
-      if (Array.isArray(list)) {
+      if (revision === revisionRef.current && !sendingRef.current && Array.isArray(list)) {
         setChats(list);
         toast.success("Conversations refreshed.");
       }
@@ -139,9 +144,10 @@ export function SupportChatConsole({
   useEffect(() => {
     if (!selectedId) return;
     let cancelled = false;
+    const revision = revisionRef.current;
     bff<AdminChatDetail>(`admin/chats/${selectedId}?mark_read=false`)
       .then((detail) => {
-        if (cancelled || !detail) return;
+        if (cancelled || revision !== revisionRef.current || sendingRef.current || !detail) return;
         setMessagesMap((prev) => ({ ...prev, [selectedId]: detail.messages }));
         setChats((prev) =>
           prev.map((c) =>
@@ -170,15 +176,19 @@ export function SupportChatConsole({
 
   // Real-time background polling: refresh chat list (5s) + active thread (4s) WITHOUT auto-marking read
   useEffect(() => {
+    let cancelled = false;
+    let inFlight = false;
     const syncNow = () => {
-      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      if (cancelled || inFlight || sendingRef.current || document.visibilityState !== "visible") return;
+      const revision = revisionRef.current;
+      inFlight = true;
       void fetchChatList().then(() => {
         window.dispatchEvent(new Event("np:admin-chat-updated"));
       });
       if (selectedId) {
         bff<AdminChatDetail>(`admin/chats/${selectedId}?mark_read=false`)
           .then((detail) => {
-            if (!detail) return;
+            if (cancelled || revision !== revisionRef.current || sendingRef.current || !detail) return;
             setMessagesMap((prev) => ({ ...prev, [selectedId]: detail.messages }));
             setChats((prev) =>
               prev.map((c) =>
@@ -195,7 +205,10 @@ export function SupportChatConsole({
             );
             window.dispatchEvent(new Event("np:admin-chat-updated"));
           })
-          .catch(() => {});
+          .catch(() => {})
+          .finally(() => { inFlight = false; });
+      } else {
+        inFlight = false;
       }
     };
 
@@ -204,6 +217,7 @@ export function SupportChatConsole({
     document.addEventListener("visibilitychange", syncNow);
 
     return () => {
+      cancelled = true;
       clearInterval(listTimer);
       window.removeEventListener("focus", syncNow);
       document.removeEventListener("visibilitychange", syncNow);
@@ -218,6 +232,8 @@ export function SupportChatConsole({
   }, [activeMessages, selectedId]);
 
   const handleSelectChat = (chat: AdminChatSummary) => {
+    if (sendingRef.current) return;
+    setReplyText("");
     setSelectedId(chat.id);
     setShowMobileChat(true);
     if (chat.unread_by_admin > 0) {
@@ -226,9 +242,11 @@ export function SupportChatConsole({
   };
 
   const handleSendReply = async () => {
-    if (!selectedChat || isSending) return;
+    if (!selectedChat || sendingRef.current) return;
     const text = replyText.trim();
-    if (!text) return;
+    if (!text || text.length > 2000) return;
+    sendingRef.current = true;
+    revisionRef.current++;
 
     const convId = selectedChat.id;
     const optimisticId = `temp-admin-${Date.now()}`;
@@ -282,6 +300,7 @@ export function SupportChatConsole({
       }));
       setReplyText(text);
     } finally {
+      sendingRef.current = false;
       setIsSending(false);
     }
   };
@@ -293,6 +312,7 @@ export function SupportChatConsole({
     }
     try {
       await bff(`admin/chats/${chat.id}`, { method: "DELETE" });
+      revisionRef.current++;
       setChats((prev) => {
         const next = prev.filter((c) => c.id !== chat.id);
         if (selectedId === chat.id) {
@@ -390,6 +410,7 @@ export function SupportChatConsole({
                     key={c.id}
                     type="button"
                     onClick={() => handleSelectChat(c)}
+                    disabled={isSending}
                     className={`w-full text-left p-3 transition-colors cursor-pointer flex items-start gap-2.5 ${
                       isSelected
                         ? "bg-primary/20 border-l-4 border-l-primary"
@@ -591,6 +612,8 @@ export function SupportChatConsole({
                 >
                   <textarea
                     rows={2}
+                    maxLength={2000}
+                    aria-label="Reply to conversation"
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     onFocus={() => {

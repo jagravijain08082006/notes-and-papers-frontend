@@ -4,18 +4,8 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { authedFetch, getMe } from "@/lib/api/server";
 import { enumParam } from "@/lib/search-params";
 import Link from "next/link";
-
-interface Q {
-  query: string;
-  count: number;
-  avg_results?: number;
-  last_seen?: string;
-}
-interface D {
-  slug: string;
-  title: string;
-  downloads: number;
-}
+import { ActivityRankings } from "@/components/admin/activity-rankings";
+import type { AdminTopDownload, AdminTopSearch } from "@/lib/api/types";
 
 function List({
   title,
@@ -52,13 +42,13 @@ export default async function InsightsPage(props: PageProps<"/admin/insights">) 
   if ((await getMe())?.role !== "admin") return <NoPermission />;
   const days = Number(enumParam((await props.searchParams).days, ["7", "30", "90"] as const, "30"));
   const [top, gaps, dl] = await Promise.all([
-    authedFetch<Q[]>("/admin/insights/searches", { query: { days, limit: 15 } }, "/admin/insights"),
-    authedFetch<Q[]>(
+    authedFetch<AdminTopSearch[]>("/admin/insights/searches", { query: { days, limit: 15 } }, "/admin/insights"),
+    authedFetch<AdminTopSearch[]>(
       "/admin/insights/no-results",
       { query: { days, limit: 15 } },
       "/admin/insights",
     ),
-    authedFetch<D[]>(
+    authedFetch<AdminTopDownload[]>(
       "/admin/insights/downloads",
       { query: { days, limit: 15 } },
       "/admin/insights",
@@ -68,8 +58,8 @@ export default async function InsightsPage(props: PageProps<"/admin/insights">) 
   return (
     <>
       <PageHeader
-        title="Search insights"
-        description="What people look for. Zero-result searches are content gaps: add those papers next."
+        title="Popular papers & searches"
+        description="See which papers students download and what they search for. Use searches with no results to decide what to add next."
         actions={
           <nav aria-label="Period" className="flex gap-1 text-sm">
             {[7, 30, 90].map((d) => (
@@ -85,36 +75,13 @@ export default async function InsightsPage(props: PageProps<"/admin/insights">) 
           </nav>
         }
       />
-      <div className="grid gap-4 xl:grid-cols-3">
-        <List
-          title="Top searches"
-          hint={`Last ${days} days`}
-          rows={top.map((q) => ({
-            key: q.query,
-            label: q.query,
-            value: `${q.count}× · ~${q.avg_results} results`,
-          }))}
-          empty="Searches will appear as people use the site."
-        />
+      <ActivityRankings downloads={dl} searches={top} days={days} />
+      <div className="mt-4">
         <List
           title="No-result searches (content gaps)"
           hint="Queries that returned nothing"
-          rows={gaps.map((q) => ({ key: q.query, label: q.query, value: `${q.count}×` }))}
-          empty="Every search found something. Nice."
-        />
-        <List
-          title="Most downloaded"
-          hint={`Last ${days} days`}
-          rows={dl.map((d) => ({
-            key: d.slug,
-            label: (
-              <Link className="text-link hover:underline" href={`/papers/${d.slug}`}>
-                {d.title}
-              </Link>
-            ),
-            value: `${d.downloads}`,
-          }))}
-          empty="Downloads will appear here."
+          rows={gaps.map((q) => ({ key: q.query, label: q.query, value: `${q.count.toLocaleString("en-IN")} searches` }))}
+          empty="No searches with zero results recorded for this period."
         />
       </div>
     </>
