@@ -8,6 +8,8 @@ Production `notesandpapers.dpdns.org` is on **Vercel**, linked by `.vercel/proje
 
 The older Cloudflare setup below is historical. On 2026-11-14 the app/front Workers accepted uploads, but their custom-domain registration failed because externally managed records exist. Reading Cloudflare confirmed zero Worker domains and zero zone Worker routes. Existing production DNS was preserved. Verify production through authenticated admin HTML containing the new rankings and Search Console setup/index-check controls.
 
+Last verified production deployment: **2026-11-14**, source commit `5c48de6`, Vercel deployment `dpl_6zwt2DzLozuLjbHkU94NuMTx7651` (READY), aliased to `https://notesandpapers.dpdns.org`. Live authenticated admin/SEO HTML, sampled assets, login redirect and unauthenticated chat checks passed. Backend source `1f28bdf` is live on Render. Cleanup retries transient Windows export-directory locks after deployment.
+
 ## Status
 
 | Part | State |

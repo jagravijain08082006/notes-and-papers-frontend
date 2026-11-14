@@ -39,5 +39,5 @@ try {
     execSync("npx vercel deploy --prod --yes", { cwd: tmp, stdio: "inherit" });
   }
 } finally {
-  rmSync(tmp, { recursive: true, force: true });
+  rmSync(tmp, { recursive: true, force: true, maxRetries: 8, retryDelay: 250 });
 }
