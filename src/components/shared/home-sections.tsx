@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useExams, useLatestPapers, useUniversities } from "@/hooks/use-catalog";
 import type { ExamSummary, Paginated, PaperSummary, UniversityListItem } from "@/lib/api/types";
-import { cleanExamTitle, getExamDomain } from "@/lib/exam-categories";
+import { cleanExamTitle, EXAM_DOMAINS, getExamDomain } from "@/lib/exam-categories";
 import { routes, yearRange } from "@/lib/routes";
 import { cn, plural } from "@/lib/utils";
 import { EmptyState } from "./empty-state";
@@ -44,10 +44,10 @@ export function SectionHeading({
   return (
     <div className="flex flex-wrap items-end justify-between gap-3 w-full min-w-0">
       <div className="space-y-2 min-w-0">
-        <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground">
+        <p className="hidden eyebrow bg-accent px-2 py-0.5 text-accent-foreground sm:inline-block">
           {eyebrow}
         </p>
-        <h2 id={id} className="text-3xl sm:text-4xl lg:text-5xl break-words leading-none">
+        <h2 id={id} className="text-2xl sm:text-4xl lg:text-5xl break-words leading-none">
           {title}
         </h2>
       </div>
@@ -66,7 +66,7 @@ export function SectionHeading({
 function TileGrid({ children, busy }: { children: React.ReactNode; busy?: boolean }) {
   return (
     <ul
-      className="grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-full min-w-0 max-w-full"
+      className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4 w-full min-w-0 max-w-full"
       aria-busy={busy || undefined}
     >
       {children}
@@ -206,28 +206,29 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
       : POPULAR_SCHOOL_BOARDS.filter((b) => b.slug !== "other-exams");
 
   return (
-    <section aria-labelledby="courses-heading" className="space-y-8">
+    <section aria-labelledby="courses-heading" className="space-y-4 sm:space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <SectionHeading
           id="courses-heading"
           eyebrow="Degree courses & curricula"
-          title="Browse university & degree courses"
+          title="Universities & boards"
           href={routes.universities}
           linkLabel="All universities"
         />
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <div className="flex flex-wrap items-center gap-2 pb-1">
         {ACADEMIC_TABS.map((tab) => {
           const isSelected = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               type="button"
+              aria-pressed={isSelected}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "shrink-0 border-2 border-border px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all shadow-hard-sm hover:-translate-x-px hover:-translate-y-px",
+                "min-h-10 shrink-0 border border-border px-3 py-2 text-xs sm:border-2 sm:px-3.5 sm:py-1.5 font-bold uppercase tracking-wider transition-all shadow-hard-sm hover:-translate-x-px hover:-translate-y-px",
                 isSelected
                   ? "bg-primary text-primary-foreground shadow-hard"
                   : "bg-card text-foreground hover:bg-primary/20",
@@ -251,20 +252,20 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
               <li key={u.slug} className="w-full min-w-0 max-w-full">
                 <Link
                   href={routes.university(u.slug)}
-                  className="brutal brutal-hover group flex h-full w-full min-w-0 flex-col justify-between gap-5 p-5 bg-card"
+                  className="brutal brutal-hover group flex h-full w-full min-w-0 flex-col justify-between gap-3 p-3 sm:gap-5 sm:p-5 bg-card"
                 >
                   <span className="block space-y-3 min-w-0">
-                    <span className="grid size-11 place-items-center border-2 border-border bg-primary transition-colors group-hover:bg-accent shadow-hard-sm">
+                    <span className="hidden size-11 place-items-center sm:grid border-2 border-border bg-primary transition-colors group-hover:bg-accent shadow-hard-sm">
                       <GraduationCap className="size-5" aria-hidden="true" />
                     </span>
-                    <span className="block font-display text-2xl sm:text-3xl uppercase leading-[1.2] break-words group-hover:text-link transition-colors">
+                    <span className="block text-sm font-bold leading-snug break-words sm:font-display sm:text-3xl sm:font-normal sm:uppercase group-hover:text-link transition-colors">
                       {u.name}
                     </span>
-                    <span className="eyebrow block text-muted-foreground truncate">
+                    <span className="block truncate text-xs text-muted-foreground sm:font-mono sm:uppercase">
                       {plural(u.paper_count, "paper")} · {plural(u.course_count, "course")}
                     </span>
                   </span>
-                  <span className="flex flex-wrap gap-2">
+                  <span className="flex flex-wrap gap-1.5 sm:gap-2">
                     {u.top_courses.map((c) => (
                       <span key={c.slug} className="eyebrow border-2 border-border px-1.5 py-0.5">
                         {c.name}
@@ -281,24 +282,24 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
               <li key={b.slug} className="w-full min-w-0 max-w-full">
                 <Link
                   href={b.href}
-                  className="brutal brutal-hover group flex h-full w-full min-w-0 flex-col justify-between gap-5 p-5 bg-card"
+                  className="brutal brutal-hover group flex h-full w-full min-w-0 flex-col justify-between gap-3 p-3 sm:gap-5 sm:p-5 bg-card"
                 >
                   <span className="block space-y-3 min-w-0">
-                    <span className="grid size-11 place-items-center border-2 border-border bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground shadow-hard-sm">
+                    <span className="hidden size-11 place-items-center sm:grid border-2 border-border bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground shadow-hard-sm">
                       {b.slug === "other-exams" ? (
                         <Award className="size-5" aria-hidden="true" />
                       ) : (
                         <School className="size-5" aria-hidden="true" />
                       )}
                     </span>
-                    <span className="block font-display text-2xl sm:text-3xl uppercase leading-[1.2] break-words group-hover:text-link transition-colors">
+                    <span className="block text-sm font-bold leading-snug break-words sm:font-display sm:text-3xl sm:font-normal sm:uppercase group-hover:text-link transition-colors">
                       {b.name}
                     </span>
-                    <span className="eyebrow block text-muted-foreground truncate">
+                    <span className="block truncate text-xs text-muted-foreground sm:font-mono sm:uppercase">
                       {b.subtitle}
                     </span>
                   </span>
-                  <span className="flex flex-wrap gap-2">
+                  <span className="flex flex-wrap gap-1.5 sm:gap-2">
                     {b.tags.map((t) => (
                       <span key={t.label} className="eyebrow border-2 border-border px-1.5 py-0.5">
                         {t.label}
@@ -314,16 +315,7 @@ export function UniversitiesSection({ initial }: { initial: UniversityListItem[]
   );
 }
 
-const HOME_EXAM_TABS = [
-  { id: "all", label: "All Popular" },
-  { id: "school-boards", label: "School Boards (RBSE, CBSE)" },
-  { id: "banking-ssc", label: "Banking & SSC" },
-  { id: "civil-services", label: "Civil Services" },
-  { id: "engineering", label: "Engineering" },
-  { id: "medical", label: "Medical & Nursing" },
-  { id: "teaching", label: "Teaching & TET" },
-  { id: "defence", label: "Defence" },
-];
+const HOME_EXAM_TABS = EXAM_DOMAINS.map(({ id, label }) => ({ id, label }));
 
 /** Popular exams. Data: GET /api/exams (server-rendered first, refreshed on load). */
 export function ExamsSection({ initial }: { initial: ExamSummary[] | null }) {
@@ -333,38 +325,39 @@ export function ExamsSection({ initial }: { initial: ExamSummary[] | null }) {
   const allExams = (data ?? []).filter((e) => e.paper_count > 0);
 
   // Filter exams based on selected domain
-  const filteredExams = allExams.filter((e) => {
-    if (activeTab === "all") return true;
-    const domain = getExamDomain(e);
-    if (activeTab === "banking-ssc") {
-      return domain.id === "banking-finance" || domain.id === "ssc-police";
-    }
-    return domain.id === activeTab;
-  }).slice(0, 24);
+  const filteredExams = allExams
+    .filter((e) => {
+      if (activeTab === "all") return true;
+      const domain = getExamDomain(e);
+
+      return domain.id === activeTab;
+    })
+    .slice(0, 24);
 
   return (
-    <section aria-labelledby="exams-heading" className="space-y-8">
+    <section aria-labelledby="exams-heading" className="space-y-4 sm:space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <SectionHeading
           id="exams-heading"
           eyebrow="National & other state archives"
-          title="Competitive exams & all boards"
+          title="Exam categories"
           href={routes.exams}
-          linkLabel="All 300+ exams"
+          linkLabel="All exams"
         />
       </div>
 
       {/* Domain Category Filter Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <div className="flex flex-wrap items-center gap-2 pb-1">
         {HOME_EXAM_TABS.map((tab) => {
           const isSelected = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               type="button"
+              aria-pressed={isSelected}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "shrink-0 border-2 border-border px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition-all shadow-hard-sm hover:-translate-x-px hover:-translate-y-px",
+                "min-h-10 shrink-0 border border-border px-3 py-2 text-xs sm:border-2 sm:px-3.5 sm:py-1.5 font-bold uppercase tracking-wider transition-all shadow-hard-sm hover:-translate-x-px hover:-translate-y-px",
                 isSelected
                   ? "bg-primary text-primary-foreground shadow-hard"
                   : "bg-card text-foreground hover:bg-primary/20",
@@ -390,26 +383,30 @@ export function ExamsSection({ initial }: { initial: ExamSummary[] | null }) {
               <li key={e.slug} className="w-full min-w-0 max-w-full">
                 <Link
                   href={routes.exam(e.slug)}
-                  className="brutal brutal-hover flex h-full w-full min-w-0 flex-col justify-between gap-5 p-5 bg-card"
+                  className="brutal brutal-hover flex h-full w-full min-w-0 flex-col justify-between gap-3 p-3 sm:gap-5 sm:p-5 bg-card"
                 >
                   <span className="flex items-start justify-between">
                     <span
-                      className={`grid size-11 place-items-center border-2 border-border ${i % 2 ? "bg-accent" : "bg-primary"}`}
+                      className={`hidden size-11 place-items-center sm:grid border-2 border-border ${i % 2 ? "bg-accent" : "bg-primary"}`}
                     >
                       <DomainIcon className="size-5" aria-hidden="true" />
                     </span>
-                    <span className="eyebrow border border-border/40 px-1.5 py-0.5 text-[11px] text-muted-foreground">
+                    <span className="hidden eyebrow border border-border/40 px-1.5 py-0.5 text-[11px] text-muted-foreground sm:inline">
                       {e.kind === "board" ? "School Board" : domain.label}
                     </span>
                   </span>
                   <span className="min-w-0">
-                    <span className="line-clamp-2 block font-display text-2xl uppercase leading-snug break-words">
+                    <span className="line-clamp-3 block text-sm font-bold leading-snug break-words sm:line-clamp-2 sm:font-display sm:text-2xl sm:font-normal sm:uppercase">
                       {cleanTitle}
                     </span>
-                    <span className="eyebrow mt-3 flex items-center justify-between border-t border-border/30 pt-2 text-muted-foreground">
-                      <span className="font-bold text-foreground">{plural(e.paper_count, "paper")}</span>
+                    <span className="mt-3 flex items-center justify-between border-t border-border/30 pt-2 text-xs text-muted-foreground sm:font-mono sm:uppercase">
+                      <span className="font-bold text-foreground">
+                        {plural(e.paper_count, "paper")}
+                      </span>
                       {e.year_min && (
-                        <span>{yearRange(e.year_min, e.year_max)}</span>
+                        <span className="hidden sm:inline">
+                          {yearRange(e.year_min, e.year_max)}
+                        </span>
                       )}
                     </span>
                   </span>
@@ -450,14 +447,20 @@ export function LatestPapersSection({
   };
 
   return (
-    <section aria-labelledby="latest-heading" className="space-y-8 w-full min-w-0 max-w-full">
+    <section
+      aria-labelledby="latest-heading"
+      className="space-y-4 sm:space-y-8 w-full min-w-0 max-w-full"
+    >
       <div className="flex flex-wrap items-end justify-between gap-3 w-full min-w-0">
         <div className="space-y-2 min-w-0">
-          <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground">
+          <p className="hidden eyebrow bg-accent px-2 py-0.5 text-accent-foreground sm:inline-block">
             Fresh in the vault
           </p>
-          <h2 id="latest-heading" className="text-3xl sm:text-4xl lg:text-5xl break-words leading-none">
-            Recently added papers
+          <h2
+            id="latest-heading"
+            className="text-2xl sm:text-4xl lg:text-5xl break-words leading-none"
+          >
+            Latest papers
           </h2>
         </div>
         <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
@@ -465,18 +468,21 @@ export function LatestPapersSection({
             type="button"
             onClick={nextBatch}
             disabled={isFetching}
-            className="flex items-center gap-1.5 border-2 border-border bg-card px-3 py-1.5 text-xs font-bold uppercase tracking-wide shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-50"
+            className="hidden sm:flex items-center gap-1.5 border-2 border-border bg-card px-3 py-1.5 text-xs font-bold uppercase tracking-wide shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:bg-primary hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 disabled:opacity-50"
             title="Show different recently added papers"
           >
-            <Shuffle className={`size-3.5 ${isFetching ? "animate-spin" : ""}`} aria-hidden="true" />
+            <Shuffle
+              className={`size-3.5 ${isFetching ? "animate-spin" : ""}`}
+              aria-hidden="true"
+            />
             <span>Shuffle papers</span>
             {page > 1 && <span className="bg-primary px-1 text-[10px]">Batch {page}</span>}
           </button>
           <Link
             href="/search?sort=latest"
-            className="inline-flex items-center gap-2 border-2 border-border bg-card px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-primary hover:shadow-hard hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5"
+            className="inline-flex min-h-10 items-center gap-2 px-2 text-sm font-bold text-link sm:border-2 sm:border-border sm:bg-card sm:px-3.5 sm:py-1.5 sm:text-xs sm:uppercase sm:tracking-wider sm:text-foreground sm:shadow-hard-sm"
           >
-            Search all <ArrowRight className="size-4" aria-hidden="true" />
+            View all <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
       </div>
@@ -485,7 +491,7 @@ export function LatestPapersSection({
       ) : isError && papers.length === 0 ? (
         <ErrorBox message={error.message} onRetry={() => void refetch()} />
       ) : papers.length > 0 ? (
-        <PaperList papers={papers} />
+        <PaperList papers={papers} mobilePreview />
       ) : (
         <EmptyState
           title="No papers yet"

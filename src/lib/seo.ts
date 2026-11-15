@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SITE_NAME, SITE_URL } from "@/lib/env";
 import type { CourseDetail, PaperDetail, SubjectDetail, TermDetail } from "@/lib/api/types";
-import { paperHref, termLabel, yearRange } from "@/lib/routes";
+import { kindLabel, paperHref, termLabel, yearRange } from "@/lib/routes";
 
 export const absoluteUrl = (path: string) => `${SITE_URL}${path === "/" ? "" : path}`;
 
@@ -33,13 +33,13 @@ export function buildMetadata({
   keywords,
   type = "website",
 }: MetaInput): Metadata {
-  // "Page | Notes & Papers" when it fits in 68 characters; long titles keep their own words instead of the brand.
+  // Follow the project's 60/155 character budgets; retain page-specific words before the brand.
   const full =
-    title.includes(SITE_NAME) || title.length + SITE_NAME.length + 3 > 68
+    title.includes(SITE_NAME) || title.length + SITE_NAME.length + 3 > 60
       ? title
       : `${title} | ${SITE_NAME}`;
-  const t = clip(full, 68);
-  const d = clip(description, 160);
+  const t = clip(full, 60);
+  const d = clip(description, 155);
   const url = absoluteUrl(path);
   return {
     title: { absolute: t },
@@ -94,7 +94,11 @@ export function courseMeta(c: CourseDetail) {
 
 /** "UNIRAJ" or "RTU Kota" for the two Rajasthan universities, otherwise the university's own name. */
 function universityTag(name: string) {
-  return /rajasthan\s+university/i.test(name) ? "UNIRAJ" : /rajasthan\s+technical/i.test(name) ? "RTU Kota" : name;
+  return /rajasthan\s+university/i.test(name)
+    ? "UNIRAJ"
+    : /rajasthan\s+technical/i.test(name)
+      ? "RTU Kota"
+      : name;
 }
 
 export function termMeta(t: TermDetail) {
@@ -221,7 +225,12 @@ export function faqLd(faqs: { q: string; a: string }[]): JsonLd {
 }
 
 export function learningResourceLd(p: PaperDetail, title: string, description: string): JsonLd {
-  const eduLevel = p.course_name ?? p.section ?? p.exam_name ?? "Secondary Education";
+  const eduLevel = p.course_name ?? p.section ?? p.exam_name;
+  const language = p.language ?? "";
+  const languages = [
+    ...(/\b(?:hindi|hi)\b|हिन्दी|हिंदी/i.test(language) ? ["hi"] : []),
+    ...(/\b(?:english|en)\b/i.test(language) ? ["en"] : []),
+  ];
   return {
     "@context": "https://schema.org",
     "@type": ["LearningResource", "DigitalDocument"],
@@ -229,11 +238,11 @@ export function learningResourceLd(p: PaperDetail, title: string, description: s
     ...(p.meta_keywords?.length ? { keywords: p.meta_keywords.join(", ") } : {}),
     description,
     url: absoluteUrl(paperHref(p)),
-    learningResourceType: p.kind === "notes" ? "Notes" : "Question Paper",
-    educationalLevel: eduLevel,
+    learningResourceType: kindLabel(p.kind),
+    ...(eduLevel ? { educationalLevel: eduLevel } : {}),
     educationalUse: "Previous Year Question Paper Practice / Exam Preparation",
     encodingFormat: "application/pdf",
-    inLanguage: p.language === "Hindi" ? "hi" : "en",
+    ...(languages.length ? { inLanguage: languages.length === 1 ? languages[0] : languages } : {}),
     isAccessibleForFree: true,
     hasDigitalDocumentPermission: {
       "@type": "DigitalDocumentPermission",

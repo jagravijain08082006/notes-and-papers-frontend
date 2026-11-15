@@ -2,14 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  FileCheck,
-  Loader2,
-  RefreshCw,
-  Share2,
-  Sparkles,
-} from "lucide-react";
+import { ArrowLeft, FileCheck, Loader2, RefreshCw, Share2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { PdfPreview } from "@/components/shared/pdf-preview";
 import { PaperList } from "@/components/shared/paper-list";
@@ -31,6 +24,7 @@ export function DownloadManager({
   const [downloaded, setDownloaded] = useState(false);
   const [downloadedBlobUrl, setDownloadedBlobUrl] = useState<string | null>(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   // Revoke object URL on unmount
   useEffect(() => {
@@ -44,6 +38,7 @@ export function DownloadManager({
   // Trigger download flow
   const triggerFileDownload = useCallback(async () => {
     setIsDownloading(true);
+    setDownloadError(null);
     track("download_attempt", { paper_slug: paper.slug });
 
     try {
@@ -83,9 +78,11 @@ export function DownloadManager({
       setDownloaded(true);
       setProgress(100);
       setStatusMessage("Verified copy saved to your device!");
-      toast.success("PDF Downloaded successfully!");
+      toast.success("Download started");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Download failed. Please try again.");
+      const message = err instanceof Error ? err.message : "Download failed. Please try again.";
+      setDownloadError(message);
+      toast.error(message);
     } finally {
       setIsDownloading(false);
     }
@@ -124,38 +121,38 @@ export function DownloadManager({
 
   function copyShareLink() {
     if (typeof window !== "undefined") {
-      navigator.clipboard.writeText(window.location.origin + routes.paper(paper.slug));
+      navigator.clipboard.writeText(window.location.origin + paperHref(paper));
       toast.success("Paper link copied to clipboard!");
     }
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8 sm:space-y-12">
       {/* HEADER / STATUS CARD */}
-      <section className="border-2 border-border bg-card p-6 shadow-hard sm:p-10">
+      <section className="border border-border bg-card p-4 sm:border-2 sm:p-10 sm:shadow-hard">
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-border pb-4">
             <span className="eyebrow flex items-center gap-2 border-2 border-border bg-primary px-3 py-1 font-bold shadow-hard-sm">
               <FileCheck className="size-4" aria-hidden="true" />
-              {downloaded ? "DOWNLOAD COMPLETED" : "PREPARING YOUR CLEAN PDF"}
+              {downloaded ? "Download started" : "Preparing PDF"}
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            <span className="hidden text-xs font-bold uppercase tracking-wider text-muted-foreground sm:inline">
               Official Vault Repository
             </span>
           </div>
 
           <div className="space-y-3">
-            <h1 className="text-3xl font-display uppercase tracking-wider sm:text-5xl lg:text-6xl break-words leading-tight">
+            <h1 className="text-2xl font-display uppercase tracking-wider sm:text-5xl lg:text-6xl break-words leading-tight">
               {paper.title}
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-sm sm:text-lg text-muted-foreground">
               {paperContext(paper)}
               {paper.university_name ? ` · ${paper.university_name}` : ""}
             </p>
           </div>
 
           {/* Paper Metadata Badges */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 pt-2">
+          <div className="hidden gap-3 sm:grid sm:grid-cols-4 pt-2">
             <div className="border-2 border-border bg-background p-3">
               <span className="eyebrow block text-muted-foreground">Year</span>
               <span className="font-display text-2xl uppercase">{paper.year ?? "N/A"}</span>
@@ -181,14 +178,18 @@ export function DownloadManager({
           </div>
 
           {/* ANIMATED PROGRESS LOADER */}
-          {!downloaded && (
-            <div className="space-y-3 border-2 border-border bg-muted/40 p-6 shadow-hard-sm">
+          {!downloaded && !downloadError && (
+            <div
+              role="status"
+              className="space-y-3 border border-border bg-muted/40 p-4 sm:border-2 sm:p-6 sm:shadow-hard-sm"
+            >
               <div className="flex items-center justify-between text-sm font-bold uppercase tracking-wider">
                 <span className="flex items-center gap-2">
                   <Loader2 className="size-4 animate-spin text-foreground" />
-                  {statusMessage}
+                  <span className="sm:hidden">Preparing download…</span>
+                  <span className="hidden sm:inline">{statusMessage}</span>
                 </span>
-                <span className="font-display text-lg">{progress}%</span>
+                <span className="hidden font-display text-lg sm:inline">{progress}%</span>
               </div>
               <div className="h-5 w-full overflow-hidden border-2 border-border bg-card p-0.5 shadow-inner">
                 <div
@@ -196,12 +197,21 @@ export function DownloadManager({
                   style={{ width: `${progress}%` }}
                 />
               </div>
-              <p className="text-xs text-muted-foreground">
-                Your PDF is being streamed from our high-speed vault. If prompted, please allow downloads in your browser.
+              <p className="hidden text-xs text-muted-foreground sm:block">
+                Your PDF is being streamed from our high-speed vault. If prompted, please allow
+                downloads in your browser.
               </p>
             </div>
           )}
 
+          {downloadError && (
+            <div role="alert" className="space-y-3 border border-destructive p-4">
+              <p className="text-sm text-destructive">{downloadError}</p>
+              <Button onClick={() => void triggerFileDownload()} disabled={isDownloading}>
+                Retry download
+              </Button>
+            </div>
+          )}
           {/* COOL CELEBRATORY MESSAGE WHEN DOWNLOADED */}
           {downloaded && (
             <div className="space-y-4 border-2 border-border bg-primary p-6 text-primary-foreground shadow-hard sm:p-8">
@@ -211,15 +221,15 @@ export function DownloadManager({
                 </div>
                 <div className="space-y-1">
                   <h2 className="text-2xl font-black uppercase tracking-wide sm:text-3xl">
-                    🎉 PDF Download Started!
+                    Download started
                   </h2>
                   <p className="text-sm font-medium opacity-90 sm:text-base">
-                    Your clean, official copy of <strong>{paper.title}</strong> has been sent to your downloads folder. Best of luck with your exams!
+                    Check your browser downloads.
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-3 pt-3">
+              <div className="flex flex-col gap-3 pt-3 sm:flex-row sm:flex-wrap">
                 <Button
                   onClick={() => void triggerFileDownload()}
                   disabled={isDownloading}
@@ -233,7 +243,7 @@ export function DownloadManager({
                   className="inline-flex h-11 items-center gap-2 border-2 border-border bg-background px-5 text-sm font-bold uppercase tracking-wider text-foreground shadow-hard-sm hover:bg-card active:translate-x-0.5 active:translate-y-0.5"
                 >
                   <ArrowLeft className="size-4" />
-                  Back to paper details
+                  Back to paper
                 </Link>
                 <Button
                   variant="outline"
@@ -254,14 +264,17 @@ export function DownloadManager({
         <section aria-labelledby="live-preview-heading" className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-border pb-3">
             <div className="space-y-1">
-              <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground font-bold tracking-wider shadow-hard-sm">
+              <p className="hidden eyebrow bg-accent px-2 py-0.5 text-accent-foreground font-bold tracking-wider shadow-hard-sm sm:inline-block">
                 Document Viewer
               </p>
-              <h2 id="live-preview-heading" className="text-3xl sm:text-4xl font-display uppercase tracking-wider">
-                Live PDF preview
+              <h2
+                id="live-preview-heading"
+                className="text-3xl sm:text-4xl font-display uppercase tracking-wider"
+              >
+                Preview
               </h2>
             </div>
-            <p className="text-sm text-muted-foreground font-medium">
+            <p className="hidden text-sm text-muted-foreground font-medium sm:block">
               Read or solve questions directly in your browser without leaving this page.
             </p>
           </div>
@@ -270,7 +283,8 @@ export function DownloadManager({
             slug={paper.slug}
             title={paper.title}
             blobUrl={downloadedBlobUrl}
-            defaultOpen={downloaded}
+            defaultOpen={false}
+            autoOpenBlob={false}
             pages={paper.pages}
           />
         </section>
@@ -279,20 +293,20 @@ export function DownloadManager({
       {/* SUGGESTIONS & RELATED EXPLORATION */}
       <section className="space-y-5 border-t-2 border-border pt-10">
         <div className="space-y-1">
-          <span className="eyebrow inline-block bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm">
+          <span className="hidden eyebrow bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm sm:inline-block">
             Keep Practicing
           </span>
           <h2 className="text-2xl sm:text-3xl font-display uppercase tracking-wider">
-            Suggested Next Steps &amp; Related Papers
+            More papers
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="hidden text-sm text-muted-foreground sm:block">
             Download adjacent exam years or explore syllabus-related subjects.
           </p>
         </div>
 
         {suggestedPapers && suggestedPapers.length > 0 && (
           <div className="pt-2">
-            <PaperList papers={suggestedPapers} />
+            <PaperList papers={suggestedPapers} mobilePreview />
           </div>
         )}
 

@@ -46,8 +46,27 @@ export async function SiteFooter() {
     },
   ];
   return (
-    <footer className="mt-20 border-t-4 border-border bg-card">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <footer className="mt-10 border-t-2 border-border bg-card sm:mt-20 sm:border-t-4">
+      <nav aria-label="Footer" className="grid grid-cols-3 gap-x-2 px-4 py-4 text-sm sm:hidden">
+        {[
+          { href: "/search", label: "Search" },
+          { href: "/downloads", label: "Downloads" },
+          { href: "/contact", label: "Help" },
+          { href: "/about", label: "About" },
+          { href: "/privacy", label: "Privacy" },
+          { href: "/terms", label: "Terms" },
+          { href: "/takedown", label: "Copyright" },
+        ].map((link) => (
+          <Link
+            key={link.href}
+            href={link.href}
+            className="flex min-h-11 items-center justify-center text-muted-foreground hover:text-foreground"
+          >
+            {link.label}
+          </Link>
+        ))}
+      </nav>
+      <div className="mx-auto hidden max-w-7xl px-4 py-10 sm:block sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div className="space-y-4">
             <Link
@@ -96,20 +115,28 @@ export async function SiteFooter() {
           <div className="grid gap-6 md:grid-cols-2 md:gap-10">
             <div className="space-y-2">
               <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
-                <span className="size-2 bg-accent inline-block border border-border" aria-hidden="true" />
+                <span
+                  className="size-2 bg-accent inline-block border border-border"
+                  aria-hidden="true"
+                />
                 Disclaimer
               </h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                The resources, notes, and previous year question papers provided on this network are solely for educational purposes to help students prepare for exams.
+                The resources, notes, and previous year question papers provided on this network are
+                solely for educational purposes to help students prepare for exams.
               </p>
             </div>
             <div className="space-y-2">
               <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-foreground">
-                <span className="size-2 bg-primary inline-block border border-border" aria-hidden="true" />
+                <span
+                  className="size-2 bg-primary inline-block border border-border"
+                  aria-hidden="true"
+                />
                 DMCA &amp; Copyright
               </h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                If you find any copyrighted material hosted on our server that belongs to you, please mail us immediately at{" "}
+                If you find any copyrighted material hosted on our server that belongs to you,
+                please mail us immediately at{" "}
                 <a
                   href={`mailto:${CONTACT_EMAIL || "thecodinggiant@gmail.com"}`}
                   className="font-bold text-link underline hover:text-foreground"

@@ -14,12 +14,14 @@ const SIZE = 20;
 
 export async function generateMetadata(props: PageProps<"/notes">) {
   const sp = await props.searchParams;
+  const filtered = Object.keys(sp).length > 0;
+  const notes = filtered ? null : await listNotes({ page: 1, size: SIZE }).catch(() => null);
   return buildMetadata({
     title: "Notes for Rajasthan University | Notes & Papers",
     description: "Student notes for Rajasthan University subjects, free to read and download.",
     path: "/notes",
     // thin until notes exist; filtered/paged views are never indexed
-    noindex: Object.keys(sp).length > 0,
+    noindex: filtered || notes?.total === 0,
     keywords: [
       "student notes",
       "rajasthan university notes",
@@ -82,13 +84,18 @@ export default async function NotesPage(props: PageProps<"/notes">) {
             {data.items.map((n) => (
               <li key={n.slug}>
                 <Card className="group h-full transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard border-2 border-border">
-                  <Link href={`/notes/${n.slug}`} className="flex h-full flex-col justify-between p-4 sm:p-5">
+                  <Link
+                    href={`/notes/${n.slug}`}
+                    className="flex h-full flex-col justify-between p-4 sm:p-5"
+                  >
                     <div className="flex items-start gap-3.5">
                       <span className="grid size-11 sm:size-12 shrink-0 place-items-center border-2 border-border bg-primary text-foreground shadow-hard-sm transition-colors group-hover:bg-accent group-hover:text-accent-foreground">
                         <FileText className="size-5 sm:size-6" aria-hidden="true" />
                       </span>
                       <div className="min-w-0 flex-1 space-y-1.5">
-                        <h2 className="font-bold text-lg sm:text-xl leading-snug group-hover:text-link transition-colors">{n.title}</h2>
+                        <h2 className="font-bold text-lg sm:text-xl leading-snug group-hover:text-link transition-colors">
+                          {n.title}
+                        </h2>
                         {n.description && (
                           <p className="line-clamp-2 text-xs sm:text-sm text-muted-foreground">
                             {n.description}
@@ -99,7 +106,10 @@ export default async function NotesPage(props: PageProps<"/notes">) {
                           {n.subject_name && <Badge>{n.subject_name}</Badge>}
                         </div>
                       </div>
-                      <ArrowRight className="hidden size-5 shrink-0 transition-transform group-hover:translate-x-1 sm:block text-muted-foreground group-hover:text-foreground" aria-hidden="true" />
+                      <ArrowRight
+                        className="hidden size-5 shrink-0 transition-transform group-hover:translate-x-1 sm:block text-muted-foreground group-hover:text-foreground"
+                        aria-hidden="true"
+                      />
                     </div>
                   </Link>
                 </Card>

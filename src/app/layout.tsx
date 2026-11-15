@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Free previous year question papers for UNIRAJ (Rajasthan University), RTU Kota, Rajasthan Board (RBSE), other school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
+    "Free question papers for UNIRAJ, RTU Kota, RBSE, other school boards and competitive exams. Browse by subject and download previous year PDFs.",
   applicationName: SITE_NAME,
   keywords: [
     "notes and papers",
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     title: `${SITE_NAME} - Previous Year Question Papers PDF`,
     url: `${SITE_URL}/`,
     description:
-      "Free previous year question papers for UNIRAJ (Rajasthan University), RTU Kota, Rajasthan Board (RBSE), other school boards & competitive exams (UPSC, SSC, NEET). Download authentic PYQ PDFs free.",
+      "Free question papers for UNIRAJ, RTU Kota, RBSE, other school boards and competitive exams. Browse by subject and download previous year PDFs.",
   },
   appleWebApp: {
     title: SITE_NAME,
@@ -95,6 +95,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
       className={`${display.variable} ${body.variable} ${mono.variable} h-full antialiased`}
     >

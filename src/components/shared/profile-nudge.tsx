@@ -26,6 +26,7 @@ export function ProfileNudge({ me }: { me: Me }) {
   const key = `np_profile_nudge_${me.id}`;
 
   useEffect(() => {
+    if (window.matchMedia("(max-width: 639px)").matches) return;
     if (missing === 0) return;
     let snoozed = false;
     try {
@@ -39,7 +40,8 @@ export function ProfileNudge({ me }: { me: Me }) {
     return () => clearTimeout(t);
   }, [missing, key]);
 
-  if (!open || missing === 0 || HIDDEN_ON.some((p) => path === p || path.startsWith(`${p}/`))) return null;
+  if (!open || missing === 0 || HIDDEN_ON.some((p) => path === p || path.startsWith(`${p}/`)))
+    return null;
 
   function later() {
     setOpen(false);

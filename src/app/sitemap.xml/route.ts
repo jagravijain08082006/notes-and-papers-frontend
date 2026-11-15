@@ -4,9 +4,8 @@ import { API_SITEMAP_TYPES, sitemapIndexXml, xmlResponse } from "@/lib/sitemap";
 
 export const revalidate = 86400;
 
-export async function GET(req: Request) {
-  const origin = new URL(req.url).origin;
-  const baseUrl = origin && !origin.includes("localhost") ? origin : SITE_URL;
+export async function GET() {
+  const baseUrl = SITE_URL;
   const now = new Date().toISOString().split("T")[0];
   const items = [{ loc: `${baseUrl}/sitemaps/static/1.xml`, lastmod: now }];
 

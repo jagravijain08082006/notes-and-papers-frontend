@@ -8,6 +8,7 @@ import {
   ArrowRight,
   CheckCircle2,
   HelpCircle,
+  MessageCircle,
   RotateCw,
   Send,
   Sparkles,
@@ -72,7 +73,13 @@ export function SupportChat() {
   const { data: user, isPending } = useMe();
   const pathname = usePathname();
   // Reset private state on account changes and reopen chat on the return route after login.
-  return <SupportChatWidget key={`${user?.id ?? "signed-out"}:${pathname}`} user={user ?? null} isPending={isPending} />;
+  return (
+    <SupportChatWidget
+      key={`${user?.id ?? "signed-out"}:${pathname}`}
+      user={user ?? null}
+      isPending={isPending}
+    />
+  );
 }
 
 function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: boolean }) {
@@ -80,8 +87,10 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
   const queryClient = useQueryClient();
   const isMounted = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
 
-  const [isOpen, setIsOpen] = useState(() =>
-    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("support") === "chat",
+  const [isOpen, setIsOpen] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("support") === "chat",
   );
   const [mode, setMode] = useState<"chat" | "guide">("chat");
   const [floatingAnim, setFloatingAnim] = useState("idle");
@@ -100,11 +109,14 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
   const revisionRef = useRef(0);
 
   const userName = user?.display_name?.split(" ")[0] || "Scholar";
-  const handleSessionError = useCallback((error: unknown) => {
-    if (error instanceof BffError && (error.status === 401 || error.status === 403)) {
-      queryClient.setQueryData(["me"], null);
-    }
-  }, [queryClient]);
+  const handleSessionError = useCallback(
+    (error: unknown) => {
+      if (error instanceof BffError && (error.status === 401 || error.status === 403)) {
+        queryClient.setQueryData(["me"], null);
+      }
+    },
+    [queryClient],
+  );
 
   const tourSteps: TourStep[] = [
     {
@@ -120,7 +132,8 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
       animation: "searching",
       badge: "Search",
       title: "Instant Paper Search 🔍",
-      speech: "Quickly find papers by course (B.Tech, BCA, BSc, BCom), semester number, or exact subject code.",
+      speech:
+        "Quickly find papers by course (B.Tech, BCA, BSc, BCom), semester number, or exact subject code.",
       tip: "Use the top search bar anytime to jump right to your subject.",
       action: { href: "/search", label: "Try Search" },
     },
@@ -128,7 +141,8 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
       animation: "proud",
       badge: "Downloads",
       title: "Clean Watermark-Free PDFs 📄",
-      speech: "Preview every paper in your browser before downloading. High-resolution and exam-ready.",
+      speech:
+        "Preview every paper in your browser before downloading. High-resolution and exam-ready.",
       tip: "Signed-in users can view past downloads in their profile.",
       action: { href: "/downloads", label: "My Downloads" },
     },
@@ -136,7 +150,8 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
       animation: "excited",
       badge: "Bookmarks",
       title: "Save For Exam Night 🔖",
-      speech: "Tap the bookmark icon on any paper to save it to your personal vault for fast revision.",
+      speech:
+        "Tap the bookmark icon on any paper to save it to your personal vault for fast revision.",
       tip: "Keep all your important papers organized in one place.",
       action: { href: "/bookmarks", label: "My Bookmarks" },
     },
@@ -181,12 +196,23 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
       inFlight = true;
       bff<GuestChatState>(markRead ? "chat?mark_read=true" : "chat")
         .then((state) => {
-          if (cancelled || revision !== revisionRef.current || sendingRef.current || !state || !Array.isArray(state.messages)) return;
+          if (
+            cancelled ||
+            revision !== revisionRef.current ||
+            sendingRef.current ||
+            !state ||
+            !Array.isArray(state.messages)
+          )
+            return;
           setMessages(state.messages);
           setUnreadCount(markRead ? 0 : state.unread_by_guest || 0);
         })
-        .catch((error) => { if (!cancelled) handleSessionError(error); })
-        .finally(() => { inFlight = false; });
+        .catch((error) => {
+          if (!cancelled) handleSessionError(error);
+        })
+        .finally(() => {
+          inFlight = false;
+        });
     };
 
     poll();
@@ -344,17 +370,20 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
               setUnreadCount(0);
               setFloatingAnim("happy");
             }}
-            className="group relative flex items-center justify-center rounded-full transition-transform hover:scale-105 active:scale-95 cursor-pointer drop-shadow-md focus:outline-none"
+            className="group relative flex size-12 items-center justify-center rounded-full border-2 border-border bg-primary text-primary-foreground shadow-hard-sm sm:size-auto sm:border-0 sm:bg-transparent sm:shadow-none transition-transform hover:scale-105 active:scale-95 cursor-pointer"
             title="Chat with Support"
             aria-label="Chat with Support"
           >
-            <NoteyAvatar
-              animation={floatingAnim}
-              size={58}
-              onAnimationEnd={(endedAnim) => {
-                if (endedAnim === "waking") setFloatingAnim("idle");
-              }}
-            />
+            <MessageCircle className="size-5 sm:hidden" aria-hidden="true" />
+            <span className="hidden sm:block">
+              <NoteyAvatar
+                animation={floatingAnim}
+                size={58}
+                onAnimationEnd={(endedAnim) => {
+                  if (endedAnim === "waking") setFloatingAnim("idle");
+                }}
+              />
+            </span>
             {user && unreadCount > 0 && (
               <span
                 className="absolute -top-0.5 -right-0.5 z-10 min-w-5 h-5 px-1 rounded-full border-2 border-background bg-foreground text-background text-[10px] font-black grid place-items-center shadow-hard-xs animate-bounce"
@@ -388,7 +417,7 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
                 >
                   Support Chat
                 </h2>
-                <p className="text-[11px] text-muted-foreground font-medium mt-0.5">
+                <p className="hidden text-[11px] text-muted-foreground font-medium mt-0.5 sm:block">
                   Direct 1-on-1 help with our team
                 </p>
               </div>
@@ -406,8 +435,10 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
                     setModalAnim("happy");
                   }
                 }}
-                className={`inline-flex items-center gap-1 border-2 border-border px-2 py-1 text-[11px] font-black uppercase tracking-wider shadow-hard-sm transition-all hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 cursor-pointer ${
-                  mode === "guide" ? "bg-primary text-primary-foreground" : "bg-card text-foreground"
+                className={`hidden sm:inline-flex items-center gap-1 border-2 border-border px-2 py-1 text-[11px] font-black uppercase tracking-wider shadow-hard-sm transition-all hover:bg-muted active:translate-x-0.5 active:translate-y-0.5 cursor-pointer ${
+                  mode === "guide"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-card text-foreground"
                 }`}
                 title={mode === "guide" ? "Back to Chat" : "Take Website Tour"}
               >
@@ -478,7 +509,10 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
                 </div>
 
                 <div className="flex items-start gap-2 border-l-2 border-primary bg-muted/40 px-2.5 py-2 text-[11px] text-muted-foreground">
-                  <HelpCircle className="size-3.5 shrink-0 mt-0.5 text-primary" aria-hidden="true" />
+                  <HelpCircle
+                    className="size-3.5 shrink-0 mt-0.5 text-primary"
+                    aria-hidden="true"
+                  />
                   <span>{currentTour.tip}</span>
                 </div>
               </div>
@@ -532,16 +566,24 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
               </div>
             </div>
           ) : isPending ? (
-            <div role="status" className="flex-1 grid place-items-center p-5 text-sm text-muted-foreground">
+            <div
+              role="status"
+              className="flex-1 grid place-items-center p-5 text-sm text-muted-foreground"
+            >
               Checking your account...
             </div>
           ) : !user ? (
             <div className="flex flex-1 flex-col justify-center gap-4 p-5">
               <h3 className="text-lg font-black uppercase">Log in to chat</h3>
               <p className="text-sm text-muted-foreground">
-                Chat with our support team using your account. Your name, email and conversation stay together so we can help you.
+                Chat with our support team using your account. Your name, email and conversation
+                stay together so we can help you.
               </p>
-              <Link href={loginHref} onClick={() => setIsOpen(false)} className="inline-flex min-h-11 items-center justify-center border-2 border-border bg-primary px-4 py-2 text-sm font-bold uppercase text-primary-foreground shadow-hard-sm">
+              <Link
+                href={loginHref}
+                onClick={() => setIsOpen(false)}
+                className="inline-flex min-h-11 items-center justify-center border-2 border-border bg-primary px-4 py-2 text-sm font-bold uppercase text-primary-foreground shadow-hard-sm"
+              >
                 Log in to continue
               </Link>
             </div>
@@ -585,7 +627,9 @@ function SupportChatWidget({ user, isPending }: { user: Me | null; isPending: bo
                               : "bg-card text-foreground"
                           }`}
                         >
-                          <p className="whitespace-pre-wrap leading-relaxed break-words">{msg.text}</p>
+                          <p className="whitespace-pre-wrap leading-relaxed break-words">
+                            {msg.text}
+                          </p>
                         </div>
                       </div>
                     );

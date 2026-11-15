@@ -12,12 +12,15 @@ export interface Crumb {
 export function Breadcrumbs({ items }: { items: Crumb[] }) {
   return (
     <>
-      <nav aria-label="Breadcrumb" className="mb-6">
-        <ol className="flex flex-wrap items-center gap-1.5 sm:gap-2 border-2 border-border bg-card px-3 py-2 sm:px-4 sm:py-2.5 text-xs font-bold uppercase tracking-wider shadow-hard-sm">
+      <nav aria-label="Breadcrumb" className="mb-4 sm:mb-6">
+        <ol className="flex items-center gap-1.5 overflow-x-auto sm:flex-wrap sm:gap-2 sm:border-2 sm:border-border sm:bg-card sm:px-4 sm:py-2.5 text-xs font-bold sm:uppercase sm:tracking-wider sm:shadow-hard-sm">
           {items.map((it, i) => {
             const last = i === items.length - 1;
             return (
-              <li key={`${it.path}-${i}`} className="inline-flex min-w-0 items-center gap-1.5">
+              <li
+                key={`${it.path}-${i}`}
+                className={`min-w-0 shrink-0 items-center gap-1.5 ${i > 0 && i < items.length - 2 ? "hidden sm:inline-flex" : "inline-flex"}`}
+              >
                 {last ? (
                   <span
                     aria-current="page"
@@ -35,7 +38,12 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
                     {i === 0 ? <span className="sr-only">{it.name}</span> : it.name}
                   </Link>
                 )}
-                {!last && <ChevronRight className="size-3.5 shrink-0 text-muted-foreground/80" aria-hidden="true" />}
+                {!last && (
+                  <ChevronRight
+                    className="size-3.5 shrink-0 text-muted-foreground/80"
+                    aria-hidden="true"
+                  />
+                )}
               </li>
             );
           })}

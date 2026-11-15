@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
-import { CheckCircle2, Clock, Download, Eye, ShieldCheck, Sparkles } from "lucide-react";
+import { CheckCircle2, Clock, Download, ShieldCheck, Sparkles } from "lucide-react";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { FaqAccordion } from "@/components/shared/faq-accordion";
 import { JsonLdScript } from "@/components/shared/json-ld";
@@ -12,7 +12,7 @@ import { getLatestPapers, getPaper, getPaperRedirect } from "@/lib/api/public";
 import type { PaperSummary } from "@/lib/api/types";
 import { kindLabel, paperContext, paperHref, routes, subjectHref } from "@/lib/routes";
 import { cleanPreviewExcerpt } from "@/lib/sanitize-preview";
-import { breadcrumbLd, buildMetadata, faqLd, learningResourceLd, paperMeta } from "@/lib/seo";
+import { buildMetadata, faqLd, learningResourceLd, paperMeta } from "@/lib/seo";
 import { getRbseSubjectBySlug, matchRbseSubject } from "@/lib/rbse-channels";
 
 export async function paperMetadata(slug: string) {
@@ -122,70 +122,82 @@ export async function PaperPage({
         { name: p.year ? String(p.year) : "Paper", path: selfPath },
       ]
     : p.exam_slug === "uni-rajasthanboard" && rbseClassSlug && rbseSubj
-    ? [
-        { name: "Home", path: "/" },
-        { name: "Rajasthan Board (RBSE)", path: routes.exam(p.exam_slug) },
-        { name: rbseClassTitle!, path: `/rajasthanboard/${rbseClassSlug}` },
-        {
-          name: rbseSubj.name,
-          path: `/rajasthanboard/${rbseClassSlug}/${rbseSubj.slug}`,
-        },
-        { name: p.title, path: selfPath },
+      ? [
+          { name: "Home", path: "/" },
+          { name: "Rajasthan Board (RBSE)", path: routes.exam(p.exam_slug) },
+          { name: rbseClassTitle!, path: `/rajasthanboard/${rbseClassSlug}` },
+          {
+            name: rbseSubj.name,
+            path: `/rajasthanboard/${rbseClassSlug}/${rbseSubj.slug}`,
+          },
+          { name: p.title, path: selfPath },
+        ]
+      : [
+          { name: "Home", path: "/" },
+          { name: "Exams", path: routes.exams },
+          ...(p.exam_slug
+            ? [{ name: p.exam_name ?? p.exam_slug, path: routes.exam(p.exam_slug) }]
+            : []),
+          { name: p.title, path: selfPath },
+        ];
+
+  const metadataDetails = (
+    <dl className="grid grid-cols-2 border-2 border-border bg-card shadow-hard sm:grid-cols-3 lg:grid-cols-5 [&>div]:border-b-2 [&>div]:border-r-2 [&>div]:border-border [&>div]:p-3.5 sm:[&>div]:p-5">
+      {[
+        ["Year", p.year ? String(p.year) : null],
+        ["Session", p.session],
+        ["Paper code", p.paper_code],
+        ["Language", p.language],
+        ["Type", kindLabel(p.kind)],
+        ["Pages", p.pages ? String(p.pages) : null],
       ]
-    : [
-        { name: "Home", path: "/" },
-        { name: "Exams", path: routes.exams },
-        ...(p.exam_slug
-          ? [{ name: p.exam_name ?? p.exam_slug, path: routes.exam(p.exam_slug) }]
-          : []),
-        { name: p.title, path: selfPath },
-      ];
+        .filter(([, v]) => v)
+        .map(([k, v]) => (
+          <div key={k}>
+            <dt className="eyebrow text-muted-foreground">{k}</dt>
+            <dd className="mt-1 break-words text-base font-bold sm:mt-2 sm:font-display sm:text-3xl sm:font-normal sm:uppercase sm:leading-[1.2]">
+              {v}
+            </dd>
+          </div>
+        ))}
+    </dl>
+  );
 
   return (
-    <article className="space-y-20">
+    <article className="space-y-8 sm:space-y-20">
       <TrackOnMount type="resource_view" paperSlug={slug} />
       <Breadcrumbs items={crumbs} />
 
-      <header className="space-y-8">
-        <div className="space-y-4">
+      <header className="flex flex-col gap-5 sm:gap-8">
+        <div className="space-y-3 sm:space-y-4">
           <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground">
             {kindLabel(p.kind)}
             {p.year ? ` · ${p.year}` : ""}
           </p>
-          <h1 className="max-w-6xl text-3xl sm:text-5xl lg:text-7xl break-words leading-tight">{m.h1}</h1>
-          <p className="text-xl text-muted-foreground">
+          <h1 className="max-w-6xl text-2xl sm:text-5xl lg:text-7xl break-words leading-tight">
+            {m.h1}
+          </h1>
+          <p className="text-sm sm:text-xl text-muted-foreground">
             {paperContext(p)}
             {isCourse && uniName ? ` · ${uniName}` : ""}
           </p>
         </div>
 
-        <dl className="grid grid-cols-2 border-2 border-border bg-card shadow-hard sm:grid-cols-3 lg:grid-cols-5 [&>div]:border-b-2 [&>div]:border-r-2 [&>div]:border-border [&>div]:p-3.5 sm:[&>div]:p-5">
-          {[
-            ["Year", p.year ? String(p.year) : null],
-            ["Session", p.session],
-            ["Paper code", p.paper_code],
-            ["Language", p.language],
-            ["Type", kindLabel(p.kind)],
-            ["Pages", p.pages ? String(p.pages) : null],
-          ]
-            .filter(([, v]) => v)
-            .map(([k, v]) => (
-              <div key={k}>
-                <dt className="eyebrow text-muted-foreground">{k}</dt>
-                <dd className="mt-2 font-display text-3xl uppercase leading-[1.2]">{v}</dd>
-              </div>
-            ))}
-        </dl>
+        <div className="order-3 hidden sm:order-2 sm:block">{metadataDetails}</div>
+        <details className="order-3 border border-border bg-card p-3 sm:hidden">
+          <summary className="cursor-pointer py-2 text-sm font-bold">Paper details</summary>
+          {metadataDetails}
+        </details>
 
         {/* PREMIUM HIGH-IMPACT DOWNLOAD ACTION HERO */}
         <section
           aria-label="Download paper"
-          className="my-8 overflow-hidden border-2 border-border bg-card shadow-hard-lg"
+          className="order-2 overflow-hidden border border-border bg-card shadow-hard-sm sm:order-3 sm:border-2 sm:shadow-hard-lg"
         >
           {/* TOP CONTRAST HEADER RIBBON */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-border bg-muted/60 px-4 py-3 sm:px-6">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 border-2 border-border bg-primary px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm">
+              <span className="hidden sm:inline-flex items-center gap-1.5 border-2 border-border bg-primary px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-primary-foreground shadow-hard-sm">
                 <ShieldCheck className="size-3.5" aria-hidden="true" />
                 Verified Vault Copy
               </span>
@@ -202,8 +214,8 @@ export async function PaperPage({
           </div>
 
           {/* MAIN ACTION BODY */}
-          <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-8">
-            <div className="space-y-4">
+          <div className="grid gap-4 p-4 sm:gap-6 sm:p-7 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-8">
+            <div className="hidden space-y-4 sm:block">
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2.5">
                   <h2 className="font-display text-2xl uppercase leading-none tracking-wider sm:text-3xl text-foreground">
@@ -256,17 +268,7 @@ export async function PaperPage({
                 </div>
               )}
 
-              {cleanedExcerpt && (
-                <a
-                  href="#excerpt-heading"
-                  className="inline-flex h-9 w-full items-center justify-center gap-2 border-2 border-border bg-background px-3 text-xs font-bold uppercase tracking-wider text-foreground shadow-hard-sm transition-all hover:bg-muted hover:-translate-x-px hover:-translate-y-px active:translate-x-0.5 active:translate-y-0.5"
-                >
-                  <Eye className="size-3.5" aria-hidden="true" />
-                  <span>Read Preview Online</span>
-                </a>
-              )}
-
-              <p className="text-center font-mono text-[11px] font-medium text-muted-foreground">
+              <p className="hidden text-center font-mono text-[11px] font-medium text-muted-foreground sm:block">
                 ⚡ Direct link · Free account
               </p>
             </div>
@@ -274,11 +276,13 @@ export async function PaperPage({
         </section>
       </header>
 
-      <section aria-labelledby="about-heading" className="max-w-5xl space-y-5">
-        <h2 id="about-heading" className="text-3xl sm:text-4xl">
-          About this paper
-        </h2>
-        <p className="text-lg leading-relaxed text-muted-foreground">
+      <details className="max-w-5xl border-b border-border pb-4">
+        <summary className="cursor-pointer py-2">
+          <h2 id="about-heading" className="inline text-lg sm:text-2xl">
+            About this paper
+          </h2>
+        </summary>
+        <p className="mt-3 text-sm sm:text-lg leading-relaxed text-muted-foreground">
           This is the {p.year ? `${p.year} ` : ""}
           {topic} {kindLabel(p.kind).toLowerCase()}
           {isCourse
@@ -293,20 +297,22 @@ export async function PaperPage({
           </Link>
           .
         </p>
-      </section>
+      </details>
 
       {cleanedExcerpt && (
-        <section aria-labelledby="excerpt-heading" className="max-w-5xl space-y-5">
-          <h2 id="excerpt-heading" className="text-3xl sm:text-4xl">
-            Paper preview
-          </h2>
+        <details className="max-w-5xl border-b border-border pb-4">
+          <summary className="cursor-pointer py-2">
+            <h2 id="excerpt-heading" className="inline text-lg sm:text-2xl">
+              Paper preview
+            </h2>
+          </summary>
           <blockquote
             lang={/[ऀ-ॿ]/.test(cleanedExcerpt) ? "hi" : undefined}
             className="whitespace-pre-line border-2 border-border bg-card p-5 shadow-hard-sm text-sm leading-relaxed"
           >
             {cleanedExcerpt}
           </blockquote>
-        </section>
+        </details>
       )}
 
       {p.other_years.length > 0 && (
@@ -331,10 +337,13 @@ export async function PaperPage({
         <section aria-labelledby="recent-heading" className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-1">
-              <span className="eyebrow inline-block bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm">
+              <span className="hidden eyebrow bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm sm:inline-block">
                 Keep Practicing
               </span>
-              <h2 id="recent-heading" className="text-3xl sm:text-4xl font-display uppercase tracking-wider">
+              <h2
+                id="recent-heading"
+                className="text-3xl sm:text-4xl font-display uppercase tracking-wider"
+              >
                 Recent Question Papers
               </h2>
             </div>
@@ -345,30 +354,32 @@ export async function PaperPage({
               Browse All Papers →
             </Link>
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="hidden text-sm text-muted-foreground sm:block">
             Explore recent question papers added across university courses and exam categories.
           </p>
           <PaperList papers={fallbackPapers} />
         </section>
       )}
 
-      <section aria-labelledby="faq-heading" className="max-w-5xl space-y-5">
-        <h2 id="faq-heading" className="text-3xl sm:text-4xl font-display uppercase tracking-wider">
-          Frequently asked questions
-        </h2>
+      <details className="max-w-5xl border-b border-border pb-4">
+        <summary className="cursor-pointer py-2">
+          <h2 id="faq-heading" className="inline text-lg sm:text-2xl">
+            Questions
+          </h2>
+        </summary>
         <FaqAccordion faqs={faqs} />
-      </section>
+      </details>
 
       {/* SUGGESTIONS & NEXT STEPS */}
-      <section className="space-y-5 border-t-2 border-border pt-10">
+      <section className="space-y-4 border-t border-border pt-5 sm:space-y-5 sm:border-t-2 sm:pt-10">
         <div className="space-y-1">
-          <span className="eyebrow inline-block bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm">
+          <span className="hidden eyebrow bg-primary px-2.5 py-1 text-primary-foreground font-bold tracking-wider shadow-hard-sm sm:inline-block">
             Keep Practicing
           </span>
           <h2 className="text-2xl sm:text-3xl font-display uppercase tracking-wider">
-            Suggested Next Steps &amp; Related Links
+            More papers
           </h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="hidden text-sm text-muted-foreground sm:block">
             Explore more question papers, syllabus streams, and exam collections.
           </p>
         </div>
@@ -397,7 +408,7 @@ export async function PaperPage({
         </div>
       </section>
 
-      <JsonLdScript data={[learningResourceLd(p, m.title, m.description), breadcrumbLd(crumbs), faqLd(faqs)]} />
+      <JsonLdScript data={[learningResourceLd(p, m.title, m.description), faqLd(faqs)]} />
     </article>
   );
 }

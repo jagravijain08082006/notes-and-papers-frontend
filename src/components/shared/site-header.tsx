@@ -21,15 +21,15 @@ export async function SiteHeader() {
     { href: "/search", label: "Search" },
   ];
   const RAJASTHAN_MOBILE = [
-    { href: routes.rbse, label: "RBSE Rajasthan Board (9th–12th)" },
-    { href: routes.uniraj, label: "UNIRAJ Jaipur (UOR)" },
-    { href: routes.rtu, label: "RTU Kota Engineering" },
+    { href: routes.rbse, label: "RBSE Board" },
+    { href: routes.uniraj, label: "UNIRAJ" },
+    { href: routes.rtu, label: "RTU" },
   ];
   const OTHER_MOBILE = [
     { href: routes.boards, label: "All School Boards" },
     { href: routes.universities, label: "All Universities" },
     { href: routes.exams, label: "Competitive Exams" },
-    { href: routes.categories, label: "Categories Directory" },
+    { href: routes.categories, label: "Categories" },
     ...(flags.notes ? [{ href: "/notes", label: "Notes" }] : []),
     { href: "/search", label: "Search Papers" },
     ...(flags.uploads ? [{ href: "/upload", label: "Upload" }] : []),
@@ -78,31 +78,25 @@ export async function SiteHeader() {
           >
             <nav
               aria-label="Mobile"
-              className="absolute right-0 top-14 w-64 space-y-1 border-2 border-border bg-card p-2 shadow-hard"
+              className="absolute right-0 top-14 max-h-[calc(100dvh-5.5rem)] w-64 max-w-[calc(100vw-1.5rem)] space-y-1 overflow-y-auto border-2 border-border bg-card p-2 shadow-hard"
             >
               <div className="border-b-2 border-border/60 pb-1 mb-1">
-                <p className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
-                  Rajasthan Core
-                </p>
                 {RAJASTHAN_MOBILE.map((n) => (
                   <Link
                     key={n.href}
                     href={n.href}
-                    className="block px-3 py-2 text-xs font-black uppercase tracking-wide bg-primary/20 hover:bg-primary border border-border/40 my-1 transition-colors"
+                    className="flex min-h-11 items-center px-3 py-2 text-sm font-bold bg-primary/20 hover:bg-primary my-1 transition-colors"
                   >
                     {n.label}
                   </Link>
                 ))}
               </div>
               <div>
-                <p className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-muted-foreground">
-                  Other Archives
-                </p>
                 {OTHER_MOBILE.map((n) => (
                   <Link
                     key={n.href}
                     href={n.href}
-                    className="block px-3 py-1.5 text-xs font-bold uppercase tracking-wide hover:bg-muted transition-colors"
+                    className="flex min-h-11 items-center px-3 py-2 text-sm font-medium hover:bg-muted transition-colors"
                   >
                     {n.label}
                   </Link>
@@ -113,14 +107,6 @@ export async function SiteHeader() {
                   Theme
                 </span>
                 <ThemeToggle />
-              </div>
-              <div className="border-t-2 border-border/60 pt-2 mt-2">
-                <Link
-                  href="/signup"
-                  className="block w-full text-center py-2 bg-primary text-primary-foreground border-2 border-border font-bold uppercase text-xs shadow-hard-sm hover:shadow-hard transition-all"
-                >
-                  Create Account (Sign Up)
-                </Link>
               </div>
             </nav>
           </DetailsMenu>

@@ -1,5 +1,25 @@
 # Handover (2026-11-12, ninth pass)
 
+## SEO review and publishing (2026-11-15)
+
+- User requests SEO review and pushing all changes, and explicitly chooses to keep the outer workspace local. Push only the nested backend/frontend application repositories; the wrapper origin incorrectly points at the frontend repository and must not be pushed over app main.
+- Fixed metadata budgets (60/155), concise home/default descriptions, duplicate paper breadcrumb JSON-LD, resource-kind/language structured data, canonical sitemap origins, invalid sitemap page handling, and empty Notes hub noindex/sitemap exclusion. Removed unused home statistics fetch. Details and limitations: `docs/SEO-REVIEW.md`.
+- Keep latest mobile preference: hide only Universities & Boards on phones, retain all exam categories. Full frontend check passes with 12 existing warnings / zero errors. Mobile no-JS SEO/schema/sitemap verification evidence is in backend `data/reports/seo-review-20261115/`; prior interaction evidence remains in `mobile-ui-20261115/`. Publishing follows verification; production deployment uses Vercel, not Cloudflare.
+
+## Mobile public/user interface (2026-11-15)
+
+- User requests a clean, simple mobile interface with minimal extra copy. **Latest clarification:** hide the screenshot's duplicate Universities & Boards section on phones only; retain it from `sm` up. Keep ExamsSection and all 11 EXAM_DOMAINS filters visible on mobile. The primary RTU/UNIRAJ/RBSE/Notes shortcuts remain visible. Compact two-column cards replace the tall one-column layout; do not remove exam categories when simplifying the screen.
+- Mobile search uses a single-row labelled input/button; latest papers show four previews with View all. Menu labels/touch targets and footer links are simpler. Promotional and profile-nudge timers skip phone widths. Support remains login-gated with a small chat icon.
+- Paper download action is above expandable details on mobile; About, preview and questions use native details. Search filters and avatar selection are expandable. Account cards are compact. Download errors have visible retry; success copy is brief and the embedded PDF stays closed until requested (`PdfPreview.autoOpenBlob=false`). Canonical share URLs use paperHref.
+- Changed-file ESLint, Prettier and TypeScript passed. Headless Chromium checks at 320/390/430 px covered category visibility, menu, no horizontal overflow, search/filter use, guest download/chat login gates, fixture signed-in account/menu, download failure/retry/success and desktop layout. Account/download fixtures were isolated locally; no production writes. Screenshots and verification report: backend `data/reports/mobile-ui-20261115/`. Source changes are local, uncommitted and undeployed. Preserve earlier workspace-cleanup handover notes.
+- Final browser run exercised all 11 category filters at each phone width, plus guest bookmark login. It passed with zero uncaught errors and zero unexpected console errors. A discovered BookmarkButton hydration mismatch (cached account query resolving between SSR and hydration) was fixed using the established useSyncExternalStore mounted snapshot pattern for disabled/saved state. Temporary fixture script and failed-run screenshots removed after verification; normal local preview uses the unchanged `.env.local`.
+- Latest screenshot-specific change verified separately at 320/390/430/1280 px: Universities & Boards hidden only below `sm`; Exam categories and all 11 controls visible at every width; no horizontal overflow. Evidence: `visibility-verification.json` and updated `home-after.png` in the report folder. Normal preview is running at localhost:3010. No changes pushed/deployed in this mobile-edit task.
+
+## Workspace cleanup (2026-11-15)
+
+- Removed regenerable `.next`, `.open-next` and local `.wrangler` output while no Node/Python processes were running. Application source, public assets, node_modules, env files, `.vercel` deployment link and Cloudflare configuration were preserved. The next local build/typecheck recreates the generated output it needs; production is unaffected.
+- Also removed old workspace debug logs/scratch experiments and Python bytecode: 10,484 generated files / 778.57 MiB overall. Maintenance wrappers now live in workspace `scripts/`; useful data/reports were retained. Local manifest: backend `data/reports/workspace-cleanup-20261115.json`. No application code or deployment was changed.
+
 ## Deployment target correction (2026-11-14)
 
 - Backend fixes pushed as `1f28bdf` and verified live: health ready 200, admin overview 200 with rankings, SEO nine warnings, anonymous chat 401.

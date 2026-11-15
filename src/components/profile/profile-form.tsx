@@ -66,52 +66,54 @@ export function ProfileForm({ me }: { me: Me }) {
   }
 
   return (
-    <form onSubmit={save} noValidate className="space-y-10">
-      <fieldset className="space-y-4">
-        <legend className="mb-4 text-3xl">Choose your avatar</legend>
-        <div className="flex items-center gap-4">
-          <Avatar value={v.avatar} label="Selected avatar" className="size-24 shadow-hard" />
-          <p className="max-w-sm text-sm text-muted-foreground">
-            Pick a cartoon avatar. It shows next to your name across the site.
-            {v.avatar && (
-              <button
-                type="button"
-                onClick={() => setV((p) => ({ ...p, avatar: "" }))}
-                className="ml-2 font-bold uppercase text-link underline"
-              >
-                Remove
-              </button>
-            )}
-          </p>
-        </div>
-        <ul className="scroll-slim grid max-h-72 grid-cols-4 gap-3 overflow-y-auto border-2 border-border bg-card p-3 sm:grid-cols-6 lg:grid-cols-8">
-          {AVATAR_CHOICES.map((a) => {
-            const on = v.avatar === a;
-            return (
-              <li key={a}>
+    <form onSubmit={save} noValidate className="space-y-6 sm:space-y-10">
+      <details className="border border-border p-3">
+        <summary className="cursor-pointer py-2 text-sm font-bold">Change avatar</summary>
+        <fieldset className="space-y-4">
+          <legend className="sr-only">Choose your avatar</legend>
+          <div className="flex items-center gap-4">
+            <Avatar value={v.avatar} label="Selected avatar" className="size-24 shadow-hard" />
+            <p className="max-w-sm text-sm text-muted-foreground">
+              Pick a cartoon avatar. It shows next to your name across the site.
+              {v.avatar && (
                 <button
                   type="button"
-                  aria-pressed={on}
-                  aria-label={`Use avatar ${a.replace(":", " ")}`}
-                  onClick={() => setV((p) => ({ ...p, avatar: a }))}
-                  className={cn(
-                    "relative block w-full border-2 border-transparent transition-transform hover:-translate-y-0.5 hover:border-border",
-                    on && "border-border shadow-hard-sm",
-                  )}
+                  onClick={() => setV((p) => ({ ...p, avatar: "" }))}
+                  className="ml-2 font-bold uppercase text-link underline"
                 >
-                  <Avatar value={a} className="aspect-square w-full border-0" />
-                  {on && (
-                    <span className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center border-2 border-border bg-accent">
-                      <Check className="size-3" aria-hidden="true" />
-                    </span>
-                  )}
+                  Remove
                 </button>
-              </li>
-            );
-          })}
-        </ul>
-      </fieldset>
-
+              )}
+            </p>
+          </div>
+          <ul className="scroll-slim grid max-h-72 grid-cols-4 gap-3 overflow-y-auto border-2 border-border bg-card p-3 sm:grid-cols-6 lg:grid-cols-8">
+            {AVATAR_CHOICES.map((a) => {
+              const on = v.avatar === a;
+              return (
+                <li key={a}>
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    aria-label={`Use avatar ${a.replace(":", " ")}`}
+                    onClick={() => setV((p) => ({ ...p, avatar: a }))}
+                    className={cn(
+                      "relative block w-full border-2 border-transparent transition-transform hover:-translate-y-0.5 hover:border-border",
+                      on && "border-border shadow-hard-sm",
+                    )}
+                  >
+                    <Avatar value={a} className="aspect-square w-full border-0" />
+                    {on && (
+                      <span className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center border-2 border-border bg-accent">
+                        <Check className="size-3" aria-hidden="true" />
+                      </span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </fieldset>
+      </details>
       <fieldset className="space-y-5">
         <legend className="mb-4 text-3xl">About you</legend>
         <p className="text-xs text-muted-foreground">Everything except your name is optional.</p>

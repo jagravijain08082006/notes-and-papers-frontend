@@ -31,7 +31,7 @@ export function UserMenu() {
           href="/login"
           className={cn(
             buttonVariants({ variant: "outline", size: "sm" }),
-            "h-8 px-2.5 text-xs font-bold uppercase tracking-wider sm:h-9 sm:px-3",
+            "h-10 px-3 text-xs font-bold uppercase tracking-wider sm:h-9",
           )}
         >
           Log in
@@ -59,39 +59,39 @@ export function UserMenu() {
 
   return (
     <div className="relative">
-    <ProfileNudge me={me} />
-    <DetailsMenu
-      className="relative"
-      summary={
-        <summary
-          aria-label="Account menu"
-          className={cn(
-            buttonVariants({ variant: "outline", size: "sm" }),
-            "cursor-pointer list-none gap-2 pl-1.5",
-          )}
-        >
-          <Avatar value={me.avatar} className="size-6" />
-          <span className="hidden max-w-28 truncate sm:inline">
-            {me.display_name ?? me.email ?? "Account"}
-          </span>
-        </summary>
-      }
-    >
-      <div className="absolute right-0 top-11 z-50 w-56 space-y-1 border-2 border-border bg-card p-2 shadow-hard">
-        <Link href="/account" className={item}>
-          <User className="size-4" aria-hidden="true" /> My account
-        </Link>
-        <Link href="/bookmarks" className={item}>
-          <Bookmark className="size-4" aria-hidden="true" /> Bookmarks
-        </Link>
-        <Link href="/downloads" className={item}>
-          <Download className="size-4" aria-hidden="true" /> Downloads
-        </Link>
-        <button type="button" onClick={signOut} className={item}>
-          <LogOut className="size-4" aria-hidden="true" /> Sign out
-        </button>
-      </div>
-    </DetailsMenu>
+      <ProfileNudge me={me} />
+      <DetailsMenu
+        className="relative"
+        summary={
+          <summary
+            aria-label="Account menu"
+            className={cn(
+              buttonVariants({ variant: "outline", size: "sm" }),
+              "h-10 cursor-pointer list-none gap-2 pl-1.5 sm:h-9",
+            )}
+          >
+            <Avatar value={me.avatar} className="size-6" />
+            <span className="hidden max-w-28 truncate sm:inline">
+              {me.display_name ?? me.email ?? "Account"}
+            </span>
+          </summary>
+        }
+      >
+        <div className="absolute right-0 top-11 z-50 w-56 space-y-1 border-2 border-border bg-card p-2 shadow-hard">
+          <Link href="/account" className={item}>
+            <User className="size-4" aria-hidden="true" /> My account
+          </Link>
+          <Link href="/bookmarks" className={item}>
+            <Bookmark className="size-4" aria-hidden="true" /> Bookmarks
+          </Link>
+          <Link href="/downloads" className={item}>
+            <Download className="size-4" aria-hidden="true" /> Downloads
+          </Link>
+          <button type="button" onClick={signOut} className={item}>
+            <LogOut className="size-4" aria-hidden="true" /> Sign out
+          </button>
+        </div>
+      </DetailsMenu>
     </div>
   );
 }

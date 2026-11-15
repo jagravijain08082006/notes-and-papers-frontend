@@ -60,41 +60,49 @@ export function SearchView() {
     router.replace(toQuery({ ...params, page: 1, ...patch }), { scroll: false });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5 sm:space-y-8">
       <div className="space-y-3 min-w-0">
-        <p className="eyebrow inline-block bg-accent px-2 py-0.5 text-accent-foreground">
+        <p className="hidden eyebrow bg-accent px-2 py-0.5 text-accent-foreground sm:inline-block">
           Search archive
         </p>
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-none">Search &amp; explore papers</h1>
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-none">Search papers</h1>
       </div>
       <SearchBar key={params.q} defaultValue={params.q} />
 
       {data && (data.facets.courses.length > 0 || data.facets.years.length > 0) && (
-        <div className="grid grid-cols-1 gap-4 border-2 border-border bg-card p-4 sm:p-5 shadow-hard-sm sm:grid-cols-2 lg:grid-cols-4 w-full min-w-0">
-          <FilterSelect
-            label="Course"
-            value={params.course ?? ""}
-            options={data.facets.courses}
-            onChange={(course) => update({ course })}
-          />
-          <FilterSelect
-            label="Year"
-            value={params.year ?? ""}
-            options={data.facets.years}
-            onChange={(year) => update({ year })}
-          />
-          <FilterSelect
-            label="Type"
-            value={params.kind ?? ""}
-            options={data.facets.kinds}
-            onChange={(kind) => update({ kind })}
-          />
-          <div className="flex items-end">
-            <Button variant="ghost" onClick={() => update({ course: "", year: "", kind: "" })}>
-              Clear filters
-            </Button>
+        <details
+          className="border border-border bg-card p-3 sm:border-2 sm:p-5 w-full min-w-0"
+          open={Boolean(params.course || params.year || params.kind)}
+        >
+          <summary className="cursor-pointer py-2 text-sm font-bold">
+            Filters{params.course || params.year || params.kind ? " · Active" : ""}
+          </summary>
+          <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+            <FilterSelect
+              label="Course"
+              value={params.course ?? ""}
+              options={data.facets.courses}
+              onChange={(course) => update({ course })}
+            />
+            <FilterSelect
+              label="Year"
+              value={params.year ?? ""}
+              options={data.facets.years}
+              onChange={(year) => update({ year })}
+            />
+            <FilterSelect
+              label="Type"
+              value={params.kind ?? ""}
+              options={data.facets.kinds}
+              onChange={(kind) => update({ kind })}
+            />
+            <div className="flex items-end">
+              <Button variant="ghost" onClick={() => update({ course: "", year: "", kind: "" })}>
+                Clear filters
+              </Button>
+            </div>
           </div>
-        </div>
+        </details>
       )}
 
       {!active ? (
@@ -182,7 +190,7 @@ function FilterSelect({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-11 w-full border-2 border-input bg-card px-2 text-sm font-medium"
+        className="h-11 w-full border-2 border-input bg-card px-2 text-base font-medium"
       >
         <option value="">All</option>
         {options.map((o) => (

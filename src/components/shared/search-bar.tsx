@@ -78,7 +78,8 @@ export function SearchBar({
   const showShimmer = open && trimmed.length >= 2 && (isDebouncing || isFetching);
   const showRecents = open && trimmed.length === 0 && recents.length > 0;
   const showEmptyNotice = open && !showShimmer && debounced.length >= 2 && suggestions.length === 0;
-  const hasDropdownContent = showShimmer || suggestions.length > 0 || showEmptyNotice || showRecents;
+  const hasDropdownContent =
+    showShimmer || suggestions.length > 0 || showEmptyNotice || showRecents;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -94,10 +95,10 @@ export function SearchBar({
   function addRecent(q: string) {
     const clean = q.trim();
     if (!clean) return;
-    const updated = [clean, ...recents.filter((r) => r.toLowerCase() !== clean.toLowerCase())].slice(
-      0,
-      MAX_RECENTS,
-    );
+    const updated = [
+      clean,
+      ...recents.filter((r) => r.toLowerCase() !== clean.toLowerCase()),
+    ].slice(0, MAX_RECENTS);
     setRecents(updated);
     saveStoredRecents(updated);
   }
@@ -142,16 +143,19 @@ export function SearchBar({
       <label htmlFor={`${listId}-input`} className="sr-only">
         Search question papers
       </label>
-      <div className="flex flex-col gap-2.5 sm:flex-row sm:gap-3">
+      <div className="flex gap-2 sm:gap-3">
         {/* Input Wrapper: Dropdown is relative to THIS box, never displaced by button on mobile */}
         <div ref={wrapperRef} className="relative min-w-0 flex-1">
           <div
             className={cn(
               "flex min-w-0 items-center gap-2.5 border-2 border-border bg-card px-3.5 transition-all focus-within:border-foreground focus-within:shadow-hard",
-              size === "lg" ? "h-12 sm:h-14" : "h-10 sm:h-11",
+              size === "lg" ? "h-12 sm:h-14" : "h-12 sm:h-11",
             )}
           >
-            <Search className="size-4 shrink-0 text-muted-foreground sm:size-5" aria-hidden="true" />
+            <Search
+              className="size-4 shrink-0 text-muted-foreground sm:size-5"
+              aria-hidden="true"
+            />
             <input
               id={`${listId}-input`}
               name="q"
@@ -166,7 +170,7 @@ export function SearchBar({
               aria-controls={listId}
               aria-autocomplete="list"
               aria-activedescendant={active >= 0 ? `${listId}-${active}` : undefined}
-              placeholder="Search subject, course, or exam..."
+              placeholder="Subject, course or exam"
               value={value}
               onFocus={() => {
                 setOpen(true);
@@ -212,7 +216,10 @@ export function SearchBar({
               </button>
             )}
             {showShimmer && (
-              <Loader2 className="size-4 shrink-0 animate-spin text-muted-foreground" aria-hidden="true" />
+              <Loader2
+                className="size-4 shrink-0 animate-spin text-muted-foreground"
+                aria-hidden="true"
+              />
             )}
           </div>
 
@@ -256,7 +263,10 @@ export function SearchBar({
                         i === active && "bg-primary",
                       )}
                     >
-                      <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                      <Search
+                        className="size-4 shrink-0 text-muted-foreground"
+                        aria-hidden="true"
+                      />
                       <span className="min-w-0 flex-1 truncate">{s}</span>
                     </li>
                   ))}
@@ -267,7 +277,9 @@ export function SearchBar({
               {showEmptyNotice && (
                 <div className="p-4 text-center text-sm text-muted-foreground">
                   <p className="font-semibold">No direct suggestions found</p>
-                  <p className="mt-1 text-xs">Press Enter or click &quot;Find papers&quot; to search the whole vault.</p>
+                  <p className="mt-1 text-xs">
+                    Press Enter or click &quot;Find papers&quot; to search the whole vault.
+                  </p>
                 </div>
               )}
 
@@ -323,13 +335,14 @@ export function SearchBar({
 
         <Button
           type="submit"
+          aria-label="Find papers"
           size={size === "lg" ? "lg" : "md"}
-          className="h-12 w-full font-bold uppercase tracking-wider shadow-hard-sm hover:shadow-hard active:translate-x-0.5 active:translate-y-0.5 sm:h-14 sm:w-auto sm:px-8"
+          className="h-12 w-12 shrink-0 px-0 font-bold uppercase tracking-wider shadow-hard-sm hover:shadow-hard sm:h-14 sm:w-auto sm:px-8"
         >
-          Find papers
+          <Search className="size-5 sm:hidden" aria-hidden="true" />
+          <span className="hidden sm:inline">Find papers</span>
         </Button>
       </div>
     </form>
   );
 }
-

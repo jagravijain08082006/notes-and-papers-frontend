@@ -38,6 +38,7 @@ export function SocialCommunityPopup() {
   const animFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
+    if (window.matchMedia("(max-width: 639px)").matches) return;
     // Check if popup was already shown in the last 24 hours
     try {
       const lastShown = localStorage.getItem(STORAGE_KEY);

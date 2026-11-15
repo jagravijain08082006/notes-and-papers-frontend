@@ -1,15 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import {
-  ExternalLink,
-  Eye,
-  EyeOff,
-  Maximize2,
-  Minimize2,
-  Printer,
-  Sparkles,
-} from "lucide-react";
+import { ExternalLink, Eye, EyeOff, Maximize2, Minimize2, Printer, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { previewUrl } from "@/lib/api/urls";
 
@@ -19,6 +11,7 @@ interface PdfPreviewProps {
   src?: string;
   blobUrl?: string | null;
   defaultOpen?: boolean;
+  autoOpenBlob?: boolean;
   pages?: number | null;
 }
 
@@ -33,10 +26,11 @@ export function PdfPreview({
   src,
   blobUrl,
   defaultOpen = false,
+  autoOpenBlob = true,
   pages,
 }: PdfPreviewProps) {
   const [userToggled, setUserToggled] = useState<boolean | null>(null);
-  const open = userToggled ?? (defaultOpen || Boolean(blobUrl));
+  const open = userToggled ?? (defaultOpen || (autoOpenBlob && Boolean(blobUrl)));
   const [isFullscreen, setIsFullscreen] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
@@ -55,9 +49,7 @@ export function PdfPreview({
     <section
       aria-labelledby={`preview-heading-${slug}`}
       className={`space-y-4 transition-all ${
-        isFullscreen
-          ? "fixed inset-0 z-[100] flex flex-col bg-background p-4 sm:p-6"
-          : ""
+        isFullscreen ? "fixed inset-0 z-[100] flex flex-col bg-background p-4 sm:p-6" : ""
       }`}
     >
       {/* TOOLBAR & HEADER */}

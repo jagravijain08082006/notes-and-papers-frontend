@@ -30,20 +30,22 @@ export default async function AccountPage() {
   ];
 
   return (
-    <div className="space-y-14">
+    <div className="space-y-8 sm:space-y-14">
       <header className="flex flex-wrap items-center justify-between gap-6">
-        <div className="flex items-center gap-5">
+        <div className="flex min-w-0 items-center gap-3 sm:gap-5">
           <Avatar
             value={me.avatar}
             label="Your avatar"
-            className="size-20 shadow-hard sm:size-24"
+            className="size-14 shrink-0 shadow-hard-sm sm:size-24 sm:shadow-hard"
           />
-          <div className="space-y-2">
-            <p className="eyebrow inline-block bg-accent px-2 py-0.5 capitalize text-accent-foreground">
+          <div className="min-w-0 space-y-2">
+            <p className="hidden eyebrow bg-accent px-2 py-0.5 capitalize text-accent-foreground sm:inline-block">
               {me.role}
             </p>
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl break-words leading-tight">{me.display_name ?? "Student"}</h1>
-            <p className="text-sm text-muted-foreground">
+            <h1 className="text-2xl sm:text-5xl lg:text-6xl break-words leading-tight">
+              {me.display_name ?? "Student"}
+            </h1>
+            <p className="break-words text-xs sm:text-sm text-muted-foreground">
               {me.email}
               {me.college ? ` · ${me.college}` : ""}
               {me.city || me.state ? ` · ${[me.city, me.state].filter(Boolean).join(", ")}` : ""}
@@ -53,22 +55,24 @@ export default async function AccountPage() {
         <SignOutButton />
       </header>
 
-      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
         {links.map(({ href, label, hint, icon: Icon }) => (
           <li key={href}>
             <Link
               href={href}
-              className="brutal brutal-hover group flex h-full items-center gap-4 p-5"
+              className="brutal brutal-hover group flex h-full items-center gap-2 p-3 sm:gap-4 sm:p-5"
             >
-              <span className="grid size-12 shrink-0 place-items-center border-2 border-border bg-primary">
+              <span className="grid size-9 shrink-0 place-items-center border border-border bg-primary sm:size-12 sm:border-2">
                 <Icon className="size-5" aria-hidden="true" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block font-bold uppercase tracking-wide">{label}</span>
-                <span className="block text-sm text-muted-foreground">{hint}</span>
+                <span className="block text-sm font-bold sm:text-base sm:uppercase sm:tracking-wide">
+                  {label}
+                </span>
+                <span className="hidden text-sm text-muted-foreground sm:block">{hint}</span>
               </span>
               <ArrowRight
-                className="size-4 transition-transform group-hover:translate-x-1"
+                className="hidden size-4 transition-transform group-hover:translate-x-1 sm:block"
                 aria-hidden="true"
               />
             </Link>
@@ -76,8 +80,8 @@ export default async function AccountPage() {
         ))}
       </ul>
 
-      <section aria-labelledby="profile-heading" className="space-y-8">
-        <h2 id="profile-heading" className="text-4xl sm:text-5xl">
+      <section aria-labelledby="profile-heading" className="space-y-5 sm:space-y-8">
+        <h2 id="profile-heading" className="text-2xl sm:text-5xl">
           Your profile
         </h2>
         <ProfileForm me={me} />

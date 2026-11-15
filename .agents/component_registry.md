@@ -13,10 +13,10 @@
 - **SiteHeader / SiteFooter / ThemeToggle / OfflineBanner:** src/components/shared/
 - **CommunityPopup (Telegram/Instagram slide-in modal with 10s auto-dismiss & close):** src/components/shared/community-popup.tsx
 - **SearchBar (GET form + suggestions, 450ms debounce, in-flight coalescing, shimmer, local history):** src/components/shared/search-bar.tsx
-- **PaperCard / PaperList / PaperListSkeleton (`Paper #{index+1}` sequence badges, safe links):** src/components/shared/paper-card.tsx, paper-list.tsx
-- **DownloadManager (countdown, auto-download, success state, embedded preview):** src/components/shared/download-manager.tsx
+- **PaperCard / PaperList / PaperListSkeleton (compact phone rows, safe links, optional mobilePreview shows four items with an external View all action; sequence/code badges on desktop):** src/components/shared/paper-card.tsx, paper-list.tsx
+- **DownloadManager (auto-download, concise status, visible error/retry, optional embedded preview):** src/components/shared/download-manager.tsx
 - **ExamsCatalogView (domain tabs: All, University, Competitive, School Board; debounced search):** src/components/shared/exams-catalog-view.tsx
-- **UniversitiesSection (home section with Universities & School Boards 4-col grid & filter pills):** src/components/shared/home-sections.tsx
+- **UniversitiesSection / ExamsSection (visible on mobile, compact two-column cards, course/board shortcuts and all EXAM_DOMAINS filter controls):** src/components/shared/home-sections.tsx
 - **ExamsSection (dynamic home/exams showcase with active filters):** src/components/shared/exams-section.tsx
 - **InteractiveCard (icon tiles for courses, terms, subjects):** src/components/shared/interactive-card.tsx
 - **Pagination (link based):** src/components/shared/pagination.tsx
@@ -28,8 +28,8 @@
 - **ProsePage (legal/static pages):** src/components/shared/prose-page.tsx
 
 - **UserMenu / SignOutButton / DevLoginForm:** src/components/shared/{user-menu,sign-out-button,dev-login-form}.tsx
-- **BookmarkButton / ReportDialog (supports variant, size) / PdfPreview:** src/components/shared/{bookmark-button,report-dialog,pdf-preview}.tsx
-- **PaperPage (high-impact hero download card + trust badges):** src/components/shared/paper-page.tsx
+- **BookmarkButton (hydration-safe saved/loading state) / ReportDialog (supports variant, size) / PdfPreview (optional autoOpenBlob, default true):** src/components/shared/{bookmark-button,report-dialog,pdf-preview}.tsx
+- **PaperPage (mobile-first download action with expandable metadata/about/preview/questions; complete SEO metadata and JSON-LD):** src/components/shared/paper-page.tsx
 - **UploadForm / ContactForm (min 16px font inputs):** src/components/shared/{upload-form,contact-form}.tsx
 - **SupportChat / SupportChatTrigger (login-required account chat, session identity, live polling, interactive tour):** src/components/shared/support-chat.tsx
 - **NoteyAvatar (animated mascot avatar with conditional semantic div/button rendering):** src/components/account/notey-avatar.tsx
