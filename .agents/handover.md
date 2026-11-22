@@ -1,3 +1,14 @@
+# Handover (2026-11-22, SEO / AEO / GEO pass)
+
+## SEO, AEO, GEO and hosting (2026-11-22)
+
+- **Hosting reality:** production is Vercel (domain `notesandpapers.dpdns.org` A records -> Vercel, DNS only). Deploy with `npm run vercel:deploy` (pushes do NOT deploy: Hobby blocks commit authors). The Cloudflare two-Worker + D1 setup (`cache-worker.js`, `app-worker.js`, `wrangler*.jsonc`, `schema.sql`, `scripts/prewarm.mjs`) is kept only as a fallback and serves no traffic. Next 16 build on Vercel prerenders ~1,300 hub pages (`src/lib/static-params.ts`, only when `VERCEL=1`); papers are ISR on first visit.
+- **Done today:** `llms.txt` and new `llms-full.txt` are routes generated from live API data (the stale static `public/llms*.txt` were deleted: public files beat routes). Paper pages show an always-visible "Quick answer" sentence plus "Last updated", and FAQ data built only from real fields (code, language, pages). Course and term pages got a visible FAQ + FAQPage JSON-LD. Organization data has `sameAs` (Telegram, Instagram) and a `contactPoint`. `/exams` title shortened (it was clipped mid-list). Next.js upgraded 16.4.1 -> 16.4.6 (build refused to finish on 16.4.1: moderate advisories up to 16.4.4).
+- **Search Console:** connected through a service account (`seo-reader@notes-and-papers-515509...`, property `https://notesandpapers.dpdns.org/`, Full permission). Env names `GOOGLE_SC_CREDENTIALS_JSON` + `GOOGLE_SC_SITE_URL` must exist on Render and as GitHub secrets for the dashboard and nightly refresh. The first key was pasted into a chat; user chose not to rotate it.
+- **Measuring gotcha:** audit scripts that count title length on raw HTML count `&amp;` as 5 characters.
+- **Also fixed:** recent-search remove buttons (act on mouse press, so the row no longer re-searches), search dropdown no longer floats over the sticky header (z-40 and closes when scrolled under it).
+- Still open: owned domain (dpdns.org is shared; Google labels results "DigitalPlat Domain"), Bing Webmaster Tools, Core Web Vitals not measured.
+
 # Handover (2026-11-12, ninth pass)
 
 ## SEO review and publishing (2026-11-15)

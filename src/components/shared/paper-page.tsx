@@ -71,7 +71,28 @@ export async function PaperPage({
       fallbackPapers = [];
     }
   }
+  // One plain sentence that states what this page is. It is shown above the fold and reused in the FAQ data, because search
+  // snippets and AI answers quote exactly this kind of direct statement. Only facts we actually hold are used.
+  const where = isCourse
+    ? ` for ${p.course_name} ${m.label}${uniName ? ` of ${uniName}` : ""}`
+    : p.exam_name && !p.title.includes(p.exam_name)
+      ? ` from ${p.exam_name}`
+      : "";
+  const quickAnswer = [
+    `${m.h1} is a ${kindLabel(p.kind).toLowerCase()}${where}${p.year ? `, ${p.year}` : ""}${p.session ? ` (${p.session})` : ""}.`,
+    p.paper_code ? `Paper code: ${p.paper_code}.` : "",
+    p.language ? `Language: ${p.language}.` : "",
+    p.pages ? `The PDF has ${p.pages} pages.` : "",
+    "It is free to download with a free account.",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const updatedOn = new Date(p.updated_at);
   const faqs = [
+    {
+      q: `What is the ${m.h1}?`,
+      a: quickAnswer,
+    },
     {
       q: `Where can I download the ${m.h1}?`,
       a: `Log in and use the download button on this page to get the ${topic} ${p.year ?? ""} PDF.`.replace(
@@ -84,6 +105,19 @@ export async function PaperPage({
       a: isCourse
         ? `It is a ${kindLabel(p.kind).toLowerCase()} for ${p.course_name} ${m.label} of ${uniName}${p.session ? `, ${p.session} session` : ""}.`
         : `It is a ${kindLabel(p.kind).toLowerCase()} listed under ${p.exam_name ?? "its exam"}${p.year ? `, ${p.year}` : ""}.`,
+    },
+    ...(p.paper_code
+      ? [{ q: `What is the paper code of the ${m.h1}?`, a: `The paper code is ${p.paper_code}.` }]
+      : []),
+    ...(p.pages
+      ? [{ q: `How many pages is the ${m.h1} PDF?`, a: `The PDF has ${p.pages} pages.` }]
+      : []),
+    ...(p.language
+      ? [{ q: `Which language is this paper in?`, a: `This paper is in ${p.language}.` }]
+      : []),
+    {
+      q: `Is this paper free?`,
+      a: `Yes. Reading this page is free, and downloading the PDF needs only a free account.`,
     },
   ];
   // For RBSE Board papers, detect nested Class & Subject for rich breadcrumbs
@@ -275,6 +309,16 @@ export async function PaperPage({
           </div>
         </section>
       </header>
+
+      <section aria-label="Quick answer" className="max-w-5xl space-y-1.5">
+        <p className="text-base font-medium leading-relaxed sm:text-xl">{quickAnswer}</p>
+        <p className="font-mono text-xs text-muted-foreground">
+          Last updated{" "}
+          <time dateTime={updatedOn.toISOString().slice(0, 10)}>
+            {updatedOn.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+          </time>
+        </p>
+      </section>
 
       <details className="max-w-5xl border-b border-border pb-4">
         <summary className="cursor-pointer py-2">

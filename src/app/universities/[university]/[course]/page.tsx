@@ -4,10 +4,11 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { EmptyState } from "@/components/shared/empty-state";
 import { InteractiveCardLink } from "@/components/shared/interactive-card";
+import { FaqAccordion } from "@/components/shared/faq-accordion";
 import { JsonLdScript } from "@/components/shared/json-ld";
 import { getCourse } from "@/lib/api/public";
 import { routes, termLabel } from "@/lib/routes";
-import { buildMetadata, collectionPageLd, courseMeta } from "@/lib/seo";
+import { buildMetadata, collectionPageLd, courseMeta, faqLd } from "@/lib/seo";
 import { plural } from "@/lib/utils";
 
 export const revalidate = 2592000;
@@ -103,6 +104,22 @@ export default async function CoursePage(props: PageProps<"/universities/[univer
   const m = courseMeta(c);
   const path = routes.course(university, course);
   const termGroups = groupTermsBySystem(c.terms, c.scheme);
+
+  const parts = c.scheme === "semester" ? "semesters" : "parts";
+  const faqs = [
+    {
+      q: `Where can I get ${c.name} previous year question papers of ${c.university_name}?`,
+      a: `${c.name} question papers of ${c.university_name} are on this page: ${c.paper_count} papers across ${c.terms.length} ${parts}${c.year_min ? `, from ${c.year_min} to ${c.year_max}` : ""}. Pick your ${c.scheme === "semester" ? "semester" : "part"}, then your subject.`,
+    },
+    {
+      q: `How many ${parts} does ${c.name} have?`,
+      a: `${c.name} has ${c.terms.length} ${parts} with papers on this site.`,
+    },
+    {
+      q: `Are the ${c.name} papers free?`,
+      a: "Yes. Every paper can be downloaded as a PDF with a free account.",
+    },
+  ];
 
   return (
     <div className="space-y-12">
@@ -221,7 +238,14 @@ export default async function CoursePage(props: PageProps<"/universities/[univer
         </div>
       )}
 
-      <JsonLdScript data={collectionPageLd(m.h1, path, m.description)} />
+      <section aria-labelledby="course-faq" className="max-w-4xl space-y-4">
+        <h2 id="course-faq" className="text-2xl sm:text-3xl">
+          Common questions
+        </h2>
+        <FaqAccordion faqs={faqs} />
+      </section>
+
+      <JsonLdScript data={[collectionPageLd(m.h1, path, m.description), faqLd(faqs)]} />
     </div>
   );
 }

@@ -92,6 +92,18 @@ export function SearchBar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // The sticky header is 64 to 80 px tall. Once the search box has scrolled up under it, the open list would be left floating
+  // over the header, so close it. (Scrolling a little while the box is still visible, e.g. when a phone keyboard opens, keeps it open.)
+  useEffect(() => {
+    if (!open) return;
+    function closeWhenHidden() {
+      const box = wrapperRef.current?.getBoundingClientRect();
+      if (box && box.bottom < 84) setOpen(false);
+    }
+    window.addEventListener("scroll", closeWhenHidden, { passive: true });
+    return () => window.removeEventListener("scroll", closeWhenHidden);
+  }, [open]);
+
   function addRecent(q: string) {
     const clean = q.trim();
     if (!clean) return;
@@ -228,7 +240,7 @@ export function SearchBar({
             <div
               id={listId}
               role="listbox"
-              className="absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden border-2 border-border bg-card shadow-hard"
+              className="absolute left-0 right-0 top-full z-40 mt-1.5 overflow-hidden border-2 border-border bg-card shadow-hard"
             >
               {/* Case 1: Shimmer skeleton while typing (debouncing / fetching) */}
               {showShimmer && (

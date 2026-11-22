@@ -9,7 +9,7 @@ import { plural } from "@/lib/utils";
 export const revalidate = 604800;
 
 export const metadata = buildMetadata({
-  title: "Exam & Board Question Papers: UPSC, SSC, NEET, GATE, UGC NET, CBSE",
+  title: "Exam & Board Question Papers: UPSC, SSC, NEET, GATE",
   description:
     "Categorized previous year question papers for competitive exams, police, banking, civil services and school boards: UPSC, SSC, GATE, NEET, UGC NET, state PSCs and more.",
   path: "/exams",

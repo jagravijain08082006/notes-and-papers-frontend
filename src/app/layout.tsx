@@ -8,7 +8,7 @@ import { OfflineBanner } from "@/components/shared/offline-banner";
 import { SocialCommunityPopup } from "@/components/shared/social-popup";
 import { SupportChat } from "@/components/shared/support-chat";
 import { JsonLdScript } from "@/components/shared/json-ld";
-import { SITE_NAME, SITE_URL } from "@/lib/env";
+import { CONTACT_EMAIL, INSTAGRAM_URL, SITE_NAME, SITE_URL, TELEGRAM_URL } from "@/lib/env";
 
 const display = Anton({
   variable: "--font-display",
@@ -131,7 +131,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                   name: SITE_NAME,
                   legalName: SITE_NAME,
                   url: `${SITE_URL}/`,
-                  sameAs: [`${SITE_URL}/`, "https://www.notesandpapers.dpdns.org/"],
+                  // The brand's own channels, so search and AI systems can tie them to this site.
+                  sameAs: [TELEGRAM_URL, INSTAGRAM_URL],
+                  contactPoint: {
+                    "@type": "ContactPoint",
+                    contactType: "customer support",
+                    email: CONTACT_EMAIL,
+                    availableLanguage: ["English", "Hindi"],
+                  },
                   logo: {
                     "@type": "ImageObject",
                     url: `${SITE_URL}/icon-192.png`,

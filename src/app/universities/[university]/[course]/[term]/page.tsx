@@ -4,10 +4,11 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { EmptyState } from "@/components/shared/empty-state";
 import { InteractiveCardLink } from "@/components/shared/interactive-card";
+import { FaqAccordion } from "@/components/shared/faq-accordion";
 import { JsonLdScript } from "@/components/shared/json-ld";
 import { getTerm } from "@/lib/api/public";
 import { routes, yearRange } from "@/lib/routes";
-import { buildMetadata, collectionPageLd, itemListLd, termMeta } from "@/lib/seo";
+import { buildMetadata, collectionPageLd, faqLd, itemListLd, termMeta } from "@/lib/seo";
 import { plural } from "@/lib/utils";
 import { prebuiltPaths } from "@/lib/static-params";
 
@@ -49,6 +50,25 @@ export default async function TermPage(
   if (!t) notFound();
   const m = termMeta(t);
   const path = routes.term(university, course, term);
+  const faqs = [
+    {
+      q: `Where can I find ${t.course.name} ${m.label} question papers of ${t.university.name}?`,
+      a: `They are on this page: ${t.paper_count} previous year papers across ${t.subjects.length} subjects${t.year_min ? `, from ${yearRange(t.year_min, t.year_max)}` : ""}. Pick a subject to see every available year.`,
+    },
+    {
+      q: `Which subjects are in ${t.course.name} ${m.label}?`,
+      a: t.subjects.length
+        ? `${t.subjects
+            .slice(0, 8)
+            .map((s) => s.name)
+            .join(", ")}${t.subjects.length > 8 ? ` and ${t.subjects.length - 8} more` : ""}.`
+        : "Papers for this term are being added.",
+    },
+    {
+      q: `Can I download these papers for free?`,
+      a: "Yes. Every paper is a PDF you can download with a free account.",
+    },
+  ];
 
   return (
     <div className="space-y-12">
@@ -125,9 +145,17 @@ export default async function TermPage(
         </div>
       )}
 
+      <section aria-labelledby="term-faq" className="max-w-4xl space-y-4">
+        <h2 id="term-faq" className="text-2xl sm:text-3xl">
+          Common questions
+        </h2>
+        <FaqAccordion faqs={faqs} />
+      </section>
+
       <JsonLdScript
         data={[
           collectionPageLd(m.h1, path, m.description),
+          faqLd(faqs),
           itemListLd(
             t.subjects.map((s) => ({
               name: s.name,
