@@ -39,5 +39,11 @@ try {
     execSync("npx vercel deploy --prod --yes", { cwd: tmp, stdio: "inherit" });
   }
 } finally {
-  rmSync(tmp, { recursive: true, force: true, maxRetries: 8, retryDelay: 250 });
+  // Windows (antivirus, the Vercel CLI) can keep the folder locked for longer than the retries. The deploy has already succeeded
+  // by now, so a leftover temporary folder must never turn it into an error.
+  try {
+    rmSync(tmp, { recursive: true, force: true, maxRetries: 8, retryDelay: 250 });
+  } catch {
+    console.warn(`Could not remove the temporary folder ${tmp}; it is safe to delete later.`);
+  }
 }
