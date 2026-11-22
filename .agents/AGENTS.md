@@ -1,7 +1,7 @@
 # Frontend agent rules (notes-and-papers-frontend-repo)
 
 Read first: `frontend_master_template.md` (house rules), `docs/projectflow.md` (product spec: sections 2, 9, 10, 11, 13),
-then this folder. Update these files as you work; write `handover.md` before stopping.
+then this folder. Update these files as you work; write `handover.md` before stopping..
 
 ## Project in one line
 SEO-first Next.js site for Rajasthan University previous-year papers. Talks to the separate FastAPI repo
