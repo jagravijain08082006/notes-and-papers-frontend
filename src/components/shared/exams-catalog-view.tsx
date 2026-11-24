@@ -183,30 +183,30 @@ export function ExamsCatalogView({
                       <li key={e.slug}>
                         <Link
                           href={routes.exam(e.slug)}
-                          className="brutal brutal-hover group flex h-full flex-col justify-between gap-3 p-3 sm:gap-5 sm:p-5 bg-card transition-all"
+                          className="brutal brutal-hover group flex h-full min-h-42 flex-col justify-between gap-3 p-3.5 sm:min-h-0 sm:gap-5 sm:p-5 bg-card transition-all active:translate-x-0.5 active:translate-y-0.5"
                         >
                           <div className="space-y-3">
                             <div className="flex items-start justify-between gap-2">
                               <span
                                 className={cn(
-                                  "hidden size-11 place-items-center sm:grid border-2 border-border shadow-hard-sm transition-colors group-hover:bg-accent group-hover:text-accent-foreground",
+                                  "grid size-9 place-items-center sm:size-11 border-2 border-border shadow-hard-sm transition-colors group-hover:bg-accent group-hover:text-accent-foreground",
                                   idx % 2 === 0
                                     ? "bg-primary text-primary-foreground"
                                     : "bg-accent text-accent-foreground",
                                 )}
                               >
-                                <DomainIcon className="size-5 shrink-0" aria-hidden="true" />
+                                <DomainIcon className="size-4 shrink-0 sm:size-5" aria-hidden="true" />
                               </span>
                               <span className="hidden sm:inline eyebrow border border-border/40 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                                 {e.kind === "board" ? "School Board" : domain.label}
                               </span>
                             </div>
-                            <span className="line-clamp-3 block text-sm font-bold leading-snug text-foreground sm:line-clamp-2 sm:font-display sm:text-2xl sm:font-normal sm:uppercase">
+                            <span className="line-clamp-3 block text-[15px] font-bold leading-tight text-foreground sm:line-clamp-2 sm:font-display sm:text-2xl sm:font-normal sm:uppercase">
                               {e.displayName}
                             </span>
                           </div>
                           <span className="flex items-center justify-between border-t border-border pt-2 text-xs text-muted-foreground sm:eyebrow sm:border-t-2 sm:pt-3">
-                            <span className="font-bold text-foreground">
+                            <span className="border border-border bg-primary/40 px-1.5 py-0.5 font-bold text-foreground sm:border-0 sm:bg-transparent sm:p-0">
                               {plural(e.paper_count, "paper")}
                             </span>
                             <span className="flex items-center gap-2">
@@ -262,30 +262,30 @@ export function ExamsCatalogView({
                   <li key={e.slug}>
                     <Link
                       href={routes.exam(e.slug)}
-                      className="brutal brutal-hover group flex h-full flex-col justify-between gap-3 p-3 sm:gap-5 sm:p-5 bg-card transition-all"
+                      className="brutal brutal-hover group flex h-full min-h-42 flex-col justify-between gap-3 p-3.5 sm:min-h-0 sm:gap-5 sm:p-5 bg-card transition-all active:translate-x-0.5 active:translate-y-0.5"
                     >
                       <div className="space-y-3">
                         <div className="flex items-start justify-between gap-2">
                           <span
                             className={cn(
-                              "hidden size-11 place-items-center sm:grid border-2 border-border shadow-hard-sm transition-colors group-hover:bg-accent group-hover:text-accent-foreground",
+                              "grid size-9 place-items-center sm:size-11 border-2 border-border shadow-hard-sm transition-colors group-hover:bg-accent group-hover:text-accent-foreground",
                               idx % 2 === 0
                                 ? "bg-primary text-primary-foreground"
                                 : "bg-accent text-accent-foreground",
                             )}
                           >
-                            <DomainIcon className="size-5 shrink-0" aria-hidden="true" />
+                            <DomainIcon className="size-4 shrink-0 sm:size-5" aria-hidden="true" />
                           </span>
                           <span className="hidden sm:inline eyebrow border border-border/40 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
                             {e.kind === "board" ? "School Board" : e.domainLabel}
                           </span>
                         </div>
-                        <span className="line-clamp-3 block text-sm font-bold leading-snug text-foreground sm:line-clamp-2 sm:font-display sm:text-2xl sm:font-normal sm:uppercase">
+                        <span className="line-clamp-3 block text-[15px] font-bold leading-tight text-foreground sm:line-clamp-2 sm:font-display sm:text-2xl sm:font-normal sm:uppercase">
                           {e.displayName}
                         </span>
                       </div>
                       <span className="flex items-center justify-between border-t border-border pt-2 text-xs text-muted-foreground sm:eyebrow sm:border-t-2 sm:pt-3">
-                        <span className="font-bold text-foreground">
+                        <span className="border border-border bg-primary/40 px-1.5 py-0.5 font-bold text-foreground sm:border-0 sm:bg-transparent sm:p-0">
                           {plural(e.paper_count, "paper")}
                         </span>
                         <span className="flex items-center gap-2">

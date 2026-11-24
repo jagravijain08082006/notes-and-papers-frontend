@@ -76,6 +76,10 @@ export const metadata: Metadata = {
   },
   verification: {
     google: "6kg8ml3F16HFts5p3ygtf5Kpr93ve4XNjX5fcRVbPl8",
+    // Bing Webmaster Tools: set NEXT_PUBLIC_BING_VERIFICATION to the "content" value of the msvalidate.01 meta tag.
+    ...(process.env.NEXT_PUBLIC_BING_VERIFICATION
+      ? { other: { "msvalidate.01": process.env.NEXT_PUBLIC_BING_VERIFICATION } }
+      : {}),
   },
 };
 

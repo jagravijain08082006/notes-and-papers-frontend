@@ -165,14 +165,23 @@ export default {
         headers: { location: url.toString(), "cache-control": "public, max-age=86400" },
       });
     }
+    // Public pages do not depend on who is signed in (the header asks /api/me from the browser), so a signed-in visitor is
+    // served the same saved page as everyone else. On a miss it is rendered WITHOUT the visitor's cookies, so the saved
+    // copy can never contain anything private. Page-data (`rsc`) requests of signed-in visitors still go to the app.
+    const hasSession = SESSION.test(request.headers.get("cookie") || "") || request.headers.has("authorization");
     const cacheable =
       request.method === "GET" &&
       !PRIVATE.test(url.pathname) &&
       !url.hostname.startsWith("www.") &&
-      !SESSION.test(request.headers.get("cookie") || "") &&
-      !request.headers.has("authorization") &&
+      !(hasSession && request.headers.has("rsc")) &&
       !request.headers.has("range");
     if (!cacheable) return callApp(request, env);
+    if (hasSession) {
+      const headers = new Headers(request.headers);
+      headers.delete("cookie");
+      headers.delete("authorization");
+      request = new Request(request.url, { method: "GET", headers });
+    }
 
     const cache = caches.default;
     const deploy = env.CF_VERSION_METADATA?.id ?? "dev";
